@@ -1,0 +1,16 @@
+page,url
+Tagesschau,https://www.tagesschau.de/xml/rss2/
+Heute,https://www.zdf.de/rss/zdf/nachrichten
+T-Online,https://feeds.t-online.de/rss/nachrichten
+Bild,"https://www.bild.de/rssfeeds/vw-alles/vw-alles-26970192,dzbildplus=false,sort=1,teaserbildmobil=false,view=rss2,wtmc=ob.feed.bild.xml"
+NTV,https://www.n-tv.de/rss
+Focus,https://rss.focus.de/fol/XML/rss_folnews.xml
+Welt,https://www.welt.de/feeds/latest.rss
+FAZ,https://www.faz.net/rss/aktuell/
+Spiegel,https://www.spiegel.de/schlagzeilen/index.rss
+RND,https://www.rnd.de/arc/outboundfeeds/rss/category/e-mobility/
+stern,https://www.stern.de/feed/standard/alle-nachrichten/
+Zeit,https://newsfeed.zeit.de/all
+Sueddeutsche,https://rss.sueddeutsche.de/app/service/rss/alles/index.rss?output=rss
+Handelsblatt,https://www.handelsblatt.com/contentexport/feed/schlagzeilen
+Taz,https://taz.de/!p4608;rss/

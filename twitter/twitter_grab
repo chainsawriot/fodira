@@ -1,0 +1,29 @@
+#!/usr/bin/env Rscript
+
+args <- commandArgs(trailingOnly=TRUE)
+handle <- args[1]
+message(handle)
+## debug
+## handle <- "bundeskanZLer"
+
+## debug
+##Sys.setenv(TWEET_DB="~/dev/fodira/twitter/test.duckdb")
+.scrape <- function(handle) {
+    db <- Sys.getenv("TWEET_DB")
+    if (db == "") {
+        stop("Please setup `TWEET_DB`!")
+    }
+    con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db , read_only = FALSE)
+all_users <- DBI::dbGetQuery(con, "SELECT distinct user_username FROM tweets")
+    DBI::dbDisconnect(con, shutdown = TRUE)
+    output_dir <- academictwitteR:::.gen_random_dir()
+    if (tolower(handle) %in% tolower(all_users$user_username)) {
+        academictwitteR::get_all_tweets(users = handle, n = Inf, bind_tweets = FALSE, data_path = output_dir, verbose = FALSE)
+    } else {
+        academictwitteR::get_all_tweets(users = handle, n = Inf, bind_tweets = FALSE, data_path = output_dir, start_tweets = "2021-12-31T00:00:00Z", verbose = FALSE)
+    }
+    academicquacker::quack(output_dir, db = db, db_close = TRUE, convert_date = TRUE, verbose = FALSE, return_con = FALSE)
+    unlink(output_dir, recursive = TRUE)
+}
+
+.scrape(handle)

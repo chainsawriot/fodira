@@ -3,7 +3,7 @@
 ## install.packages(c("tidyRSS", "purrr", "dplyr"))
 
 args <- commandArgs(trailingOnly=TRUE)
-csv <- args[2]
+csv <- args[1]
 ## for debug
 ##csv <- "rss_list.csv"
 

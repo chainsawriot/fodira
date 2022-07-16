@@ -1,0 +1,7 @@
+# Usage
+
+```sh
+chmod +x page_dl
+./page_dl https://www.tagesschau.de/inland/lauterbach-vierte-impfung-corona-103.html
+```
+

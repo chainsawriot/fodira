@@ -13,15 +13,26 @@ chmod+x twitter_grab
 ./twitter_grab zdfheute
 ```
 
-If there is no data in the DB, `twitter_grab` will collect data from 2021-12-31 up to now. The next time it runs, it will only collect data from the last 30 days.
+Actually, you can put more than one handle
 
-If we run it daily, we will at least have the like counts / comment counts etc. of a tweet in 30 days.
+```sh
+./twitter_grab zdfheute tagesschau
+```
 
 To loop through handles in a text file, e.g. poli.txt
 
 ```sh
-while read p; do
-  ./twitter_grab $p
-done <poli.txt
+./twitter_grab < poli.txt
 ```
 
+Or as an input text stream
+
+```sh
+cat poli.txt | ./twitter_grab
+```
+
+# Storage logic
+
+If there is no data in the DB for a given handle, `twitter_grab` will collect data from 2021-12-31 up to now. The next time it runs, it will only collect data from the last 30 days for that handle.
+
+If we run it daily, we will at least have the like counts / comment counts etc. of a tweet in 30 days.

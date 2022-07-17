@@ -1,14 +1,21 @@
 #!/usr/bin/env Rscript
 
 args <- commandArgs(trailingOnly=TRUE)
-handle <- args[1]
-message(handle)
+if (length(args) == 0) {
+    handles <- readLines(file("stdin"))
+} else {
+    handles <- args
+}
 ## debug
-## handle <- "bundeskanZLer"
+## handles <- "bundeskanZLer"
 
 ## debug
 ##Sys.setenv(TWEET_DB="~/dev/fodira/twitter/test.duckdb")
 .scrape <- function(handle) {
+    if (is.na(handle)) {
+        return(invisible(handle))
+    }
+    message(handle)
     db <- Sys.getenv("TWEET_DB")
     if (db == "") {
         stop("Please setup `TWEET_DB`!")
@@ -26,4 +33,4 @@ all_users <- DBI::dbGetQuery(con, "SELECT distinct user_username FROM tweets")
     unlink(output_dir, recursive = TRUE)
 }
 
-.scrape(handle)
+purrr::walk(handles, .scrape)

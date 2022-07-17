@@ -16,7 +16,10 @@ if (Sys.getenv("ARTICLE_DIR") == "") {
 ## urls <- "https://www.bild.de/regional/hamburg/hamburg-aktuell/soltau-auf-dem-weg-in-den-knast-nach-dem-pinkeln-schuettelte-er-die-polizisten-a-80708066.bild.html?wtmc=ob.feed"
 ## Sys.setenv("ARTICLE_DIR" = "~/dev/fodira/page_dl/html")
 
-rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+ff_options <- list("moz:firefoxOptions" = list(args = list('--headless')))
+
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE,
+                          extraCapabilities = ff_options)
 remDr <- rD[["client"]]
 
 .scrape <- function(url, remDr, sleep = 1) {

@@ -1,24 +1,42 @@
 #!/usr/bin/env Rscript
+
 args <- commandArgs(trailingOnly=TRUE)
-url <- args[1]
+if (length(args) == 0) {
+    urls <- readLines(file("stdin"))
+} else {
+    urls <- args
+}
+
+
 if (Sys.getenv("ARTICLE_DIR") == "") {
     stop("Please set `ARTICLE_DIR`!")
 }
 
 ## debug
-## url <- "https://www.bild.de/regional/hamburg/hamburg-aktuell/soltau-auf-dem-weg-in-den-knast-nach-dem-pinkeln-schuettelte-er-die-polizisten-a-80708066.bild.html?wtmc=ob.feed"
+## urls <- "https://www.bild.de/regional/hamburg/hamburg-aktuell/soltau-auf-dem-weg-in-den-knast-nach-dem-pinkeln-schuettelte-er-die-polizisten-a-80708066.bild.html?wtmc=ob.feed"
 ## Sys.setenv("ARTICLE_DIR" = "~/dev/fodira/page_dl/html")
 
 rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
 remDr <- rD[["client"]]
-remDr$navigate(url)
-src <- remDr$getPageSource()
 
-url_hash <- digest::sha1(url, digits = 40)
+.scrape <- function(url, remDr, sleep = 1) {
+    message(url)
+    if (is.na(url)) {
+        return(tibble::tibble(url = NA, fname = NA))
+    }
+    remDr$navigate(url)
+    src <- remDr$getPageSource()
+    url_hash <- digest::sha1(url, digits = 40)
+    fname <- paste0(url_hash, "_" ,Sys.time(), ".html")
+    writeLines(src[[1]], file.path(Sys.getenv("ARTICLE_DIR"), fname))
+    Sys.sleep(sleep)
+    return(tibble::tibble(url = url, fname = fname))
+}
 
-fname <- paste0(url_hash, "_" ,Sys.time(), ".html")
-
-writeLines(src[[1]], file.path(Sys.getenv("ARTICLE_DIR"), fname))
+res <- purrr::map_dfr(urls, .scrape, remDr = remDr)
 
 remDr$close()
 z <- rD$server$stop()
+
+## Should push this back to the DB
+res

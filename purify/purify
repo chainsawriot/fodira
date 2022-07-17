@@ -1,0 +1,15 @@
+#!/usr/bin/env Rscript
+
+args <- commandArgs(trailingOnly=TRUE)
+if (length(args) == 0) {
+    json_file<- readLines(file("stdin"))
+} else {
+    json_file<- args
+}
+
+content <- jsonlite::read_json(json_file)
+
+out <- stringr::str_replace_all(stringr::str_replace_all(content$textContent, "\n[ \n]+\n", "\n"), " +", " ")
+
+
+cat(stringr::str_trim(out, "both"))

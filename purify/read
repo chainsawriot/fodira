@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+var DOMParser = require('linkedom').DOMParser;
+var Readability = require('@mozilla/readability').Readability;
+const process = require('process');
+
+function read_parse(fname) {
+    const data = fs.readFileSync(fname, 'utf8');
+    const doc = new DOMParser().parseFromString(data, 'text/html');
+    const reader = new Readability(doc);
+    const res = reader.parse();
+    let json_data = JSON.stringify(res);
+    let json_fname = fname + ".json";
+    fs.writeFileSync(json_fname, json_data);
+    return(json_fname);
+}
+
+const arg = process.argv.slice(2);
+console.log(read_parse(arg[0]));

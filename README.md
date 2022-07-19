@@ -11,3 +11,4 @@ The project depends on the following envvars. Please set these envvars in the *r
 
 The project needs R (for most of the data collection) and node (for [readability](https://github.com/mozilla/readability)).
 
+i chan

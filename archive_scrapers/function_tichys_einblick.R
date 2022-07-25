@@ -34,8 +34,6 @@ tichy_getlink_url <- function(url){
   return(tichy_getlink(pjs_session$getSource()))
 }
 
-tichy_getlink_url("https://www.tichyseinblick.de/tichys-einblick/")
-
 tichy_go_thr_columns <- function(rubrik, startdate){
   i <- 1
   j <- 1

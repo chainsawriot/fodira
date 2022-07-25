@@ -9,51 +9,46 @@ pjs_session <- Session$new(port = pjs_instance$port)
 Sys.setlocale("LC_TIME", "de_DE")
 
 #function for geting links from page
-tichy_getlink <- function(html){
+compact_getlink <- function(html){
 
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'entry-content')]//div[contains(@class, 'category-content-title')]/a") %>% 
+    rvest::html_elements(xpath = "//div[contains(@class, 'content')]//h2/a") %>% 
     rvest::html_text(., trim = TRUE) -> item_title
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'entry-content')]//div[contains(@class, 'category-content-title')]/a") %>% 
+    rvest::html_elements(xpath = "//div[contains(@class, 'content')]//h2/a") %>% 
     rvest::html_attr("href")  -> item_link
-  
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'entry-content')]//span[contains(@class, 'date')]") %>% 
-    rvest::html_text(., trim = TRUE) %>% 
-    as.Date(., tryFormat = c("%d. %B %Y")) -> item_pubdate
     
-    df <- data.frame(item_title, item_link, item_pubdate)
+    df <- data.frame(item_title, item_link)
     return(df)
 }
 
-tichy_getlink_url <- function(url){
+compact_getlink_url <- function(url){
   pjs_session$go(url)
   print(url)
-  return(tichy_getlink(pjs_session$getSource()))
+  return(compact_getlink(pjs_session$getSource()))
 }
 
-tichy_getlink_url("https://www.tichyseinblick.de/tichys-einblick/")
 
-tichy_go_thr_columns <- function(rubrik, startdate){
-  i <- 1
-  j <- 1
+compact_go_thr_columns <- function(endnr){
   valid_links <- data.frame()
-  while (i > 0) {
-    tichy_getlink_url(paste0("https://www.tichyseinblick.de/", rubrik, "/page/", j, "/")) %>% 
-      subset(item_pubdate>=as.Date(startdate)) -> subset_links
-    i <- nrow(subset_links)
-    j <- j + 1
+  for (i in 1:endnr) {
+    paste0("https://www.compact-online.de/compact-aktuell/page/", i, "/") %>%
+      purrr::map_df(~compact_getlink_url(.)) -> subset_links
     valid_links <- rbind(valid_links, subset_links)
+    # k=k+1
+    # if (k > 50){
+    #   print("wait")
+    #   Sys.sleep(90)
+    #   k <- 0
+    # }
   }
   return(valid_links)
 }
 
 
-c("tichys-einblick", "kolumnen", "gastbeitrag", "daili-es-sentials", 
-  "meinungen", "feuilleton", "wirtschaft") %>% 
-  purrr::map_dfr(~tichy_go_thr_columns(., startdate = "2022-01-01")) -> valid_links
+
+compact_go_thr_columns(100) -> valid_links
 
 
 

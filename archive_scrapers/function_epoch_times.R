@@ -34,58 +34,43 @@ epoch_getlink <- function(html){
     return(df)
 }
 
-epoch_getdate <- function(html){
-
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//span[contains(@class, 'publish-date')]") %>% 
-    rvest::html_text(., trim = TRUE) %>% 
-    as.Date(., tryFormat = c("%d. %B %Y")) -> item_pubdate
-  
-  return(item_pubdate)
-}
-
-epoch_getdate_url <- function(url){
-  pjs_session$go(url)
-  print(url)
-  Sys.sleep(3)
-  return(epoch_getdate(pjs_session$getSource()))
-}
 
 epoch_getlink_url <- function(url){
   pjs_session$go(url)
   print(url)
+  pjs_session$getSource()
   df <- epoch_getlink(pjs_session$getSource())
-  df$item_pubdate <- df$item_link %>% purrr::map_chr(~epoch_getdate_url(.))
   return(df)
 }
 
-pjs_session$go("https://www.epochtimes.de/politik/page/3")
+x <- FALSE
 
-df <- epoch_getlink(pjs_session$getSource())
-df$item_pubdate <- df$item_link %>% purrr::map_chr(~epoch_getdate_url(.))
+class(x)
 
-x <- epoch_getlink_url("https://www.epochtimes.de/politik/page/3")
+epoch_go_thr_columns <- function(rubrik, endnr){
 
-lcm_go_thr_columns <- function(rubrik, startdate){
-  i <- 1
-  j <- 1
+  # k <- 0
   valid_links <- data.frame()
-  while (i > 0) {
-    lcm_getlink_url(paste0("https://lowerclassmag.com/category/", rubrik, "/page/", j, "/")) %>% 
-      subset(item_pubdate>=as.Date(startdate)) -> subset_links
-    i <- nrow(subset_links)
-    j <- j + 1
+  for (i in 1:endnr) {
+    paste0("https://www.epochtimes.de/", rubrik, "/page/", i, "/") %>%
+      purrr::map_df(~epoch_getlink_url(.)) -> subset_links
     valid_links <- rbind(valid_links, subset_links)
+    # k=k+1
+    # if (k > 50){
+    #   print("wait")
+    #   Sys.sleep(90)
+    #   k <- 0
+    # }
   }
+
   return(valid_links)
 }
 
 
-c("themen/inland", "themen/ausland", "themen/wirtschaft", "themen/kultur", 
-  "lcm-columns/hinter-feindlichen-linien", "lcm-columns/anger-management",
-  "lcm-columns/schabers-hass", "lcm-columns/bafi-im-bann-der-daemonen") %>% 
-  purrr::map_dfr(~lcm_go_thr_columns(., startdate = "2022-01-01")) -> valid_links
+c("politik", "wirtschaft", "gesundheit", 
+  "meinung", "china", "feuilleton") %>% 
+  purrr::map_dfr(~epoch_go_thr_columns(., endnr = 300)) -> valid_links
 
-
+df <- epoch_getlink(pjs_session$getSource())
 
 

@@ -1,52 +1,56 @@
-
-require(webdriver)
+require(RSelenium)
 require(magrittr)
-pjs_instance <- run_phantomjs()
-pjs_session <- Session$new(port = pjs_instance$port)
 
-
-#Sys.setlocale("LC_TIME", "C")
-Sys.setlocale("LC_TIME", "de_DE")
-
-#function for geting links from page
-ak_getlink <- function(html){
-
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//li[contains(@class, 'article-item article-item--type-issue')]//h3//a") %>% 
-    rvest::html_text(., trim = TRUE) -> item_title
-  
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//li[contains(@class, 'article-item article-item--type-issue')]//h3//a") %>% 
-    rvest::html_attr("href")  -> item_link
-  
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//small[contains(@class, 'issue-header__publication-date t-small-sl s-m-b-8')]") %>% 
-    rvest::html_text(., trim = TRUE) %>% 
-    as.Date(., tryFormat = c("%d. %B %Y")) -> item_pubdate
-    
-    df <- data.frame(item_title, item_link, item_pubdate)
-    return(df)
+.process_html <- function(src, slug) {
+    psrc <- rvest::read_html(src)
+    titles <- rvest::html_elements(psrc, css = "a.js-article-card-url")
+    title <- titles %>% rvest::html_text() %>% stringr::str_trim()
+    link <- titles %>% rvest::html_attr("href")
+    return(tibble::tibble(title = title, link = link, slug = slug))
 }
 
-ak_getlink_url <- function(url){
-  pjs_session$go(url)
-  print(url)
-  return(ak_getlink(pjs_session$getSource()))
+## slug <- slugs[4]
+## url <- paste0(base_url, slugs[4])
+## remDr$navigate(url)
+
+.scrape <- function(slug, max_pages = 30, debug = FALSE) {
+    rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+    remDr <- rD[["client"]]
+
+    url <- paste0("https://www.freitag.de/", slug)
+    remDr$navigate(url)
+    x <- readline("Please click the cookies thing.")
+    res <- tibble::tibble()
+    counter <- 1
+    cont <- TRUE
+    while(cont) {
+        Sys.sleep(2)
+        if (debug) {
+            message("Flip")
+        }
+        click_next <- tryCatch({
+            webElem <- remDr$findElement(using = "css", "a[title='Next Page']")
+            webElem$clickElement()
+            TRUE
+        }, error = function(e) {
+            return(FALSE)
+        })
+        if (click_next) {
+            counter <- counter + 1
+        } else {
+            cont <- FALSE
+        }
+        src <- remDr$getPageSource()[[1]]
+        links <- .process_html(src, slug)
+        res <- dplyr::bind_rows(res, links)
+        if (counter > max_pages) {
+            cont <- FALSE
+        }
+    }
+    remDr$close()
+    z <- rD$server$stop()
+    return(res)
 }
 
-
-ak_go_thr_archive <- function(start_issue, end_issue){
-  V1<- end_issue:start_issue
-  
-  V1 %>% as.character() %>%
-    paste0("https://www.akweb.de/ausgaben/", .) %>%
-    purrr::map_df(~ak_getlink_url(.)) -> valid_links
-  
-  return(valid_links)
-}
-
-valid_links <- ak_go_thr_archive("678", "683")
-
-
-
-
+slugs <- c("politik", "wirtschaft", "kultur", "gruenes-wissen", "debatte")
+valid_links <- purrr::map_dfr(slugs, .scrape, max_pages = 30)

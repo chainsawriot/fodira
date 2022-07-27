@@ -1,8 +1,7 @@
-
-require(webdriver)
+require(RSelenium)
 require(magrittr)
-pjs_instance <- run_phantomjs()
-pjs_session <- Session$new(port = pjs_instance$port)
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+remDr <- rD[["client"]]
 
 
 #Sys.setlocale("LC_TIME", "C")
@@ -11,35 +10,41 @@ Sys.setlocale("LC_TIME", "de_DE")
 #function for geting links from page
 mmn_getlink <- function(html){
 
-  rvest::read_html(pjs_session$getSource()) %>% 
+  rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//article//h2/a") %>% 
     rvest::html_text(trim = TRUE) -> item_title
   
-  rvest::read_html(pjs_session$getSource()) %>% 
+  rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//article//h2/a") %>% 
-    rvest::html_attr("href")  -> paste0("https://www.mmnews.de", .) -> item_link
+    rvest::html_attr("href") %>% paste0("https://www.mmnews.de", .) -> item_link
   
+  stringr::str_extract(item_link, "[0-9]{4}[0-9]+") -> item_number
   
-  df <- data.frame(item_title, item_link)
+  df <- data.frame(item_title, item_link, item_number)
     return(df)
 }
 
 
+
+
 mmn_getlink_url <- function(url){
-  pjs_session$go(url)
+  remDr$navigate(url)
   print(url)
-  pjs_session$getSource()
-  df <- mmn_getlink(pjs_session$getSource())
+  df <- mmn_getlink(remDr$getPageSource()[[1]])
   return(df)
 }
 
 
-mmn_go_thr_columns <- function(rubrik, endnr){
-  # k <- 0
+mmn_go_thr_columns <- function(rubrik){
+  i <- 1
+  j <- 0
+  m <- ifelse(rubrik == "aktuelle-presse", 15,7)
   valid_links <- data.frame()
-  for (i in 0:endnr) {
-    paste0("https://www.mmnews.de/", rubrik, "?start=", i*15, "/") %>%
-      purrr::map_df(~mmn_getlink_url(.)) -> subset_links
+  while (i > 0) {
+    paste0("https://www.mmnews.de/", rubrik, "?start=", j*m, "/") %>%
+      purrr::map_df(~mmn_getlink_url(.)) %>% subset(., item_number > 174900)-> subset_links
+    i <- nrow(subset_links)
+    j <- j+1
     valid_links <- rbind(valid_links, subset_links)
     # k=k+1
     # if (k > 50){
@@ -55,8 +60,7 @@ mmn_go_thr_columns <- function(rubrik, endnr){
 
 c("aktuelle-presse", "wirtschaft", "boerse", 
   "politik", "gold", "vermischtes", "witziges") %>% 
-  purrr::map_dfr(~mmn_go_thr_columns(., endnr = 600)) -> valid_links
+  purrr::map_dfr(~mmn_go_thr_columns(.)) -> valid_links
 
-
-test <- mmn_getlink_url("https://www.mmnews.de/aktuelle-presse?start=15/")
-
+remDr$close()
+z <- rD$server$stop()

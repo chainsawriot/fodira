@@ -52,6 +52,7 @@ c("world", "deutschland", "our_class", "antirassismus", "jugend", "frauen-und-lg
   "geschichte-und-kultur", "hintergruende") %>% 
   purrr::map_dfr(~klggkl_go_thr_columns(., startdate = "2022-01-01")) -> valid_links
 
+valid_links <- dplyr::distinct(valid_links)
 
 
 

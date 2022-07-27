@@ -40,7 +40,7 @@ lcm_go_thr_columns <- function(rubrik, startdate){
   j <- 1
   valid_links <- data.frame()
   while (i > 0) {
-    lcm_getlink_url(paste0("https://lowerclassmag.com/category/", rubrik, "/page/", j, "/")) %>% 
+    lcm_getlink_url(paste0("https://lowerclassmag.com/", rubrik, "/page/", j, "/")) %>% 
       subset(item_pubdate>=as.Date(startdate)) -> subset_links
     i <- nrow(subset_links)
     j <- j + 1
@@ -50,11 +50,13 @@ lcm_go_thr_columns <- function(rubrik, startdate){
 }
 
 
-c("themen/inland", "themen/ausland", "themen/wirtschaft", "themen/kultur", 
+c("blog-2", "category/themen/inland", "category/themen/ausland", 
+  "category/themen/wirtschaft", "category/themen/kultur", 
   "lcm-columns/hinter-feindlichen-linien", "lcm-columns/anger-management",
   "lcm-columns/schabers-hass", "lcm-columns/bafi-im-bann-der-daemonen") %>% 
   purrr::map_dfr(~lcm_go_thr_columns(., startdate = "2022-01-01")) -> valid_links
 
+valid_links <- dplyr::distinct(valid_links)
 
 
 

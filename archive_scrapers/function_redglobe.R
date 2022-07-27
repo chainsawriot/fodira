@@ -51,5 +51,6 @@ redglobe_go_thr_archive <- function(startdate){
 
 valid_links <- redglobe_go_thr_archive("2022-01-01")
 
+valid_links <- dplyr::distinct(valid_links)
 
 

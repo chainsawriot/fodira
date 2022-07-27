@@ -33,8 +33,8 @@ nd_go_thr_columns <- function(rubrik, startdate){
     pjs_session$getSource() %>% nd_getlink() %>% 
       subset(item_pubdate>=as.Date(startdate)) -> subset_links
     i <- nrow(subset_links)
-    j <- j + 25
     print(paste(rubrik, j))
+    j <- j + 25
     valid_links <- rbind(valid_links, subset_links)
   }
   return(valid_links)
@@ -46,6 +46,8 @@ c("rubrik/meinung", "rubrik/politik-oekonomie", "rubrik/hauptstadtregion",
   "die-woche/rubrik/mikroskop", "die-woche/rubrik/begegnungen", 
   "die-woche/rubrik/metropole", "die-woche/rubrik/sport", "die-woche/rubrik/reise") %>% 
   purrr::map_dfr(~nd_go_thr_columns(., startdate = "2022-01-01")) -> valid_links
+
+valid_links <- dplyr::distinct(valid_links)
 
 
 

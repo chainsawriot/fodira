@@ -4,6 +4,10 @@ require(magrittr)
 rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
 remDr <- rD[["client"]]
 
+remDr$setTimeout(type = "page load", milliseconds = 10000000)
+remDr$setTimeout(type = "script", milliseconds = 10000000)
+remDr$setTimeout(type = "implicit", milliseconds = 10000000)
+
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
 
@@ -65,6 +69,8 @@ epoch_go_thr_columns <- function(rubrik, endnr){
 c("politik", "wirtschaft", "gesundheit", 
   "meinung", "china", "feuilleton") %>% 
   purrr::map_dfr(~epoch_go_thr_columns(., endnr = 300)) -> valid_links
+
+valid_links <- dplyr::distinct(valid_links)
 
 remDr$close()
 z <- rD$server$stop()

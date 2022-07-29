@@ -35,7 +35,7 @@ jungle_world_getlink_url <- function(url){
 }
 
 jungle_world_go_thr_archive <- function(startdate){
-  V1<-format(seq(as.Date("2022-01-01")+7, Sys.Date(), by="weeks"), "%Y/%U") #not elegant - how?
+  V1<-format(seq(as.Date("2022-01-01")+7, Sys.Date()+3, by="weeks"), "%Y/%U") #not elegant - how?
   
   V1 %>% as.character() %>%
     paste0("https://jungle.world/inhalt/", .) %>%

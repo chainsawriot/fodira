@@ -1,61 +1,65 @@
-
-require(webdriver)
+require(RSelenium)
 require(magrittr)
-pjs_instance <- run_phantomjs()
-pjs_session <- Session$new(port = pjs_instance$port)
-
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+remDr <- rD[["client"]]
 
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
 
 #function for geting links from page
 dwn_getlink <- function(html){
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//dl/dd") %>% length() -> j
   
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'boxtext')]//a[3]") %>% 
-    rvest::html_text(., trim = TRUE) -> item_title
-
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'boxtext')]//a[3]") %>% 
-    rvest::html_attr("href")  -> item_link
-
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'boxtext')]//div[contains(@class, 'pubdate')]") %>% 
-    rvest::html_text(., trim = TRUE) %>% 
-    as.Date(., tryFormat = c("%d.%m.%Y")) -> item_pubdate
-    
-    df <- data.frame(item_title, item_link, item_pubdate)
+  item_title <- c()
+  item_link <- c()
+  item_pubdate <- c(as.Date(""))
+  
+  for (i in 1:j) {
+    rvest::read_html(html) %>% 
+      rvest::html_elements(xpath = paste0("//dl/dd[", i, "]/a[contains(@class, 'title')]")) %>% 
+      rvest::html_text(., trim = TRUE) %>% c(item_title, .)-> item_title
+    rvest::read_html(html) %>% 
+      rvest::html_elements(xpath = paste0("//dl/dd[", i, "]/a[contains(@class, 'title')]")) %>% 
+      rvest::html_attr("href") -> item_link_ 
+    item_link <- c(item_link, item_link_)
+    rvest::read_html(html) %>% 
+      rvest::html_elements(xpath = paste0("//dl/dt[", i, "]")) %>% 
+      rvest::html_text(., trim = TRUE) %>%
+      as.Date(., tryFormat=c("%d.%m.%y")) %>% rep(. , length(item_link_)) -> item_pubdate_
+    item_pubdate <- c(item_pubdate, item_pubdate_)
+    ?rep
+  }
+    df <- data.frame(item_title, item_link, item_pubdate = item_pubdate[2:length(item_pubdate)])
     return(df)
 }
 
 dwn_getlink_url <- function(url){
-  pjs_session$go(url)
+  remDr$navigate(url)
   print(url)
-  return(dwn_getlink(pjs_session$getSource()))
+  return(dwn_getlink(remDr$getPageSource()[[1]]))
 }
 
-dwn_getlink_url("https://deutsche-wirtschafts-nachrichten.de/finanzen")
 
-
-tichy_go_thr_columns <- function(rubrik, startdate){
-  i <- 1
-  j <- 1
+dwm_go_thr_search <- function(url){
   valid_links <- data.frame()
-  while (i > 0) {
-    dwn_getlink_url(paste0("https://deutsche-wirtschafts-nachrichten.de/", rubrik, "/page/", j, "/")) %>% 
-      subset(item_pubdate>=as.Date(startdate)) -> subset_links
-    i <- nrow(subset_links)
-    j <- j + 1
+  remDr$navigate(url)
+  remDr$getPageSource()[[1]] %>% rvest::read_html() %>% 
+      rvest::html_elements(xpath = paste0("//p[last()]/a[contains(@class, 'pager')][last()]")) %>% 
+      rvest::html_text(., trim = TRUE) %>% as.numeric() -> nr_
+  for (i in 1:nr_) {
+    dwn_getlink_url(paste0(url, "&page=", i)) -> subset_links
     valid_links <- rbind(valid_links, subset_links)
-  }
+  } 
   return(valid_links)
 }
 
 
-c("tichys-einblick", "kolumnen", "gastbeitrag", "daili-es-sentials", 
-  "meinungen", "feuilleton", "wirtschaft") %>% 
-  purrr::map_dfr(~tichy_go_thr_columns(., startdate = "2022-01-01")) -> valid_links
+dwm_go_thr_search("https://deutsche-wirtschafts-nachrichten.de/search?lex=0&search=&match=0&author=&d1=1&m1=1&y1=2022&d2=28&m2=7&y2=2022&act=yes") -> valid_links
 
 
+valid_links <- dplyr::distinct(valid_links)
 
 
+remDr$close()
+z <- rD$server$stop()

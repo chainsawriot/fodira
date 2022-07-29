@@ -68,7 +68,7 @@ jf_go_thr_archive <- function(startdate){
   
   for (i in 1:length(V1)) {
     remDr$navigate(paste0("https://jungefreiheit.de/", V1[i], "/"))
-    print(url)
+    print(paste0("https://jungefreiheit.de/", V1[i], "/"))
     jf_getlink(remDr$getPageSource()[[1]]) -> subset_links
     valid_links <- rbind(valid_links, subset_links)
   }
@@ -79,3 +79,6 @@ jf_go_thr_archive <- function(startdate){
 
 
 jf_go_thr_archive("2022-01-01") -> valid_links2
+
+valid_links3 <- dplyr::distinct(rbind(valid_links2, valid_links))
+

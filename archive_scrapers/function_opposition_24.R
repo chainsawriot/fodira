@@ -1,9 +1,9 @@
 
 require(webdriver)
 require(magrittr)
+
 pjs_instance <- run_phantomjs()
 pjs_session <- Session$new(port = pjs_instance$port)
-
 
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
@@ -34,16 +34,13 @@ opp_getlink_url <- function(url){
   return(opp_getlink(pjs_session$getSource()))
 }
 
-opp_go_thr_archive <- function(startdate){
+opp_go_thr_archive <- function(year, lastpage){
   i <- 1
   j <- 1
   k <- 0
   valid_links <- data.frame()
-  
-  while (i > 0) {
-    opp_getlink_url(paste0("https://opposition24.com/page/", j, "/")) %>% 
-      subset(item_pubdate>=as.Date(startdate)) -> subset_links
-    i <- nrow(subset_links)
+  while (j <= 97) {
+    opp_getlink_url(paste0("https://opposition24.com/", year, "/page/", j, "/")) -> subset_links
     j <- j + 1
     # k <- k + 1
     valid_links <- rbind(valid_links, subset_links)
@@ -55,7 +52,7 @@ opp_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-valid_links <- opp_go_thr_archive("2022-01-01")
+valid_links <- opp_go_thr_archive("2022", 97)
 
 
 

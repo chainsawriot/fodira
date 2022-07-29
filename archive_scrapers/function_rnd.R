@@ -1,9 +1,8 @@
 
-require(webdriver)
+require(RSelenium)
 require(magrittr)
-pjs_instance <- run_phantomjs()
-pjs_session <- Session$new(port = pjs_instance$port)
-
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+remDr <- rD[["client"]]
 
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
@@ -30,9 +29,9 @@ rnd_getlink <- function(html){
 }
 
 rnd_getlink_url <- function(url){
-  pjs_session$go(url)
+  remDr$navigate(url)
   print(url)
-  return(rnd_getlink(pjs_session$getSource()))
+  return(rnd_getlink(remDr$getPageSource()[[1]]))
 }
 
 ## doesn't work headless - no idea why, individual pages work - sometimes not

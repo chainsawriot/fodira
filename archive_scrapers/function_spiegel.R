@@ -1,15 +1,15 @@
 
-require(webdriver)
+require(RSelenium)
 require(magrittr)
-pjs_instance <- run_phantomjs()
-pjs_session <- Session$new(port = pjs_instance$port)
-
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+remDr <- rD[["client"]]
 
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
 
 #function for geting links from page
 spiegel_getlink <- function(html){
+  html <- remDr$getPageSource()[[1]]
 
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//header//h2/a") %>% 
@@ -17,12 +17,12 @@ spiegel_getlink <- function(html){
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//header//h2/a") %>% 
-    rvest::html_attr("href") %>% paste0("https://www.welt.de", .) -> item_link
+    rvest::html_attr("href")  -> item_link
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//h2[contains(@class, 'lg:mr-24 md:mr-24 sm:mx-16')]") %>%
     rvest::html_text(., trim = TRUE) %>% stringr::str_extract(., "[0-9]+[.] [A-za-zäöü]+ [0-9]+") %>%
-    as.Date(tryFormat = c("%d.%m.%Y")) -> item_pubdate
+    as.Date(tryFormat = c("%d. %B %Y")) -> item_pubdate
 
     df <- data.frame(item_title, item_link, item_pubdate)
     
@@ -30,26 +30,26 @@ spiegel_getlink <- function(html){
 }
 
 spiegel_getlink_url <- function(url){
-  pjs_session$go(url)
+  remDr$navigate(url)
   print(url)
-  return(spiegel_getlink(pjs_session$getSource()))
+  return(spiegel_getlink(remDr$getPageSource()[[1]]))
 }
 
 spiegel_getlink_url("https://www.spiegel.de/nachrichtenarchiv/artikel-19.07.2022.html")
 
 ###doesn't work with headless browser
 
-welt_go_thr_archive <- function(startdate){
+spiegel_go_thr_archive <- function(startdate){
   seq(as.Date(startdate), Sys.Date(), by="days") %>% 
-    format.Date(format="-%d-%m-%Y") %>% stringr::str_replace_all(., "-0", "-")-> V1
+    format.Date(format="%d-%m-%Y") %>% stringr::str_replace_all(., "-", ".")-> V1
   
   V1 %>%
-    paste0("https://www.welt.de/schlagzeilen/nachrichten-vom", ., ".html") %>%
-    purrr::map_df(~welt_getlink_url(.)) -> valid_links
+    paste0("https://www.spiegel.de/nachrichtenarchiv/artikel-", ., ".html") %>%
+    purrr::map_df(~spiegel_getlink_url(.)) -> valid_links
   
   return(valid_links)
 }
 
 
-welt_go_thr_archive(startdate = "2022-01-01") -> valid_links
+spiegel_go_thr_archive(startdate = "2022-01-01") -> valid_links
 

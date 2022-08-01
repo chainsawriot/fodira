@@ -14,7 +14,7 @@ Sys.setlocale("LC_TIME", "de_DE")
 
 #function for geting links from page
 suedd_getlink <- function(html){
-  #html <- remDr$getPageSource()[[1]]
+ # html <- pjs_session$getUrl()
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'entrylist__content')]//a/em") %>% 
     rvest::html_text(., trim = TRUE) -> item_title
@@ -37,7 +37,9 @@ suedd_getlink <- function(html){
     return(df)
 }
 
+pjs_session$go("https://www.sueddeutsche.de/archiv/m%C3%BCnchen/2022/01")
 
+pjs_session$getUrl()
 
 suedd_getlink_url <- function(url, startdate){
   # remDr$navigate(url)

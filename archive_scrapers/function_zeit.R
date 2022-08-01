@@ -36,13 +36,64 @@ zeit_getlink <- function(html){
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//article[contains(@class, 'newsteaser')]//time[contains(@class, 'newsteaser__time')]") %>% 
-    rvest::html_text(trim = TRUE) %>% stringr::str_replace(., "Heute, .+", format(Sys.Date(), "%d. %m. %Y")) %>% as.Date(., format= "%d. %m. %Y") -> item_pubdate
-  
+    rvest::html_text(trim = TRUE) %>% stringr::str_replace(., "Heute, .+", format(Sys.Date(), "%d. %m. %Y")) %>% as.Date(., tryFormat= "%d. %m. %Y") -> item_pubdate
   
   df <- data.frame(item_title, item_link, item_pubdate)
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-standard')]//a[contains(@class, 'zon-teaser-standard__faux-link')]") %>% 
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-wide')]/a[contains(@class, 'zon-teaser-wide__faux-link')]") %>%
+    rvest::html_attr("title") -> item_title
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-wide')]/a[contains(@class, 'zon-teaser-wide__faux-link')]") %>% 
+    rvest::html_attr("href")  -> item_link
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-wide')]//time[contains(@class, 'zon-teaser-wide__datetime')]") %>% 
+    rvest::html_text(trim = TRUE) %>% 
+    stringr::str_replace(., "Vor .+ Stunden", format(Sys.Date(), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor .+ Stunde", format(Sys.Date(), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor 1 Tag", format((Sys.Date()-1), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor 2 Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>% 
+    stringr::str_replace(., "Vor .+ Minuten", format(Sys.Date(), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor .+ Minute", format(Sys.Date(), "%d. %B %Y")) %>%
+    as.Date(., tryFormat= c("%d. %m. %Y", "%d. %B %Y")) -> item_pubdate
+  
+  if(length(item_pubdate) < length(item_title)){
+    l <- item_pubdate[1]
+    item_pubdate <- l
+  }
+  
+  df <- rbind(df, data.frame(item_title, item_link, item_pubdate))
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-lead')]/a[contains(@class, 'zon-teaser-lead__faux-link')]") %>%
+    rvest::html_attr("title") -> item_title
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-lead')]/a[contains(@class, 'zon-teaser-lead__faux-link')]") %>% 
+    rvest::html_attr("href")  -> item_link
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-lead')]//time[contains(@class, 'zon-teaser-lead__datetime')]") %>% 
+    rvest::html_text(trim = TRUE) %>% 
+    stringr::str_replace(., "Vor .+ Stunden", format(Sys.Date(), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor .+ Stunde", format(Sys.Date(), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor 1 Tag", format((Sys.Date()-1), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor 2 Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>% 
+    stringr::str_replace(., "Vor .+ Minuten", format(Sys.Date(), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor .+ Minute", format(Sys.Date(), "%d. %B %Y")) %>%
+    as.Date(., tryFormat= c("%d. %m. %Y", "%d. %B %Y")) -> item_pubdate
+  
+  if(length(item_pubdate) < length(item_title)){
+    l <- item_pubdate[1]
+    item_pubdate <- l
+  }
+  
+  df <- rbind(df, data.frame(item_title, item_link, item_pubdate))
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-standard')]//a[contains(@class, 'zon-teaser-standard__faux-link')]") %>%
     rvest::html_attr("title") -> item_title
   
   rvest::read_html(html) %>% 
@@ -54,14 +105,49 @@ zeit_getlink <- function(html){
     rvest::html_text(trim = TRUE) %>%
     stringr::str_replace(., "Vor .+ Stunden", format(Sys.Date(), "%d. %B %Y")) %>%
     stringr::str_replace(., "Vor .+ Stunde", format(Sys.Date(), "%d. %B %Y")) %>%
-    
     stringr::str_replace(., "Vor 1 Tag", format((Sys.Date()-1), "%d. %B %Y")) %>%
-    
-    stringr::str_replace(., "Vor 2 Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor 2 Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>% 
+    stringr::str_replace(., "Vor .+ Minuten", format(Sys.Date(), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor .+ Minute", format(Sys.Date(), "%d. %B %Y")) %>%
     as.Date(., tryFormat= c("%d. %m. %Y", "%d. %B %Y")) -> item_pubdate
   
+  if(length(item_pubdate) < length(item_title)){
+    l <- item_pubdate[1]
+    item_pubdate <- l
+  }
   
-    return(df)
+  
+  df <- rbind(df, data.frame(item_title, item_link, item_pubdate))
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-poster')]//a[contains(@class, 'zon-teaser-poster__faux-link')]") %>%
+    rvest::html_attr("title") -> item_title
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-poster')]//a[contains(@class, 'zon-teaser-poster__faux-link')]") %>% 
+    rvest::html_attr("href")  -> item_link
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-poster')]//time[contains(@class, 'zon-teaser-poster__datetime')]") %>% 
+    rvest::html_text(trim = TRUE) %>%
+    stringr::str_replace(., "Vor .+ Stunden", format(Sys.Date(), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor .+ Stunde", format(Sys.Date(), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor 1 Tag", format((Sys.Date()-1), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor 2 Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>% 
+    stringr::str_replace(., "Vor .+ Minuten", format(Sys.Date(), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor .+ Minute", format(Sys.Date(), "%d. %B %Y")) %>%
+    as.Date(., tryFormat= c("%d. %m. %Y", "%d. %B %Y")) -> item_pubdate
+  
+  if(length(item_pubdate) < length(item_title)){
+    l <- item_pubdate[1]
+    item_pubdate <- l
+  }
+  
+  df <- rbind(df, data.frame(item_title, item_link, item_pubdate))
+  
+  df <- dplyr::distinct(df)
+  
+  return(df)
 }
 
 
@@ -135,7 +221,7 @@ zeit_go_thr_topic <- function(url, startdate){
   return(df)
 }
 
-df <- zeit_go_thr_topic("https://www.zeit.de/thema/krieg-in-ukraine", "2022-01-01")
+# df <- zeit_getlink_url("https://www.zeit.de/thema/krieg-in-ukraine", "2022-01-01")
   
   
 

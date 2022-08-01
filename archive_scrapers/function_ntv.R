@@ -111,7 +111,7 @@ ntv_getlink_url <- function(url, startdate){
   return(df)
 }
 
-#ntv_getlink_url("https://www.n-tv.de/thema/absturz-air-france-flug-447")
+ntv_getlink_url("https://www.n-tv.de/thema/terroranschlaege-von-paris", "2022-01-01")
 
 
 ntv_go_thr_topic <- function(url, startdate){

@@ -1,15 +1,20 @@
 
-require(RSelenium)
+# require(RSelenium)
+# require(magrittr)
+# rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+# remDr <- rD[["client"]]
+
+require(webdriver)
 require(magrittr)
-rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
-remDr <- rD[["client"]]
+pjs_instance <- run_phantomjs()
+pjs_session <- Session$new(port = pjs_instance$port)
 
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
 
 #function for geting links from page
 suedd_getlink <- function(html){
-  html <- remDr$getPageSource()[[1]]
+  #html <- remDr$getPageSource()[[1]]
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'entrylist__content')]//a/em") %>% 
     rvest::html_text(., trim = TRUE) -> item_title
@@ -34,20 +39,34 @@ suedd_getlink <- function(html){
 
 
 
-suedd_getlink_url <- function(url){
-  remDr$navigate(url)
-  print(url)
-  df <- suedd_getlink(remDr$getPageSource()[[1]])
-  
-  remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>% 
+suedd_getlink_url <- function(url, startdate){
+  # remDr$navigate(url)
+  # print(url)
+  # df <- suedd_getlink(remDr$getPageSource()[[1]])
+  pjs_session$go(url)
+  print(pjs_session$getUrl())
+  df <- suedd_getlink(pjs_session$getSource())  %>%
+    subset(., item_pubdate >= as.Date(startdate))
+  print(nrow(df))
+  # 
+  # remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>% 
+  #   rvest::html_elements(xpath = "//li[contains(@class, 'navigation')]//li[last()]") %>%
+  #   rvest::html_text(., trim = TRUE) -> n
+  # 
+  pjs_session$getSource() %>% rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//li[contains(@class, 'navigation')]//li[last()]") %>%
     rvest::html_text(., trim = TRUE) -> n
   
   if(length(n) > 0){
     for (i in 2:n) {
-      remDr$navigate(paste0(url, "page/", i))
-      print(paste0(url, "page/", i))
-      df <- rbind(df, suedd_getlink(remDr$getPageSource()[[1]]))
+      # remDr$navigate(paste0(url, "page/", i))
+      # print(paste0(url, "page/", i))
+      # df <- rbind(df, suedd_getlink(remDr$getPageSource()[[1]]))
+      pjs_session$go(paste0(url, "page/", i))
+      print(pjs_session$getUrl())
+      df <- suedd_getlink(pjs_session$getSource())  %>%
+        subset(., item_pubdate >= as.Date(startdate)) %>% rbind(df, .)
+      print(nrow(df))
     } 
   }
                       
@@ -57,10 +76,16 @@ suedd_getlink_url <- function(url){
 ## doesn't work headless - no idea why, individual pages work - sometimes not
 
 suedd_go_thr_archive <- function(startdate){
-  remDr$navigate("https://www.sueddeutsche.de/archiv")
+  # remDr$navigate("https://www.sueddeutsche.de/archiv")
+  pjs_session$go("https://www.sueddeutsche.de/archiv")
+  print(pjs_session$getUrl())
   
-  remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'department-overview-title')]//a") %>% 
+  # remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>% 
+  #   rvest::html_elements(xpath = "//div[contains(@class, 'department-overview-title')]//a") %>% 
+  #   rvest::html_attr("href") -> categories
+  
+  pjs_session$getSource() %>% rvest::read_html(html) %>%
+    rvest::html_elements(xpath = "//div[contains(@class, 'department-overview-title')]//a") %>%
     rvest::html_attr("href") -> categories
   
   seq(as.Date(startdate), Sys.Date(), by="months") %>% 
@@ -71,13 +96,12 @@ suedd_go_thr_archive <- function(startdate){
   
   V2 %>%
     paste0("https://www.sueddeutsche.de", ., "/") %>%
-    purrr::map_df(~suedd_getlink_url(.)) -> valid_links
+    purrr::map_df(~suedd_getlink_url(., startdate = startdate)) -> valid_links
   
   return(valid_links)
 }
 
-
 suedd_go_thr_archive(startdate = "2022-01-01") -> valid_links
 
-remDr$close()
-z <- rD$server$stop()
+# remDr$close()
+# z <- rD$server$stop()

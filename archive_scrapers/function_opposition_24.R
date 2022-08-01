@@ -39,15 +39,12 @@ opp_go_thr_archive <- function(year, lastpage){
   j <- 1
   k <- 0
   valid_links <- data.frame()
-  while (j <= 97) {
+  while (j <= lastpage) {
     opp_getlink_url(paste0("https://opposition24.com/", year, "/page/", j, "/")) -> subset_links
     j <- j + 1
-    # k <- k + 1
+
     valid_links <- rbind(valid_links, subset_links)
-    # if(k > 50){
-    #   Sys.sleep(60)
-    #   k <- 0
-    # }
+
   }
   return(valid_links)
 }

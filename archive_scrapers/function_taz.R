@@ -10,6 +10,7 @@ Sys.setlocale("LC_TIME", "de_DE")
 #function for geting links from page
 taz_getlink <- function(html){
 
+  #remDr$getPageSource()[[1]] -> html
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//ul[contains(@role, 'directory')]/li/a") %>% 
     length() -> j
@@ -36,6 +37,13 @@ taz_getlink <- function(html){
     rvest::html_elements(xpath = "//ul[contains(@role, 'directory')]/li/a") %>% 
     rvest::html_attr("href") %>% paste0("https://www.taz.de", .) -> item_link
   
+  if(length(item_link) == 1){
+    if(item_link == "https://www.taz.de"){
+      item_link <- NULL
+    }
+  }
+
+  
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//ul[contains(@role, 'directory')]//li[contains(@class, 'date')]") %>%
     rvest::html_text(., trim = TRUE) %>% 
@@ -57,14 +65,18 @@ taz_getlink_url <- function(url){
   remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'sectfoot')]//li[last()]/a") %>%
     rvest::html_attr("href") %>% paste0(url,.) -> url2
-  
+  print(nrow(df))
   while(n == "weitere >") {
     remDr$navigate(url2)
     print(url2)
     df <- rbind(df, taz_getlink(remDr$getPageSource()[[1]]))
+    print(nrow(df))
     remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>% 
       rvest::html_elements(xpath = "//div[contains(@class, 'sectfoot')]//li[last()]") %>%
       rvest::html_text(., trim = TRUE) -> n
+    if(length(n) == 0){
+      n <- "no"
+    }
     remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>% 
       rvest::html_elements(xpath = "//div[contains(@class, 'sectfoot')]//li[last()]/a") %>%
       rvest::html_attr("href") %>% paste0(url,.) -> url2
@@ -72,6 +84,8 @@ taz_getlink_url <- function(url){
   
   return(df)
 }
+
+# taz_getlink_url("https://taz.de/!s=&eTagAb=2022-04-23&eTagBis=2022-04-25/")
 
 taz_go_thr_archive <- function(startdate){
   seq(as.Date(startdate)-1, Sys.Date()-2, by="days") %>% 
@@ -90,6 +104,8 @@ taz_go_thr_archive <- function(startdate){
 
 
 taz_go_thr_archive(startdate = "2022-01-01") -> valid_links
+
+valid_links <- dplyr::distinct(valid_links)
 
 remDr$close()
 z <- rD$server$stop()

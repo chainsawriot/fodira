@@ -49,7 +49,9 @@ ntv_getlink <- function(html){
 
 
 ntv_getlink_url <- function(url, startdate){
+  print("uno")
   pjs_session$go(url)
+  print("dos")
   print(pjs_session$getUrl())
   df <- ntv_getlink(pjs_session$getSource())  
   
@@ -66,22 +68,23 @@ ntv_getlink_url <- function(url, startdate){
   # remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>% 
   #   rvest::html_elements(xpath = "//div[contains(@class, 'paging')]//li[last()]") %>%
   #   rvest::html_text(., trim = TRUE) %>% as.numeric()-> n
-  
+  print("tres")
   pjs_session$getSource() %>% rvest::read_html() %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'paging')]//li[last()]") %>%
     rvest::html_text(., trim = TRUE) %>% as.numeric()-> n
-  
+  print("quadro")
   print(nrow(df))
   
   if(and(length(n) > 0, nrow(df) > 0)){
     if(n > 1){
       i <- 1
       while(i <= n) {
-        
+        print("cinco")
         # pjs_session$getSource() %>% rvest::read_html(html) %>% 
         #   rvest::html_elements(xpath = "//a[contains(@class, 'paging__next1 icon icon__arrow')]") %>%
         #   rvest::html_attr("href")  -> link
         pjs_session$go(paste0(url, "/archiv-", i))
+        print("ses")
         print(pjs_session$getUrl())
         
         # webElem <- remDr$findElement(using = "css", "a[class='paging__next1 icon icon__arrow']")
@@ -111,13 +114,14 @@ ntv_getlink_url <- function(url, startdate){
   return(df)
 }
 
-ntv_getlink_url("https://www.n-tv.de/thema/terroranschlaege-von-paris", "2022-01-01")
+#ntv_getlink_url("https://www.n-tv.de/thema/terroranschlaege-in-bruessel", "2022-01-01")
 
 
 ntv_go_thr_topic <- function(url, startdate){
   # remDr$navigate(url)
   # print(url)
-  
+  # url <- "https://www.n-tv.de/thema/index-T"
+  # startdate <- "2022-01-01"
   pjs_session$go(url)
   print(url)
   
@@ -134,7 +138,7 @@ ntv_go_thr_topic <- function(url, startdate){
   return(df)
 }
 
-ntv_go_thr_topics <- function(startdate){
+ntv_go_thr_topics <- function(startdate, n){
   # remDr$navigate("https://www.n-tv.de/thema/")
   pjs_session$go("https://www.n-tv.de/thema/")
   print("https://www.n-tv.de/thema/")
@@ -147,17 +151,17 @@ ntv_go_thr_topics <- function(startdate){
   #   rvest::html_elements(xpath = "//ul[contains(@class, 'theme__index')]/li/a") %>% 
   #   rvest::html_attr("href")  -> theme_links
   
-  theme_links %>% purrr::map_df(~ntv_go_thr_topic(., startdate)) -> valid_links
+  theme_links[n] %>% purrr::map_df(~ntv_go_thr_topic(., startdate)) -> valid_links
 
   return(valid_links)
 }
 
 
-ntv_go_thr_topics("2022-01-01")-> valid_links
+ntv_go_thr_topics("2022-01-01", 20:27)-> valid_links1
 
-#ntv_go_thr_topics("2022-01-01", n=2)-> valid_links2
+ntv_go_thr_topics("2022-01-01", 1:19)-> valid_links2
 
-valid_links <- dplyr::distinct(valid_links)
+valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2))
 
 remDr$close()
 z <- rD$server$stop()

@@ -1,54 +1,104 @@
+#devtools::install_github("ropensci/RSelenium")
+#install.packages("RSelenium")
 require(RSelenium)
 require(magrittr)
-rD <- RSelenium::rsDriver(browser = "chrome", chromever = "103.0.5060.134", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+#eCap <- list(phantomjs.binary.path = "C:/phantomjs-2.1.1/bin.exe")
+fprof <- makeFirefoxProfile(list(permissions.default.image = 21))
+rD <- RSelenium::rsDriver(browser = "firefox", 
+                          #chromever = "103.0.5060.134", 
+                          port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), 
+                          #phantomver = "2.1.1",
+                          extraCapabilities = fprof,
+                          check = TRUE, verbose = FALSE)
+
 remDr <- rD[["client"]]
 
-
+#binman::list_versions("phantomjs")
+# 
 # require(webdriver)
 # require(magrittr)
 # pjs_instance <- run_phantomjs()
 # pjs_session <- Session$new(port = pjs_instance$port)
 # 
-# pjs_session$go("https://www.zeit.de/")
-# pjs_session$findElement(css="button.message_component")
+# pjs_session$go("https://www.zeit.de/thema")
+# 
+# pjs_session$getSource() %>% writeLines("test.html")
 
-
+# # el <- pjs_session$findElement(css = "button.message-component")
+# el <- pjs_session$findElement(xpath = "//div[contains(@class, 'option__accbtn box__accbtn')]")
+# el$click()
+# pjs_session$getUrl()
 
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
 
 remDr$navigate("https://www.zeit.de/thema/")
-### Click away the thing
+webElem <- remDr$findElement(using = "xpath", "//div[contains(@class, 'option__accbtn box__accbtn')]")
+webElem$clickElement()
+# ### Click away the thing
 
 
 #function for geting links from page
 zeit_getlink <- function(html){
   
-  html <- remDr$getPageSource()[[1]]
-  
-  rvest::read_html(html) %>% 
+  #html <- remDr$getPageSource()[[1]]
+  # html <- pjs_session$getSource()
+  # 
+  rvest::read_html(html) %>%  
+  #html %>%
     rvest::html_elements(xpath = "//article[contains(@class, 'newsteaser')]/a[contains(@class, 'newsteaser__link')]") %>% 
     rvest::html_attr("title") -> item_title
   
   rvest::read_html(html) %>% 
+  #html %>%
     rvest::html_elements(xpath = "//article[contains(@class, 'newsteaser')]/a[contains(@class, 'newsteaser__link')]") %>% 
     rvest::html_attr("href")  -> item_link
   
   rvest::read_html(html) %>% 
+  #  html %>%
     rvest::html_elements(xpath = "//article[contains(@class, 'newsteaser')]//time[contains(@class, 'newsteaser__time')]") %>% 
     rvest::html_text(trim = TRUE) %>% stringr::str_replace(., "Heute, .+", format(Sys.Date(), "%d. %m. %Y")) %>% as.Date(., tryFormat= "%d. %m. %Y") -> item_pubdate
   
+  if(length(item_pubdate) < length(item_title)){
+    l <- item_pubdate[order(item_pubdate, decreasing = TRUE)][1]
+    item_pubdate <- l
+  }
+  
+
+  
   df <- data.frame(item_title, item_link, item_pubdate)
   
+  
+  
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-wide')]/a[contains(@class, 'zon-teaser-wide__faux-link')]") %>%
+ # html %>%
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-square')]//a[contains(@class, 'zon-teaser-square__faux-link')]") %>%
     rvest::html_attr("title") -> item_title
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-wide')]/a[contains(@class, 'zon-teaser-wide__faux-link')]") %>% 
+  # html %>%
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-square')]//a[contains(@class, 'zon-teaser-square__faux-link')]") %>% 
+    rvest::html_attr("href")  -> item_link
+
+  if(length(item_link)>0){
+    item_pubdate <- "2022-01-01"
+    
+    df <- rbind(df, data.frame(item_title, item_link, item_pubdate))
+  }
+
+  
+  rvest::read_html(html) %>% 
+  # html %>%  
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-wide')]//a[contains(@class, 'zon-teaser-wide__faux-link')]") %>%
+    rvest::html_attr("title") -> item_title
+  
+  rvest::read_html(html) %>% 
+  # html %>%
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-wide')]//a[contains(@class, 'zon-teaser-wide__faux-link')]") %>% 
     rvest::html_attr("href")  -> item_link
   
   rvest::read_html(html) %>% 
+  # html %>%  
     rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-wide')]//time[contains(@class, 'zon-teaser-wide__datetime')]") %>% 
     rvest::html_text(trim = TRUE) %>% 
     stringr::str_replace(., "Vor .+ Stunden", format(Sys.Date(), "%d. %B %Y")) %>%
@@ -60,21 +110,26 @@ zeit_getlink <- function(html){
     as.Date(., tryFormat= c("%d. %m. %Y", "%d. %B %Y")) -> item_pubdate
   
   if(length(item_pubdate) < length(item_title)){
-    l <- item_pubdate[1]
+    l <- item_pubdate[order(item_pubdate, decreasing = TRUE)][1]
     item_pubdate <- l
   }
   
   df <- rbind(df, data.frame(item_title, item_link, item_pubdate))
   
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-lead')]/a[contains(@class, 'zon-teaser-lead__faux-link')]") %>%
-    rvest::html_attr("title") -> item_title
+
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-lead')]/a[contains(@class, 'zon-teaser-lead__faux-link')]") %>% 
+  # html %>%
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-lead')]//a[contains(@class, 'zon-teaser-lead__faux-link')]") %>%
+    rvest::html_attr("title") -> item_title
+  
+  rvest::read_html(html) %>%
+  # html %>%
+    rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-lead')]//a[contains(@class, 'zon-teaser-lead__faux-link')]") %>% 
     rvest::html_attr("href")  -> item_link
   
   rvest::read_html(html) %>% 
+  # html %>%  
     rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-lead')]//time[contains(@class, 'zon-teaser-lead__datetime')]") %>% 
     rvest::html_text(trim = TRUE) %>% 
     stringr::str_replace(., "Vor .+ Stunden", format(Sys.Date(), "%d. %B %Y")) %>%
@@ -86,21 +141,26 @@ zeit_getlink <- function(html){
     as.Date(., tryFormat= c("%d. %m. %Y", "%d. %B %Y")) -> item_pubdate
   
   if(length(item_pubdate) < length(item_title)){
-    l <- item_pubdate[1]
+    l <- item_pubdate[order(item_pubdate, decreasing = TRUE)][1]
     item_pubdate <- l
   }
   
   df <- rbind(df, data.frame(item_title, item_link, item_pubdate))
   
+
+  
   rvest::read_html(html) %>% 
+  # html %>%
     rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-standard')]//a[contains(@class, 'zon-teaser-standard__faux-link')]") %>%
     rvest::html_attr("title") -> item_title
   
   rvest::read_html(html) %>% 
+  # html %>%
     rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-standard')]//a[contains(@class, 'zon-teaser-standard__faux-link')]") %>% 
     rvest::html_attr("href")  -> item_link
   
   rvest::read_html(html) %>% 
+  # html %>%
     rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-standard')]//time[contains(@class, 'zon-teaser-standard__datetime')]") %>% 
     rvest::html_text(trim = TRUE) %>%
     stringr::str_replace(., "Vor .+ Stunden", format(Sys.Date(), "%d. %B %Y")) %>%
@@ -112,22 +172,28 @@ zeit_getlink <- function(html){
     as.Date(., tryFormat= c("%d. %m. %Y", "%d. %B %Y")) -> item_pubdate
   
   if(length(item_pubdate) < length(item_title)){
-    l <- item_pubdate[1]
+    l <- item_pubdate[order(item_pubdate, decreasing = TRUE)][1]
     item_pubdate <- l
   }
   
   
   df <- rbind(df, data.frame(item_title, item_link, item_pubdate))
   
+
+  
+  
   rvest::read_html(html) %>% 
+  # html %>%
     rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-poster')]//a[contains(@class, 'zon-teaser-poster__faux-link')]") %>%
     rvest::html_attr("title") -> item_title
   
   rvest::read_html(html) %>% 
+  # html %>%
     rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-poster')]//a[contains(@class, 'zon-teaser-poster__faux-link')]") %>% 
     rvest::html_attr("href")  -> item_link
   
   rvest::read_html(html) %>% 
+  # html %>%
     rvest::html_elements(xpath = "//article[contains(@class, 'zon-teaser-poster')]//time[contains(@class, 'zon-teaser-poster__datetime')]") %>% 
     rvest::html_text(trim = TRUE) %>%
     stringr::str_replace(., "Vor .+ Stunden", format(Sys.Date(), "%d. %B %Y")) %>%
@@ -139,7 +205,7 @@ zeit_getlink <- function(html){
     as.Date(., tryFormat= c("%d. %m. %Y", "%d. %B %Y")) -> item_pubdate
   
   if(length(item_pubdate) < length(item_title)){
-    l <- item_pubdate[1]
+    l <- item_pubdate[order(item_pubdate, decreasing = TRUE)][1]
     item_pubdate <- l
   }
   
@@ -152,9 +218,15 @@ zeit_getlink <- function(html){
 
 
 zeit_getlink_url <- function(url, startdate){
+#  url <- "https://www.zeit.de/thema/angela-merkel"
   remDr$navigate(url)
   print(url)
+  # a <- as.character(url)
+  # html <- rvest::read_html(a)
+  # print("a")
+  # rvest::read_html(html)
   df <- zeit_getlink(remDr$getPageSource()[[1]]) %>%
+  # df <- zeit_getlink(html) %>%
     subset(., item_pubdate >= as.Date(startdate))
   
   # pjs_session$go(url)
@@ -165,7 +237,8 @@ zeit_getlink_url <- function(url, startdate){
   
   print(nrow(df))
   
-  remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>%
+  remDr$getPageSource()[[1]] %>% rvest::read_html() %>%
+  #  html %>%
     rvest::html_elements(xpath = "//ul[contains(@class, 'pager__pages')]//li[last()]") %>%
     rvest::html_text(., trim = TRUE) %>% as.numeric()-> n
   
@@ -177,17 +250,22 @@ zeit_getlink_url <- function(url, startdate){
     if(n > 1){
       i <- 2
       while(i <= n+1) {
-        webElem <- remDr$findElement(using = "css", "a[class='pager__button pager__button--next']")
-        webElem$clickElement()
-        print(remDr$getCurrentUrl())
+        # webElem <- remDr$findElement(using = "css", "a[class='pager__button pager__button--next']")
+        # webElem$clickElement()
+        # Sys.sleep(.5)
+        # print(remDr$getCurrentUrl())
+        # print(2)
         # pjs_session$go(paste0(url, "?p=", i))
         # print(pjs_session$getUrl())
         
+        remDr$navigate(paste0(url, "?p=", i))
         zeit_getlink(remDr$getPageSource()[[1]]) %>%
+        # rvest::read_html(paste0(url, "?p=", i)) %>%
+        #  zeit_getlink() %>%
           subset(., item_pubdate >= as.Date(startdate)) -> df2
         # zeit_getlink(pjs_session$getSource()) %>% 
         #   subset(., item_pubdate >= as.Date("2022-01-01")) -> df2
-        
+        print(remDr$getCurrentUrl())
         i <- i+1
         df <- rbind(df, df2)
         if(nrow(df2) == 0){
@@ -201,6 +279,8 @@ zeit_getlink_url <- function(url, startdate){
   
   return(df)
 }
+
+#zeit_getlink_url("https://www.zeit.de/thema/angela-merkel", "2022-01-01")
 
 zeit_go_thr_topic <- function(url, startdate){
   remDr$navigate(url)
@@ -226,7 +306,7 @@ zeit_go_thr_topic <- function(url, startdate){
   
 
 
-zeit_go_thr_topics <- function(startdate){
+zeit_go_thr_topics <- function(startdate, n){
   remDr$navigate("https://www.zeit.de/thema/index")
   
   # pjs_session$go("https://www.zeit.de/thema/index")
@@ -241,17 +321,19 @@ zeit_go_thr_topics <- function(startdate){
   #   rvest::html_elements(xpath = "//ol[contains(@class, 'alphabetpager')]/li/a") %>% 
   #   rvest::html_attr("href")  -> theme_links  
   
-  theme_links %>% purrr::map_df(~zeit_go_thr_topic(., startdate)) -> valid_links
+  theme_links[n] %>% purrr::map_df(~zeit_go_thr_topic(., startdate)) -> valid_links
 
   return(valid_links)
 }
 
 
-zeit_go_thr_topics("2022-01-01")-> valid_links
+
+zeit_go_thr_topics("2022-01-01", 1:10)-> valid_links_1
 
 valid_links <- dplyr::distinct(valid_links)
 
  remDr$close()
  z <- rD$server$stop()
 
+# rvest::read_html("https://www.zeit.de/thema/index")
 # 

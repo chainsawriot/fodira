@@ -9,7 +9,7 @@ The output of the RSS aggregator or the archive scrapers should have the followi
 5. description (optional)
 
 ```sql
-CREATE TABLE article(
+CREATE TABLE articles(
 id UBIGINT PRIMARY KEY DEFAULT nextval('serial'),
 pub VARCHAR,
 link VARCHAR,
@@ -22,7 +22,7 @@ insert_timestamp TIMESTAMP NOT NULL DEFAULT NOW()
 );
 ```
 
-AID is article:id
+AID is articles:id
 
 ```sql
 create table paywall(
@@ -32,3 +32,10 @@ paywall boolean,
 insert_timestamp TIMESTAMP NOT NULL DEFAULT NOW()
 )
 ```
+
+# Usage
+
+```sh
+Rscript ini.R
+```
+

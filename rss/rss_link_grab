@@ -19,9 +19,9 @@ input <- rio::import(csv)
 
 res <- purrr::map2(input$url, input$page, purrr::safely(.silent_parse))
 
-res %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% purrr::map(~dplyr::select(., "id", "item_link", "item_pub_date", "item_description")) %>% dplyr::bind_rows() -> valid_links
+res %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% purrr::map(~dplyr::select(., "id", "item_link", "item_title", "item_pub_date", "item_description")) %>% dplyr::bind_rows() -> valid_links
 
-valid_links %>% dplyr::rename(pub = `id`, link = `item_link`, pubdate = `item_pub_date`, title = `item_description`) -> output
+valid_links %>% dplyr::rename(pub = `id`, link = `item_link`, pubdate = `item_pub_date`, title = `item_title`, description = `item_description`) -> output
 
 if (!is.na(output_filename)) {
     saveRDS(output, output_filename)

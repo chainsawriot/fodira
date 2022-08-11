@@ -80,9 +80,12 @@ trt_go_thr_columns <- function(category, startdate){
       date[!is.na(date)] %>% lubridate::dmy() -> date
     }
     print(date)
-    if(date < as.Date(startdate)){
-      j <- FALSE
+    if(length(date)>0){
+      if(date < as.Date(startdate)){
+        j <- FALSE
+      }      
     }
+
     i <- i + 10
     print(j)
     

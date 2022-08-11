@@ -116,7 +116,7 @@ nordb_getlink <- function(category, startdate){
     # }
     j <- j + 1
     
-    if(j > 25){
+    if(j > 50){
       remDr$getPageSource()[[1]] %>%
         rvest::read_html() %>% 
         rvest::html_elements(xpath = paste0("//section[contains(@class, 'modul modul--newslist')]/div/div[contains(@class, 'row')]/div/a//time")) %>% 
@@ -144,12 +144,15 @@ nordb_getlink <- function(category, startdate){
     
     Sys.sleep(.3)
   }
-  
+ 
   remDr$getPageSource()[[1]]-> html
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//section[contains(@class, 'modul modul--newslist')]/div") %>% length() -> n
-
+  
+  remDr$close()
+  z <- rD$server$stop()
+  
   (1:n) %>% purrr::map_df(~nord_gothr_largechunk(html=html, .)) -> df
   
   print(item_pubdate[length(item_pubdate)])

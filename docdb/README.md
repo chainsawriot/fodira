@@ -39,3 +39,11 @@ insert_timestamp TIMESTAMP NOT NULL DEFAULT NOW()
 Rscript ini.R
 ```
 
+To insert links to the DB (provided that the RDS file is in the abovementioned format)
+
+```sh
+chmod +x insert
+../rss/rss_link_grab ../rss/rss_list.csv ./output.RDS
+./insert output.RDS
+rm output.RDS
+```

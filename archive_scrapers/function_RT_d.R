@@ -1,7 +1,8 @@
+#install.packages("binman")
 require(RSelenium)
 require(magrittr)
 rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 
-                                                               5679L, 
+                                                               #5679L, 
                                                                5680L, 
                                                                5681L, 
                                                                5682L), size = 1), check = FALSE, verbose = FALSE)
@@ -88,14 +89,16 @@ rt_getlink <- function(category, startdate){
         i <- FALSE
 
       }
-      # remDr$getPageSource()[[1]] %>%
-      #   rvest::read_html() %>% 
-      #   rvest::html_elements(xpath = paste0("//section[contains(@class, 'modul modul--newslist')]//button[contains(@class, 'btn btn__center btn__loadmore')]")) %>% 
-      #   rvest::html_text(., trim = TRUE) -> buttonthere
-      #   
-      # if(length(buttonthere)==0){
-      #     i <- FALSE
-      # }
+      remDr$getPageSource()[[1]] %>%
+        rvest::read_html() %>%
+        rvest::html_elements(xpath = paste0("//div[contains(@class, 'Section-root')]//button[contains(@class, 'Button-root')]")) %>%
+        rvest::html_text(., trim = TRUE) -> buttonthere
+
+      if(length(buttonthere)==0){
+        i <- FALSE
+      } else if(buttonthere[1]!="Weiter"){
+          i <- FALSE
+      }
       print(i)
     }
     sclick()
@@ -113,15 +116,17 @@ rt_getlink <- function(category, startdate){
 }
 
 
-#function for geting links from page
+c("aktuell/", "themen/ukraine-krise/", "themen/ausland/",
+  "themen/inland/", "themen/corona-pandemie/", "themen/russland/",
+  "themen/kampagne-gegen-rt-de/", "themen/wirtschaft/",
+  "tag/analyse/", "meinung/", "video/", "themen/in-eigener-sache/") %>%
+  purrr::map_df(~rt_getlink(. , "2021-12-31")) -> valid_links_1
 
-#save(valid_links1, file = "nordb.RData")
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "RT deutsch", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
-c("politik") %>%
-  purrr::map_df(~rt_getlink(. , "2021-12-31")) -> valid_links29
-
-
-
+saveRDS(valid_links, "RT_1.RDS")
 
 remDr$close()
 z <- rD$server$stop()

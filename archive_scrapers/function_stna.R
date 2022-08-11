@@ -32,4 +32,4 @@ res$resolved_urls <- purrr::map(all_urls, ~purrr::map_chr(., .resolve))
 
 res$url <- res$resolved_urls %>% purrr::map_chr(.sub)
 
-res %>% select(created_at, text, url) %>% rename(title = `text`, link = url, pubdate = created_at) %>% mutate(pubdate = lubridate::ymd_hms(pubdate)) %>% mutate(pub = "Jacobin", description = NA) %>% arrange(pubdate) %>% select(pub, link, pubdate, title, description) %>% saveRDS("jacobin_archive.RDS")
+res %>% select(created_at, text, url) %>% rename(title = `text`, link = url, pubdate = created_at) %>% mutate(pubdate = lubridate::ymd_hms(pubdate)) %>% mutate(pub = "Stuttgarter Zeitung", description = NA) %>% arrange(pubdate) %>% select(pub, link, pubdate, title, description) %>% saveRDS("stuttgarter_Z_archive.RDS")

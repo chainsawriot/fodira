@@ -114,6 +114,13 @@ valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2, valid_links3,
                      valid_links10, valid_links11, valid_links12,
                      valid_links13, valid_links14))
 
+
+
+valid_links$pub = "WAZ"
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>%
+  dplyr::select(pub, link, pubdate, title) -> valid_links
+
 saveRDS(valid_links, "waz_1.RDS")
 # remDr$close()
  # z <- rD$server$stop()

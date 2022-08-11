@@ -1,9 +1,9 @@
 require(RSelenium)
 require(magrittr)
-rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 
-                                                               5679L, 
-                                                               5680L, 
-                                                               5681L, 
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(#5678L, 
+                                                               #5679L, 
+                                                               #5680L, 
+                                                               #5681L, 
                                                                5682L), size = 1), check = FALSE, verbose = FALSE)
 remDr <- rD[["client"]]
 
@@ -24,7 +24,7 @@ nordb_click_function <- function(){
 
 sclick <- purrr::safely(nordb_click_function, quiet = TRUE)
 
-sclick()
+#sclick()
 
 
 nord_gothr_elem <- function(html, i, j){
@@ -130,6 +130,14 @@ nordb_getlink <- function(category, startdate){
         i <- FALSE
 
       }
+      remDr$getPageSource()[[1]] %>%
+        rvest::read_html() %>% 
+        rvest::html_elements(xpath = paste0("//section[contains(@class, 'modul modul--newslist')]//button[contains(@class, 'btn btn__center btn__loadmore')]")) %>% 
+        rvest::html_text(., trim = TRUE) -> buttonthere
+        
+      if(length(buttonthere)==0){
+          i <- FALSE
+      }
       print(i)
     }
     sclick()
@@ -144,23 +152,104 @@ nordb_getlink <- function(category, startdate){
 
   (1:n) %>% purrr::map_df(~nord_gothr_largechunk(html=html, .)) -> df
   
+  print(item_pubdate[length(item_pubdate)])
+  
   return(df)
 }
 
 
 #function for geting links from page
-nordb_getlink("politik", "2021-12-31") -> valid_links1
-save(valid_links1, file = "nordb.RData")
 
+#save(valid_links1, file = "nordb.RData")
 
-c("region/polizeiberichte", "region/ansbach", "region/bamberg", "region/bayreuth", "region/erlangen",
-  "region/forchheim", "region/fuerth", "region/gunzenhausen", "region/herzogenaurach",
-  "region/hoechstadt", "region/neumarkt", "region/neustadt-aisch-bad-windsheim", "region/nuernberg",
-  "region/nuernberger-land", "region/regensburg", "region/roth", "region/schwabach",
-  "region/weißenburg") %>%
+c("politik") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links29
+
+c("region/polizeiberichte") %>%
  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links2
 
+c("region/ansbach") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links3
 
+c("region/bamberg") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links4
+
+c("region/bayreuth") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links5
+
+c("region/erlangen") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links6
+
+###########################################
+c("region/forchheim") %>%
+  purrr::map_df(~nordb_getlink(. , "2022-06-23")) -> valid_links7
+
+###########################################
+c("region/fuerth") %>%
+  purrr::map_df(~nordb_getlink(. , "2022-02-10")) -> valid_links8
+
+c("region/gunzenhausen") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links9
+
+c("region/herzogenaurach") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links10
+
+c("region/hoechstadt") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links11
+
+c("region/neumarkt") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links12
+
+c("region/neustadt-aisch-bad-windsheim") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links13
+
+##############################################################
+c("region/nuernberg") %>%
+  purrr::map_df(~nordb_getlink(. , "2022-03-31")) -> valid_links14
+
+c("region/nuernberger-land") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links15
+
+c("region/regensburg") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links16
+
+c("region/roth") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links17
+
+c("region/schwabach") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links18
+
+c("region/weißenburg") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links19
+
+c("wirtschaft") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links20
+
+c("panorama") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links21
+
+c("kultur") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links22
+
+c("freizeit-events") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links23
+
+c("essen-trinken") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links24
+
+c("boulevard") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links25
+
+c("ratgeber") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links26
+
+c("tv") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links27
+
+c("sport") %>%
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links28
+
+save.image("nordb_.RData")
 
 remDr$close()
 z <- rD$server$stop()

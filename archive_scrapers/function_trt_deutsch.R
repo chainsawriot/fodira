@@ -15,6 +15,7 @@
 
 require(webdriver)
 require(magrittr)
+#webdriver::install_phantomjs()
 pjs_instance <- run_phantomjs()
 pjs_session <- Session$new(port = pjs_instance$port)
 
@@ -29,7 +30,7 @@ Sys.setlocale("LC_TIME", "de_DE")
 trt_get_links <- function(html){
   
   #html <- remDr$getPageSource()[[1]]
-  #html <- pjs_session$getSource()
+  html <- pjs_session$getSource()
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'col-xs-12 col-md-8')]//div[contains(@class, 'card-content')]//a[contains(@class, 'card-title')]") %>% 
@@ -65,13 +66,14 @@ trt_go_thr_columns <- function(category, startdate){
   i <- 10
   j <- TRUE
   while (j) {
-    Sys.sleep(.5)
+    Sys.sleep(3)
     paste0("https://www.trtdeutsch.com/", category, "?page=", i, "") %>%
       purrr::map_df(~trt_get_url(.)) -> df
     nrow(df) -> n
     print(n)
     
     if(class(df$item_link[nrow(df)]) == "character"){
+      #pjs_session$go("https://www.trtdeutsch.com/news-europa/frankreich-ermittlungsverfahren-gegen-rechtsextremisten-9038459")
       pjs_session$go(df$item_link[nrow(df)])
       print(pjs_session$getUrl())
       rvest::read_html(pjs_session$getSource()) %>% 
@@ -81,9 +83,12 @@ trt_go_thr_columns <- function(category, startdate){
     }
     print(date)
     if(length(date)>0){
-      if(date < as.Date(startdate)){
-        j <- FALSE
-      }      
+      if(!is.na(date)){
+        if(date < as.Date(startdate)){
+          j <- FALSE
+        }   
+      }
+   
     }
 
     i <- i + 10
@@ -99,12 +104,12 @@ trt_go_thr_columns <- function(category, startdate){
 c("news", "politik", "wirtschaft", "meinung",
   "exklusiv", "kultur",
   "gesellschaft", "sport", "wissenschaft") %>%
-  purrr::map_df(~trt_go_thr_columns(., "2021-12-31")) -> valid_links 
+  purrr::map_df(~trt_go_thr_columns(., "2021-12-31")) -> valid_links_1 
 
 #trt_go_thr_columns("news", "2021-12-31") -> test
 
-valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
-  mutate(pub = "TRT", description = NA) %>%
+valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
+  dplyr::mutate(pub = "TRT", description = NA, pubdate = NA) %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
 saveRDS(valid_links, "TRT_1.RDS")

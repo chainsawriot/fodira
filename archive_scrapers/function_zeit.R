@@ -328,7 +328,7 @@ zeit_go_thr_topics <- function(startdate, n){
 
 
 
-zeit_go_thr_topics("2022-01-01", 1:10)-> valid_links_1
+zeit_go_thr_topics("2021-12-31", 1:10)-> valid_links_1
 
 valid_links <- dplyr::distinct(valid_links)
 

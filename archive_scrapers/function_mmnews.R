@@ -67,6 +67,12 @@ c("aktuelle-presse", "wirtschaft", "boerse",
 
 valid_links <- dplyr::distinct(valid_links)
 
+valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
+  dplyr::mutate(pub = "Mmnews", description = NA, pubdate = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Mmnews_1.RDS")
+
 remDr$close()
 z <- rD$server$stop()
 

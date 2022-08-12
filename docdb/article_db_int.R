@@ -1,5 +1,5 @@
 ## debug
-Sys.setenv(ARTICLE_DB="~/dev/fodira/docdb/doc.duckdb")
+##Sys.setenv(ARTICLE_DB="~/dev/fodira/docdb/doc.duckdb")
 
 if (Sys.getenv("ARTICLE_DB") == "") {
     stop("Please set up `ARTICLE_DB` envvar!")

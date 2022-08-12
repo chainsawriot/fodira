@@ -36,7 +36,7 @@ insert_timestamp TIMESTAMP NOT NULL DEFAULT NOW()
 # Usage
 
 ```sh
-Rscript ini.R
+Rscript article_db_int.R
 ```
 
 To insert links to the DB (provided that the RDS file is in the abovementioned format)

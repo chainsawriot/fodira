@@ -23,7 +23,8 @@ lcm_getlink <- function(html){
     rvest::html_elements(xpath = "//div[contains(@class, 'card')]//div[contains(@class, 'lcmr-card-date-author')]") %>% 
     rvest::html_text(., trim = TRUE) %>% 
     stringr::str_extract(., "[0-9]+. [A-Z][a-zäöü]+ [0-9]+") %>%
-    as.Date(., tryFormat = c("%d. %B %Y")) -> item_pubdate
+    stringr::str_replace(., "März", "March") %>%
+    lubridate::dmy() -> item_pubdate
     
     df <- data.frame(item_title, item_link, item_pubdate)
     return(df)
@@ -58,5 +59,12 @@ c("blog-2", "category/themen/inland", "category/themen/ausland",
 
 valid_links <- dplyr::distinct(valid_links)
 
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "lowerclassmagazine", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "lowerclassmagazine.RDS")
 
 

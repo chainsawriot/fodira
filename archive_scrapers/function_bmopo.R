@@ -23,7 +23,7 @@ pjs_session <- Session$new(port = pjs_instance$port)
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
 
-writeLines(html, "test.html")
+#writeLines(html, "test.html")
 
 #function for geting links from page
 bmopo_get_links <- function(html){
@@ -88,6 +88,13 @@ bmopo_go_thr_archive <- function(startdate){
   
 bmopo_go_thr_archive("2021-12-31") -> valid_links
 
+
+valid_links %>% dplyr::distinct() %>%
+  dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Berliner Morgenpost", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Berliner Morgenpost.RDS")
 
  # remDr$close()
  # z <- rD$server$stop()

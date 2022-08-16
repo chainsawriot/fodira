@@ -347,7 +347,7 @@ require(magrittr)
 rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 
                                                                5679L, 
                                                                5680L, 
-                                                               5681L, 
+                                                               #5681L, 
                                                                5682L), size = 1), check = FALSE, verbose = FALSE)
 remDr <- rD[["client"]]
 
@@ -417,16 +417,18 @@ rownames(df) <- 1:nrow(df)
 
 #save(valid_links3, file= "allg_z_3.RData")
 
-df$url[1:360] %>% purrr::map_df(~allg_z_go_thr_columns(., "2021-12-31")) -> valid_links2
+df$url[1:360] %>% purrr::map_df(~allg_z_go_thr_columns(., "2021-12-01")) -> valid_links2
 
 
-df$url[361:nrow(df)] %>% purrr::map_df(~allg_z_go_thr_columns(., "2021-12-31")) -> valid_links3
+df$url[361:nrow(df)] %>% purrr::map_df(~allg_z_go_thr_columns(., "2021-12-01")) -> valid_links3
 
-nrow(dplyr::distinct(valid_links1))
+#nrow(dplyr::distinct(valid_links1))
 
-nrow(dplyr::distinct(rbind(valid_links2, valid_links3, valid_links4)))
+#nrow(dplyr::distinct(rbind(valid_links2, valid_links3, valid_links4)))
 
-valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2, valid_links3, valid_links4))
+valid_links <- dplyr::distinct(rbind(#valid_links1, 
+                                     valid_links2, valid_links3#, valid_links4
+                                     ))
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
   dplyr::mutate(pub = "Allgemeine Zeitung", description = NA, pubdate = NA) %>%

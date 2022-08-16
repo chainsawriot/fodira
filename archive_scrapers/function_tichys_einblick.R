@@ -11,6 +11,7 @@ Sys.setlocale("LC_TIME", "de_DE")
 #function for geting links from page
 tichy_getlink <- function(html){
 
+  html <- pjs_session$getSource()
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'entry-content')]//div[contains(@class, 'category-content-title')]/a") %>% 
     rvest::html_text(., trim = TRUE) -> item_title
@@ -22,7 +23,8 @@ tichy_getlink <- function(html){
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'entry-content')]//span[contains(@class, 'date')]") %>% 
     rvest::html_text(., trim = TRUE) %>% 
-    as.Date(., tryFormat = c("%d. %B %Y")) -> item_pubdate
+    stringr::str_replace(., "März", "March") %>%
+    lubridate::dmy() -> item_pubdate
     
     df <- data.frame(item_title, item_link, item_pubdate)
     return(df)
@@ -51,8 +53,14 @@ tichy_go_thr_columns <- function(rubrik, startdate){
 
 c("tichys-einblick", "kolumnen", "gastbeitrag", "daili-es-sentials", 
   "meinungen", "feuilleton", "wirtschaft") %>% 
-  purrr::map_dfr(~tichy_go_thr_columns(., startdate = "2022-01-01")) -> valid_links
+  purrr::map_dfr(~tichy_go_thr_columns(., startdate = "2021-12-01")) -> valid_links
 
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Tichys Einblick", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "TichysEinblick.RDS")
 
 
 

@@ -14,7 +14,9 @@ require(magrittr)
 ## remDr$navigate(url)
 
 .scrape <- function(slug, max_pages = 30, debug = FALSE) {
-    rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+    rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(#5678L, #5679L, 
+                                                                   5680L, #5681L, 
+                                                                   5682L), size = 1), check = FALSE, verbose = FALSE)
     remDr <- rD[["client"]]
 
     url <- paste0("https://www.freitag.de/", slug)
@@ -52,5 +54,24 @@ require(magrittr)
     return(res)
 }
 
-slugs <- c("politik", "wirtschaft", "kultur", "gruenes-wissen", "debatte")
-valid_links <- purrr::map_dfr(slugs, .scrape, max_pages = 30)
+
+valid_links_1 <- purrr::map_dfr("politik", .scrape, max_pages = 35)
+valid_links_2 <- purrr::map_dfr("wirtschaft", .scrape, max_pages = 35)
+valid_links_3 <- purrr::map_dfr("kultur", .scrape, max_pages = 35)
+valid_links_4 <- purrr::map_dfr("gruenes-wissen", .scrape, max_pages = 35)
+valid_links_5 <- purrr::map_dfr("debatte", .scrape, max_pages = 35)
+
+dplyr::distinct(rbind(valid_links, valid_links2, valid_links_3, 
+                      valid_links4, valid_links_5)) -> valid_links
+
+
+
+valid_links %>% dplyr::rename(title = title, link = link) %>% 
+  dplyr::mutate(pub = "Freitag", description = NA, pubdate = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Freitag.RDS")
+
+
+

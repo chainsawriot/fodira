@@ -21,7 +21,10 @@ redglobe_getlink <- function(html){
     
     rvest::read_html(html) %>% 
       rvest::html_elements(xpath = "//article//div[contains(@class, 'entry-date')]/a") %>% 
-      rvest::html_text() %>% as.Date(tryFormats = c("%d. %B %Y")) -> item_pubdate
+      rvest::html_text() %>% 
+      #as.Date(tryFormats = c("%d. %B %Y")) 
+      stringr::str_replace(., "März", "March") %>%
+      lubridate::dmy()-> item_pubdate
     
     df <- data.frame(item_title, item_link, item_pubdate)
     return(df)
@@ -49,8 +52,15 @@ redglobe_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-valid_links <- redglobe_go_thr_archive("2022-01-01")
+valid_links <- redglobe_go_thr_archive("2021-12-01")
 
 valid_links <- dplyr::distinct(valid_links)
 
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Redglobe", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Redglobe.RDS")
 

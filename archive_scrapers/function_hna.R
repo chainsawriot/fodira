@@ -6,7 +6,8 @@ require(magrittr)
 fprof <- makeFirefoxProfile(list(permissions.default.image = 21))
 rD <- RSelenium::rsDriver(browser = "firefox", 
                           #chromever = "103.0.5060.134", 
-                          port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), 
+                          port = sample(c(5678L, 5679L, 5680L, 5681L#, 5682L
+                                          ), size = 1), 
                           #phantomver = "2.1.1",
                           extraCapabilities = fprof,
                           check = TRUE, verbose = FALSE)
@@ -59,6 +60,7 @@ hna_get_url <- function(url){
   remDr$navigate(url)
   print(remDr$getCurrentUrl())
   remDr$getPageSource()[[1]] %>% hna_get_links() -> df
+  print(nrow(df))
   
   remDr$getPageSource()[[1]] %>% rvest::read_html() %>% 
     rvest::html_elements(xpath = "//a[contains(@class, 'id-Swiper-loadMore')]") %>% 
@@ -101,7 +103,7 @@ hna_get_url <- function(url){
           el <- remDr$findElement(using = "xpath", "//a[contains(@class, 'id-Swiper-loadMore')]")
           el$clickElement()
         }
-        print(i)
+        #print(i)
       }
 
     }
@@ -109,11 +111,13 @@ hna_get_url <- function(url){
       rvest::html_elements(xpath = "//a[contains(@class, 'id-Swiper-loadMore')]") %>% 
       rvest::html_attr("href") %>% length -> n
     remDr$getPageSource()[[1]] %>% hna_get_links() -> df
+    print(nrow(df))
     print(n)
   }
   
   print(remDr$getCurrentUrl())
   remDr$getPageSource()[[1]] %>% hna_get_links() -> df
+  print(nrow(df))
   return(df)
 }
 
@@ -136,8 +140,26 @@ hna_go_thr_archive <- function(startdate, enddate){
   
   
 
-hna_go_thr_archive("2022-01-01", Sys.Date())-> valid_links
+hna_go_thr_archive("2021-12-01", "2022-03-01")-> valid_links1
 
+hna_go_thr_archive("2022-03-02", "2022-06-01")-> valid_links2
+
+hna_go_thr_archive("2022-06-02", "2022-07-01")-> valid_links3
+
+hna_go_thr_archive("2022-07-02", "2022-07-20")-> valid_links4
+
+hna_go_thr_archive("2022-07-20", Sys.Date())-> valid_links5
+
+dplyr::distinct(rbind(valid_links1, valid_links2, valid_links3,
+                      valid_links4, valid_links5)) -> valid_links
+
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "HNA", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "HNA.RDS")
 
  remDr$close()
  z <- rD$server$stop()

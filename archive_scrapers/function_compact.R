@@ -48,8 +48,14 @@ compact_go_thr_columns <- function(endnr){
 
 
 
-compact_go_thr_columns(100) -> valid_links
+compact_go_thr_columns(120) -> valid_links
 
+valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
+  dplyr::mutate(pub = "Compact", description = NA, pubdate = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Compact.RDS")
 
 
 

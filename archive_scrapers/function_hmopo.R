@@ -85,8 +85,16 @@ hmopo_go_thr_archive <- function(maxnum){
 }
 
  
-hmopo_go_thr_archive(750) -> valid_links
+hmopo_go_thr_archive(850) -> valid_links
 
 
  # remDr$close()
  # z <- rD$server$stop()
+
+
+valid_links %>% dplyr::distinct() %>%
+  dplyr::rename(title = item_title, link = item_link) %>% 
+  dplyr::mutate(pub = "Hamburger MoPo", description = NA, pubdate = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Hamburger MoPo.RDS")

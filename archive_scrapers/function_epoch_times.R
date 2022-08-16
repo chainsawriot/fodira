@@ -68,9 +68,17 @@ epoch_go_thr_columns <- function(rubrik, endnr){
 
 c("politik", "wirtschaft", "gesundheit", 
   "meinung", "china", "feuilleton") %>% 
-  purrr::map_dfr(~epoch_go_thr_columns(., endnr = 300)) -> valid_links
+  purrr::map_dfr(~epoch_go_thr_columns(., endnr = 400)) -> valid_links
 
 valid_links <- dplyr::distinct(valid_links)
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
+  dplyr::mutate(pub = "Epoch Times", description = NA, pubdate = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+valid_links$pub <- "Epoch Times"
+
+saveRDS(valid_links, "Epoch Times.RDS")
 
 remDr$close()
 z <- rD$server$stop()

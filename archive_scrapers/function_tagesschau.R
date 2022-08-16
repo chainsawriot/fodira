@@ -30,13 +30,14 @@ tagesschau_getlink <- function(html){
 
 tagesschau_getlink_url <- function(url){
   pjs_session$go(url)
+  Sys.sleep(4)
   print(url)
   return(tagesschau_getlink(pjs_session$getSource()))
 }
 
 
-tagesschau_go_thr_archive <- function(startdate){
-  V1<-seq(as.Date(startdate), Sys.Date(), by="days")
+tagesschau_go_thr_archive <- function(startdate, enddate){
+  V1<-seq(as.Date(startdate), as.Date(enddate), by="days")
   
   V1 %>% as.character() %>%
     paste0("https://www.tagesschau.de/archiv/?datum=", .) %>%
@@ -46,6 +47,22 @@ tagesschau_go_thr_archive <- function(startdate){
 }
 
 
-valid_links <- tagesschau_go_thr_archive("2022-01-01")
+valid_links1 <- tagesschau_go_thr_archive("2021-12-10", "2022-03-01")
+
+valid_links2 <- tagesschau_go_thr_archive("2022-03-01", "2022-05-01")
 
 
+valid_links3 <- tagesschau_go_thr_archive("2022-05-01", "2022-06-01")
+
+valid_links4 <- tagesschau_go_thr_archive("2022-06-01", Sys.Date())
+
+valid_links <- rbind(valid_links1, valid_links2, valid_links3, valid_links4)
+
+valid_links <- dplyr::distinct(valid_links)
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Tagesschau", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Tagesschau.RDS")

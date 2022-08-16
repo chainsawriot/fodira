@@ -87,7 +87,7 @@ kiel_go_thr_archive <- function(startdate, enddate){
 # df <- zeit_getlink_url("https://www.zeit.de/thema/krieg-in-ukraine", "2022-01-01")
   
   
-kiel_go_thr_archive("2021-12-31", "2022-05-01") -> valid_links1
+kiel_go_thr_archive("2021-12-01", "2022-05-01") -> valid_links1
 
 kiel_go_thr_archive("2022-05-02", Sys.Date()) -> valid_links2
 
@@ -96,3 +96,11 @@ valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2))
 #saveRDS(valid_links1, "lvz_test.RDS")
  # remDr$close()
  # z <- rD$server$stop()
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "KN", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+valid_links <- dplyr::distinct(valid_links)
+
+saveRDS(valid_links, "KN.RDS")

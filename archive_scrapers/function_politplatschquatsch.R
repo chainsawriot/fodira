@@ -8,6 +8,8 @@ Sys.setlocale("LC_TIME", "de_DE")
 
 #function for geting links from page
 ppq_getlink <- function(html){
+  html <- pjs_session$getUrl()
+  
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'blog-posts hfeed')]//h2[contains(@class, 'date-header')]") %>% length() -> j
   
@@ -32,7 +34,8 @@ ppq_getlink <- function(html){
       rvest::html_elements(xpath = paste0("//div[contains(@class, 'date-outer')][", 
                                           i, "]/h2[contains(@class, 'date-header')][1]")) %>% 
       rvest::html_text(., trim = TRUE) %>% stringr::str_match(., "[0-9]+[.] [A-Za-zä]+ [0-9]+") %>%
-      as.Date(., tryFormat=c("%d. %B %Y"))  %>% rep(. , length(item_link_)) -> item_pubdate_
+      stringr::str_replace(., "März", "March") %>% lubridate::dmy() %>% 
+      rep(. , length(item_link_)) -> item_pubdate_
     item_pubdate <- c(item_pubdate, item_pubdate_)
   }
     df <- data.frame(item_title, item_link, item_pubdate = item_pubdate[2:length(item_pubdate)])
@@ -61,7 +64,7 @@ ppq_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-ppq_go_thr_archive("2022-01-01") -> valid_links
+ppq_go_thr_archive("2021-12-01") -> valid_links
 
 remDr$close()
 z <- rD$server$stop()

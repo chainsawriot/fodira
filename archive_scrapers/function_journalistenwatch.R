@@ -4,6 +4,12 @@ require(magrittr)
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
 
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(#5678L, 
+  #5679L, #5680L, 
+  5681L#, 5682L
+  ), size = 1), check = FALSE, verbose = FALSE)
+remDr <- rD[["client"]]
+
 #function for geting links from page
 jouw_getlink <- function(html){
   
@@ -19,21 +25,20 @@ jouw_getlink <- function(html){
     rvest::html_elements(xpath = "//div[contains(@class, 'elementor-post__meta-data')]//span[contains(@class, 'elementor-post-date')]") %>% 
     rvest::html_text(., trim = TRUE) %>% 
     stringr::str_extract(., "[0-9]+. [A-Z][a-zäöü]+ [0-9]+") %>%
-    as.Date(., tryFormat = c("%d. %B %Y")) -> item_pubdate
+    stringr::str_replace(., "März", "March") %>%
+    lubridate::dmy() -> item_pubdate
   
   df <- data.frame(item_title, item_link, item_pubdate)
   return(df)
 }
 
 jouw_go_thr_2022 <- function(startpage){
-  rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
-  remDr <- rD[["client"]]
   Sys.sleep(5)
   remDr$navigate(startpage)
   print(startpage)
   Sys.sleep(10)
-  webElem <- remDr$findElement(using = "css", "button[style='color: rgb(255, 255, 255); background-color: rgb(74, 144, 226);']")
-  webElem$clickElement()
+  #webElem <- remDr$findElement(using = "css", "button[style='color: rgb(255, 255, 255); background-color: rgb(74, 144, 226);']")
+  #webElem$clickElement()
   rvest::read_html(remDr$getPageSource()[[1]]) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'e-load-more-anchor')]") %>% 
     rvest::html_attr(., "data-max-page") %>% as.numeric() -> end
@@ -53,3 +58,9 @@ jouw_go_thr_2022 <- function(startpage){
 
 jouw_go_thr_2022("https://journalistenwatch.com/2022/") -> valid_links
 
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Jouwatch", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Jouwatch.RDS")

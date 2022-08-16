@@ -10,18 +10,19 @@ Sys.setlocale("LC_TIME", "de_DE")
 #function for geting links from page
 handelsblatt_getlink <- function(html){
 
+  #html <- remDr$getPageSource()[[1]]
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//section[contains(@class, 'vhb-related')]//span[contains(@class, 'vhb-headline')]") %>% 
     rvest::html_text(., trim = TRUE) -> item_title
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//section[contains(@class, 'vhb-related')]//ul[contains(@data-trigger-label, 'Treffer')]//a") %>% 
-    rvest::html_attr("href") %>% paste0("https://www.rnd.de", .) -> item_link
+    rvest::html_attr("href") %>% paste0("https://www.handelsblatt.de", .) -> item_link
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'vhb-archive-date')]") %>%
-    rvest::html_text(., trim = TRUE) %>% 
-    as.Date(tryFormat = c("%d. %B %Y")) -> item_pubdate
+    rvest::html_text(., trim = TRUE) %>% stringr::str_replace(., "März", "March") %>%
+    lubridate::dmy() -> item_pubdate
 
     df <- data.frame(item_title, item_link, item_pubdate)
     
@@ -60,5 +61,12 @@ handelsblatt_go_thr_archive <- function(startdate){
 }
 
 
-handelsblatt_go_thr_archive(startdate = "2022-01-01") -> valid_links
+handelsblatt_go_thr_archive(startdate = "2021-12-01") -> valid_links
 
+valid_links %>% dplyr::distinct() %>% 
+  dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Handelsblatt", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Handelsblatt.RDS")

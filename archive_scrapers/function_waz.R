@@ -108,19 +108,22 @@ waz_go_thr_archive("2021-12-31", 5501, 6000) -> valid_links12
 waz_go_thr_archive("2021-12-31", 6001, 6500) -> valid_links13
 waz_go_thr_archive("2021-12-31", 6501, 7000) -> valid_links14
 
-valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2, valid_links3,
-                     valid_links4, valid_links5, valid_links6,
-                     valid_links7, valid_links8, valid_links9,
-                     valid_links10, valid_links11, valid_links12,
-                     valid_links13, valid_links14))
+valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2, valid_links3#,
+                     #valid_links4, valid_links5, valid_links6,
+                     #valid_links7, valid_links8, valid_links9,
+                     #valid_links10, valid_links11, valid_links12,
+                     #valid_links13, valid_links14
+                     ))
 
 
 
 valid_links$pub = "WAZ"
 
-valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>%
-  dplyr::select(pub, link, pubdate, title) -> valid_links
+valid_links$description = NA
 
-saveRDS(valid_links, "waz_1.RDS")
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "waz_2.RDS")
 # remDr$close()
  # z <- rD$server$stop()

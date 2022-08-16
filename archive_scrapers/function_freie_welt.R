@@ -1,7 +1,9 @@
 require(RSelenium)
 require(magrittr)
 
-rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(#5678L, #5679L, 
+                                                               5680L, 5681L #, 5682L
+                                                               ), size = 1), check = FALSE, verbose = FALSE)
 remDr <- rD[["client"]]
 remDr$navigate("https://www.freiewelt.net/")
 webElem <- remDr$findElement(using = "css", "a[id='cmbutton-accept']")
@@ -134,5 +136,9 @@ remDr$close()
 z <- rD$server$stop()
 
 
-freiewelt_getlink_focus(remDr$getPageSource()[[1]]) %>% subset(., item_pubdate >= as.Date(startdate))-> subset_links
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Freie Welt", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
+
+saveRDS(valid_links, "Freie Welt.RDS")

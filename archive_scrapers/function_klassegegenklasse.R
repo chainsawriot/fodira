@@ -50,9 +50,17 @@ klggkl_go_thr_columns <- function(rubrik, startdate){
 
 c("world", "deutschland", "our_class", "antirassismus", "jugend", "frauen-und-lgbti",
   "geschichte-und-kultur", "hintergruende") %>% 
-  purrr::map_dfr(~klggkl_go_thr_columns(., startdate = "2022-01-01")) -> valid_links
+  purrr::map_dfr(~klggkl_go_thr_columns(., startdate = "2021-12-01")) -> valid_links
 
 valid_links <- dplyr::distinct(valid_links)
+
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Klasse gegen Klasse", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Klasse gegen Klasse.RDS")
 
 
 

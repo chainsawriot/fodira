@@ -11,6 +11,7 @@ Sys.setlocale("LC_TIME", "de_DE")
 
 nachdenkseiten_getlink <- function(html){
 
+  html <- pjs_session$getSource()
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//article//h2/a") %>% 
     rvest::html_text(., trim = TRUE) -> item_title
@@ -22,7 +23,8 @@ nachdenkseiten_getlink <- function(html){
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//article//span[contains(@class, 'postMeta')]") %>% 
     rvest::html_text(., trim = TRUE) %>% 
-    as.Date(tryFormat = c("%d. %B %Y um %H:%M")) -> item_pubdate
+    stringr::str_replace(., "März", "March") %>%
+    lubridate::dmy_hm() -> item_pubdate
     
     df <- data.frame(item_title, item_link, item_pubdate)
     return(df)
@@ -48,7 +50,16 @@ nachdenkseiten_go_thr_archive <-  function(startdate){
   return(valid_links)
 }
 
-valid_links <- nachdenkseiten_go_thr_archive("2022-01-01")
+valid_links <- nachdenkseiten_go_thr_archive("2021-12-01")
+
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Nachdenkseiten", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Nachdenkseiten.RDS")
+
 
 
 

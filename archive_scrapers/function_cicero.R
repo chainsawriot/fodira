@@ -109,9 +109,12 @@ cicero_go_thr_columns <- function(category, startdate){
       }
       if(length(date)==0){
         
-      } else if(date < as.Date(startdate)){
-        j <- FALSE
+      } else if (!is.na(date)){
+        if (date < as.Date(startdate)){
+          j <- FALSE
+        }
       }
+      
       
     }
     }
@@ -123,13 +126,13 @@ cicero_go_thr_columns <- function(category, startdate){
 
 
 c("innenpolitik", "aussenpolitik", "wirtschaft",
-  "kultur", "cicero-plus") %>% purrr::map_df(~cicero_go_thr_columns(., "2021-12-31")) -> valid_links
+  "kultur", "cicero-plus") %>% purrr::map_df(~cicero_go_thr_columns(., "2021-12-01")) -> valid_links
 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
   dplyr::mutate(pub = "Cicero", description = NA, pubdate = NA) %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
-saveRDS(valid_links, "Cicero_1.RDS")
+saveRDS(valid_links, "Cicero.RDS")
 #remDr$close()
 #z <- rD$server$stop()

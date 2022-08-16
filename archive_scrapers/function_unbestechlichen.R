@@ -52,3 +52,10 @@ unbest_go_thr_2022 <- function(startpage){
 
 unbest_go_thr_2022("https://dieunbestechlichen.com/2022/") -> valid_links
 
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "DieUnbestechlichen", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "DieUnbestechlichen.RDS")

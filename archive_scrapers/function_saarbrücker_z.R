@@ -6,7 +6,8 @@ require(magrittr)
 rD <- RSelenium::rsDriver(browser = "firefox",
                           #chromever = "103.0.5060.134",
                           port = sample(c(#5678L, 
-                                          5679L, 5680L, 5681L, 5682L), size = 1),
+                                          5679L, #5680L, #5681L, 
+                                          5682L), size = 1),
                           #phantomver = "2.1.1",
                           check = FALSE, verbose = FALSE)
 
@@ -77,7 +78,9 @@ saarbr_get_links <- function(html){
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//span[contains(@class, 'park-page-headline')]") %>%
     rvest::html_text(trim = TRUE) %>% stringr::str_extract("[0-9]+\\. [A-Za-zäöü]+ [0-9]+") %>%
-    as.Date(., tryFormat = c("%d. %b %Y"))-> df$item_pubdate
+    stringr::str_replace(., "März", "March") %>%
+    # as.Date(., tryFormat = c("%d. %b %Y"))
+    lubridate::dmy()-> df$item_pubdate
   
   return(df)
 }
@@ -105,7 +108,13 @@ saarbr_go_thr_archive <- function(startdate){
 }
 
   
-saarbr_go_thr_archive("2021-12-31") -> valid_links
+saarbr_go_thr_archive("2021-12-01") -> valid_links
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Saarbrücker Zeitung", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Saarbrücker Zeitung.RDS")
 
 
 remDr$close()

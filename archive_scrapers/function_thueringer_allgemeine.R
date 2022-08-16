@@ -29,7 +29,7 @@ Sys.setlocale("LC_TIME", "de_DE")
 th_allg_get_links <- function(html){
   
   #html <- remDr$getPageSource()[[1]]
-  #html <- pjs_session$getSource()
+  html <- pjs_session$getSource()
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//ul//article/a") %>% 
@@ -86,8 +86,13 @@ th_allg_go_thr_archive <- function(startdate){
 # df <- zeit_getlink_url("https://www.zeit.de/thema/krieg-in-ukraine", "2022-01-01")
   
   
-th_allg_go_thr_archive("2021-12-31") -> valid_links
+th_allg_go_thr_archive("2021-12-01") -> valid_links
 
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "TA", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "TA.RDS")
 
  # remDr$close()
  # z <- rD$server$stop()

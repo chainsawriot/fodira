@@ -1,6 +1,7 @@
 require(RSelenium)
 require(magrittr)
-rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L#, 5682L
+                                                               ), size = 1), check = FALSE, verbose = FALSE)
 remDr <- rD[["client"]]
 
 #Sys.setlocale("LC_TIME", "C")
@@ -55,11 +56,19 @@ dwm_go_thr_search <- function(url){
 }
 
 
-dwm_go_thr_search("https://deutsche-wirtschafts-nachrichten.de/search?lex=0&search=&match=0&author=&d1=1&m1=1&y1=2022&d2=28&m2=7&y2=2022&act=yes") -> valid_links
+dwm_go_thr_search("https://deutsche-wirtschafts-nachrichten.de/search?lex=0&search=&match=0&author=&d1=1&m1=12&y1=2021&d2=15&m2=8&y2=2022&act=yes") -> valid_links
 
 
 valid_links <- dplyr::distinct(valid_links)
 
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate.1.) %>% 
+  dplyr::mutate(pub = "DWN", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+valid_links$pub <- "DWN"
+
+saveRDS(valid_links, "DWN.RDS")
 
 remDr$close()
 z <- rD$server$stop()

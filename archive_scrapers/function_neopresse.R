@@ -22,7 +22,8 @@ neop_getlink <- function(html){
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//header//span[contains(@class, 'entry-meta-date updated')]") %>% 
     rvest::html_text(., trim = TRUE) %>% 
-    as.Date(., tryFormat = c("%d. %B %Y")) -> item_pubdate
+    stringr::str_replace(., "März", "March") %>%
+    lubridate::dmy() -> item_pubdate
     
     df <- data.frame(item_title, item_link, item_pubdate)
     return(df)
@@ -45,18 +46,24 @@ neop_go_thr_archive <- function(startdate){
       subset(item_pubdate>=as.Date(startdate)) -> subset_links
     i <- nrow(subset_links)
     j <- j + 1
-    # k <- k + 1
+    k <- k + 1
     valid_links <- rbind(valid_links, subset_links)
-    # if(k > 50){
-    #   Sys.sleep(60)
-    #   k <- 0
-    # }
+    if(k > 50){
+      Sys.sleep(60)
+      k <- 0
+    }
   }
   return(valid_links)
 }
 
-valid_links <- neop_go_thr_archive("2022-01-01")
+valid_links <- neop_go_thr_archive("2021-12-01")
 
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
+  dplyr::mutate(pub = "NeoPresse", description = NA, pubdate = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Neopresse.RDS")
 
 
 

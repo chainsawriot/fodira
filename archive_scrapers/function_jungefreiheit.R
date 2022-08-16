@@ -17,14 +17,17 @@ jf_getlink <- function(html){
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'ee-grid__item ee-loop__item')]//li[contains(@class, 'ee-post__meta ee-post__meta--date ee-post__metas__date')]") %>% 
     rvest::html_text(., trim = TRUE) %>% stringr::str_extract("[0-9]+[.] [A-Za-zäöü]+ [0-9]+") %>%
-    as.Date(., tryFormat = c("%d. %B %Y")) -> item_pubdate
+    stringr::str_replace(., "März", "March") %>%
+    #as.Date(., tryFormat = c("%d. %B %Y")) 
+    lubridate::dmy() -> item_pubdate
   
   df <- data.frame(item_title, item_link, item_pubdate)
   return(df)
 }
 
 jf_go_thr_2022 <- function(startpage){
-  rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+  rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(#5678L, 
+    5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
   remDr <- rD[["client"]]
   Sys.sleep(5)
   remDr$navigate(paste0(startpage, "page/25/"))
@@ -61,7 +64,9 @@ jf_go_thr_archive <- function(startdate){
   seq(as.Date(startdate), Sys.Date(), by="days") %>% 
      stringr::str_replace_all(., "-", "/")-> V1
   
-  rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+  rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(#5678L, 
+    #5679L, #5680L, #5681L, 
+    5682L), size = 1), check = FALSE, verbose = FALSE)
   remDr <- rD[["client"]]
   Sys.sleep(5)
   valid_links <- data.frame()
@@ -78,7 +83,13 @@ jf_go_thr_archive <- function(startdate){
 }
 
 
-jf_go_thr_archive("2022-01-01") -> valid_links2
+jf_go_thr_archive("2021-12-01") -> valid_links2
 
-valid_links3 <- dplyr::distinct(rbind(valid_links2, valid_links))
+valid_links <- dplyr::distinct(rbind(valid_links2, valid_links))
 
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Junge Freiheit", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Junge Freiheit.RDS")

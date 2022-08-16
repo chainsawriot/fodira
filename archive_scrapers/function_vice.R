@@ -17,7 +17,8 @@ vice_getlink <- function(html){
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'grid__wrapper grd-row')]//a") %>% 
-    rvest::html_attr("href") -> item_link
+    rvest::html_attr("href") %>% 
+    paste0("https://www.vice.com")-> item_link
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'grid__wrapper grd-row')]//div[contains(@class, 'dsp-inline-xs hed-xxs canonical__date hed-xxs')]") %>% 
@@ -36,6 +37,7 @@ vice_getlink <- function(html){
 
 vice_getlink_url <- function(url){
   pjs_session$go(url)
+  Sys.sleep(1)
   print(url)
   return(vice_getlink(pjs_session$getSource()))
 }
@@ -54,9 +56,14 @@ vice_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-vice_go_thr_archive(startdate = "2022-01-01") -> valid_links
+vice_go_thr_archive(startdate = "2021-12-01") -> valid_links
 
 valid_links <- dplyr::distinct(valid_links)
 
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Vice", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Vice.RDS")
 
 

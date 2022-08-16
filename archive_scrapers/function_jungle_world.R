@@ -35,7 +35,7 @@ jungle_world_getlink_url <- function(url){
 }
 
 jungle_world_go_thr_archive <- function(startdate){
-  V1<-format(seq(as.Date("2022-01-01")+7, Sys.Date()+3, by="weeks"), "%Y/%U") #not elegant - how?
+  V1<-format(seq(as.Date(startdate)+7, Sys.Date()+3, by="weeks"), "%Y/%U") #not elegant - how?
   
   V1 %>% as.character() %>%
     paste0("https://jungle.world/inhalt/", .) %>%
@@ -45,6 +45,13 @@ jungle_world_go_thr_archive <- function(startdate){
 }
 
 valid_links <- jungle_world_go_thr_archive("2022-01-01")
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Jungle World", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Jungle World.RDS")
 
 
 

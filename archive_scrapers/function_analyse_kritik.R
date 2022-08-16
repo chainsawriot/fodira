@@ -22,7 +22,8 @@ ak_getlink <- function(html){
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//small[contains(@class, 'issue-header__publication-date t-small-sl s-m-b-8')]") %>% 
     rvest::html_text(., trim = TRUE) %>% 
-    as.Date(., tryFormat = c("%d. %B %Y")) -> item_pubdate
+    stringr::str_replace(., "März", "March") %>%
+    lubridate::dmy() -> item_pubdate
     
     df <- data.frame(item_title, item_link, item_pubdate)
     return(df)
@@ -45,7 +46,15 @@ ak_go_thr_archive <- function(start_issue, end_issue){
   return(valid_links)
 }
 
-valid_links <- ak_go_thr_archive("678", "683")
+valid_links <- ak_go_thr_archive("677", "684")
+
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "akweb", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "akweb.RDS")
 
 
 

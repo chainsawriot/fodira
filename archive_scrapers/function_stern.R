@@ -41,12 +41,16 @@ stern_getlink_url <- function(url){
 stern_go_thr_archive <- function(rubrik, startdate){
   j <- 0
   i <- 1
+
   seq(as.Date(startdate), Sys.Date(), by="month") %>% format.Date(., format = "?month=%m&year=%Y") %>%
     as.character() %>% 
     stringr::str_replace_all("=0", "=") -> V1
+  print(V1)
+  valid_links <- data.frame()
   
-  
-  for (k in 1:length(V1)) {
+  for (k in (1:length(V1))) {
+    j <- 0
+    i <- 1
     while (i > 0) {
       
       paste0("https://www.stern.de/", rubrik, "/archiv/", V1[k], "&pageNum=", j) %>%
@@ -64,5 +68,11 @@ stern_go_thr_archive <- function(rubrik, startdate){
 
 c("politik", "gesellschaft", "panorama", "kultur", "lifestyle", "digital",
   "wirtschaft", "sport", "gesundheit", "genuss", "reise", "familie", 
-  "auto") %>% purrr::map_df(~stern_go_thr_archive(., startdate = "2022-01-01")) -> valid_links
+  "auto") %>% purrr::map_df(~stern_go_thr_archive(., startdate = "2021-12-01")) -> valid_links
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Stern", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Stern.RDS")
 

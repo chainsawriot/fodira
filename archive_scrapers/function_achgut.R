@@ -10,7 +10,8 @@ Sys.setlocale("LC_TIME", "de_DE")
 
 #function for geting links from page
 achgut_getlink <- function(html){
-  
+  #pjs_session$getUrl()
+  #html <- pjs_session$getSource()
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'teaser_blog')]//h3//a") %>% 
     rvest::html_text(., trim = TRUE) -> item_title
@@ -49,6 +50,7 @@ achgut_getlink <- function(html){
 achgut_getlink_url <- function(url){
   pjs_session$go(url)
   print(url)
+  Sys.sleep(1)
   return(achgut_getlink(pjs_session$getSource()))
 }
 
@@ -70,7 +72,7 @@ achgut_go_thr_archive <-  function(startdate){
       Sys.sleep(30)
       k <- 0
     }
-    if (j == 1950){
+    if (j == 1924){
       print("wait")
       Sys.sleep(45)
       k <- 0
@@ -79,5 +81,14 @@ achgut_go_thr_archive <-  function(startdate){
   return(valid_links)
 }
 
-valid_links <- achgut_go_thr_archive("2022-01-01")
+valid_links <- achgut_go_thr_archive("2021-12-01")
+
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Achse des Guten", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Achse des Guten.RDS")
+
 

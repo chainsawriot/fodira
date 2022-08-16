@@ -46,3 +46,11 @@ ossietzky_go_thr_archive <- function(){
 valid_links <- ossietzky_go_thr_archive()
 
 
+valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
+  dplyr::mutate(pub = "Ossietzky", description = NA, pubdate = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Ossietzky.RDS")
+
+

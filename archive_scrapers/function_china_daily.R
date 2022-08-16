@@ -30,7 +30,7 @@ ch_d_get_links <- function(html, rubrik){
   
   #html <- remDr$getPageSource()[[1]]
   html <- pjs_session$getSource()
-  
+  #pjs_session$getUrl()
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'CT_CLLiBox')]//a") %>% 
     rvest::html_text(trim = TRUE) -> item_title
@@ -79,6 +79,7 @@ ch_d_go_thr_columns <- function(category, startdate){
     nrow(df2) -> n
     print(n)
     df <- rbind(df, df2)
+    Sys.sleep(1)
     if(n == 0){
       j <- FALSE
     } 
@@ -93,14 +94,15 @@ ch_d_go_thr_columns <- function(category, startdate){
 
 c("aufmacher", "aktuelles", "politik", "wirtschaft", "gesellschaft",
   "nachrichten_im_bild", "bildung_kultur_und_reisen",
-  "spezial", "videos", "bilderserien", "leserfavoriten") %>%
-  purrr::map_df(~ch_d_go_thr_columns(., "2021-12-31")) -> valid_links 
+  "spezial", "videos", #"bilderserien", 
+  "leserfavoriten") %>%
+  purrr::map_df(~ch_d_go_thr_columns(., "2021-12-01")) -> valid_links 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
-  mutate(pub = "China heute", description = NA) %>%
+  dplyr::mutate(pub = "China heute", description = NA) %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
-saveRDS(valid_links, "China heute.RDS")
+saveRDS(valid_links, "China heute_1.RDS")
 
 # remDr$close()
  # z <- rD$server$stop()

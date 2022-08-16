@@ -21,7 +21,10 @@ sch_li_getlink <- function(html){
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//tbody//table[contains(@width, 600)]//tbody/tr[1]/td/font") %>% 
-    rvest::html_text(trim = TRUE) %>% as.Date(., tryFormat = c("%A %d. %B %Y")) -> item_pubdate
+    rvest::html_text(trim = TRUE) %>% 
+    #as.Date(., tryFormat = c("%A %d. %B %Y")) 
+    stringr::str_replace(., "März", "March") %>%
+    lubridate::dmy() -> item_pubdate
   
   df <- data.frame(item_title, item_link, item_pubdate)
     return(df)
@@ -82,6 +85,15 @@ sch_li_go_thr_columns <- function(){
 sch_li_go_thr_columns() -> valid_links
 
 valid_links <- dplyr::distinct(valid_links)
+
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "scharf links", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "scharf links.RDS")
+
 
 remDr$close()
 z <- rD$server$stop()

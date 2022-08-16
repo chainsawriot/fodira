@@ -1,7 +1,8 @@
 
 require(RSelenium)
 require(magrittr)
-rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L#, 5682L
+                                                               ), size = 1), check = FALSE, verbose = FALSE)
 remDr <- rD[["client"]]
 
 #Sys.setlocale("LC_TIME", "C")
@@ -10,7 +11,7 @@ Sys.setlocale("LC_TIME", "de_DE")
 #function for geting links from page
 taz_getlink <- function(html){
 
-  #remDr$getPageSource()[[1]] -> html
+  remDr$getPageSource()[[1]] -> html
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//ul[contains(@role, 'directory')]/li/a") %>% 
     length() -> j
@@ -46,8 +47,8 @@ taz_getlink <- function(html){
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//ul[contains(@role, 'directory')]//li[contains(@class, 'date')]") %>%
-    rvest::html_text(., trim = TRUE) %>% 
-    as.Date(tryFormat = c("%d. %m. %Y")) -> item_pubdate
+    rvest::html_text(., trim = TRUE) %>%stringr::str_extract(., pattern = "[0-9]+\\..[0-9]+\\..[0-9]+") %>%
+    lubridate::dmy() -> item_pubdate
 
     df <- data.frame(item_title, item_link, item_pubdate)
     
@@ -103,9 +104,16 @@ taz_go_thr_archive <- function(startdate){
 }
 
 
-taz_go_thr_archive(startdate = "2022-01-01") -> valid_links
+taz_go_thr_archive(startdate = "2021-12-01") -> valid_links
 
 valid_links <- dplyr::distinct(valid_links)
 
 remDr$close()
 z <- rD$server$stop()
+
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "TAZ", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "TAZ.RDS")

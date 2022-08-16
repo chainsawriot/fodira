@@ -132,16 +132,18 @@ weser_go_thr_page <- function(startdate){
 }
 
 
-weser_go_thr_page(startdate = "2021-12-31") -> valid_links1
+weser_go_thr_page(startdate = "2021-12-01") -> valid_links1
 
 valid_links <- dplyr::distinct(valid_links1)
 
 valid_links$pub <- "Weser Kurier"
 
-valid_links %>% dplyr::rename(title = item_title, link = item_link) %>%
-  dplyr::select(pub, link, title) -> valid_links
 
-saveRDS(valid_links, "weser_1.RDS")
+valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
+  dplyr::mutate(pub = "Weser Kurier", description = NA, pubdate = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Weser Kurier.RDS")
 
 
 remDr$close()

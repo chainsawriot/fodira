@@ -1,10 +1,10 @@
 #install.packages("binman")
 require(RSelenium)
 require(magrittr)
-rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(#5678L, 
                                                                #5679L, 
                                                                5680L, 
-                                                               5681L, 
+                                                               #5681L, 
                                                                5682L), size = 1), check = FALSE, verbose = FALSE)
 remDr <- rD[["client"]]
 
@@ -120,13 +120,13 @@ c("aktuell/", "themen/ukraine-krise/", "themen/ausland/",
   "themen/inland/", "themen/corona-pandemie/", "themen/russland/",
   "themen/kampagne-gegen-rt-de/", "themen/wirtschaft/",
   "tag/analyse/", "meinung/", "video/", "themen/in-eigener-sache/") %>%
-  purrr::map_df(~rt_getlink(. , "2021-12-31")) -> valid_links_1
+  purrr::map_df(~rt_getlink(. , "2021-12-01")) -> valid_links_1
 
-valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+valid_links_1 %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "RT deutsch", description = NA) %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
-saveRDS(valid_links, "RT_1.RDS")
+saveRDS(valid_links, "RT_2.RDS")
 
 remDr$close()
 z <- rD$server$stop()

@@ -79,8 +79,14 @@ tagesspiegel_go_thr_archive <- function(startdate){
 # df <- zeit_getlink_url("https://www.zeit.de/thema/krieg-in-ukraine", "2022-01-01")
   
   
-tagesspiegel_go_thr_archive("2021-12-31") -> valid_links
+tagesspiegel_go_thr_archive("2021-12-01") -> valid_links
 
 
  # remDr$close()
  # z <- rD$server$stop()
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Tagesspiegel", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Tagesspiegel.RDS")

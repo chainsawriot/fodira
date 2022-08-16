@@ -37,9 +37,9 @@ suedd_getlink <- function(html){
     return(df)
 }
 
-pjs_session$go("https://www.sueddeutsche.de/archiv/m%C3%BCnchen/2022/01")
+#pjs_session$go("https://www.sueddeutsche.de/archiv/m%C3%BCnchen/2022/01")
 
-pjs_session$getUrl()
+#pjs_session$getUrl()
 
 suedd_getlink_url <- function(url, startdate){
   # remDr$navigate(url)
@@ -103,7 +103,15 @@ suedd_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-suedd_go_thr_archive(startdate = "2022-01-01") -> valid_links
+suedd_go_thr_archive(startdate = "2021-12-01") -> valid_links
+
+valid_links %>% dplyr::distinct() %>% 
+  dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "SZ", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "SZ.RDS")
 
 # remDr$close()
 # z <- rD$server$stop()

@@ -25,13 +25,15 @@ rubikon_getlink <- function(html){
     rvest::html_elements(xpath = "//article[contains(@class, 'article-horizontal article-big')]//div[contains(@class, 'article-meta')]") %>% 
     rvest::html_text(., trim = TRUE) %>% 
     stringr::str_extract(., pattern = "[0-9]+[. ]+[0-9a-zA-Z]+[. ][0-9]+") %>%
-    as.Date(tryFormat = c("%d.%m.%Y", "%d. %B %Y")) -> item_pubdate
+    stringr::str_replace(., "März", "March") %>%
+    lubridate::dmy() -> item_pubdate
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//article[contains(@class, 'article-horizontal article-small')]//div[contains(@class, 'article-meta')]") %>% 
     rvest::html_text(., trim = TRUE) %>% 
     stringr::str_extract(., pattern = "[0-9]+[. ]+[0-9]+[. ][0-9]+") %>%
-    as.Date(tryFormat = c("%d.%m.%Y", "%d. %B %Y"))  %>% c(item_pubdate, .)-> item_pubdate
+    stringr::str_replace(., "März", "March") %>%
+    lubridate::dmy()  %>% c(item_pubdate, .)-> item_pubdate
     
     df <- data.frame(item_title, item_link, item_pubdate)
     return(df)
@@ -57,6 +59,13 @@ rubikon_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-valid_links <- rubikon_go_thr_archive("2022-01-01")
+valid_links <- rubikon_go_thr_archive("2021-12-01")
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Rubikon", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Rubikon.RDS")
 
 

@@ -108,11 +108,11 @@ c("news", "politik", "wirtschaft", "meinung",
 
 #trt_go_thr_columns("news", "2021-12-31") -> test
 
-valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
+valid_links_1 %>% dplyr::rename(title = item_title, link = item_link) %>% 
   dplyr::mutate(pub = "TRT", description = NA, pubdate = NA) %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
-saveRDS(valid_links, "TRT_1.RDS")
+saveRDS(valid_links, "TRT.RDS")
 
 # remDr$close()
  # z <- rD$server$stop()

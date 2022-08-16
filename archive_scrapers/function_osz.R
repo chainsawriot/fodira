@@ -90,3 +90,10 @@ osz_go_thr_archive("2021-12-31") -> valid_links
 
  # remDr$close()
  # z <- rD$server$stop()
+
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Ostsee-Zeitung", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Ostsee-Zeitung.RDS")

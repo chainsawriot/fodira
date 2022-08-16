@@ -1,9 +1,9 @@
 require(RSelenium)
 require(magrittr)
-rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(#5678L, 
                                                                5679L, 
                                                                5680L, 
-                                                               5681L, 
+                                                               #5681L, 
                                                                5682L), size = 1), check = FALSE, verbose = FALSE)
 remDr <- rD[["client"]]
 
@@ -98,21 +98,27 @@ nordkur_go_thr_archive <- function(startdate, rubrik, startn, endn){
 }
 
 c("nachrichten", "ratgeber", "meine-region") %>%
-  purrr::map_df(~nordkur_go_thr_archive(startdate = "2021-12-31", ., startn = 1, endn = 500)) -> valid_links1
+  purrr::map_df(~nordkur_go_thr_archive(startdate = "2021-12-01", ., startn = 1, endn = 500)) -> valid_links1
 
 c("nachrichten", "ratgeber", "meine-region") %>%
-  purrr::map_df(~nordkur_go_thr_archive(startdate = "2021-12-31", ., startn = 501, endn = 1000)) -> valid_links2
+  purrr::map_df(~nordkur_go_thr_archive(startdate = "2021-12-01", ., startn = 501, endn = 1000)) -> valid_links2
 
 c("nachrichten", "ratgeber", "meine-region") %>%
-  purrr::map_df(~nordkur_go_thr_archive(startdate = "2021-12-31", ., startn = 1001, endn = 1500)) -> valid_links3
+  purrr::map_df(~nordkur_go_thr_archive(startdate = "2021-12-01", ., startn = 1001, endn = 1500)) -> valid_links3
 
 c("nachrichten", "ratgeber", "meine-region") %>%
-  purrr::map_df(~nordkur_go_thr_archive(startdate = "2021-12-31", ., startn = 1501, endn = 2000)) -> valid_links4
+  purrr::map_df(~nordkur_go_thr_archive(startdate = "2021-12-01", ., startn = 1501, endn = 2500)) -> valid_links4
 
 valid_links <- rbind(valid_links1, valid_links2, valid_links3, valid_links4)
 
 #saveRDS(valid_links, "nordkurier1.RDS")
 
-unique(valid_links$item_pubdate)
+valid_links %>% dplyr::rename(title = item_title..is.na.item_title.., link = item_link..is.na.item_title.., pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Nordkurier", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+valid_links <- dplyr::distinct(valid_links)
+
+saveRDS(valid_links, "Nordkurier.RDS")
 remDr$close()
 z <- rD$server$stop()

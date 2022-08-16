@@ -45,10 +45,17 @@ c("rubrik/meinung", "rubrik/politik-oekonomie", "rubrik/hauptstadtregion",
   "die-woche/rubrik/politik-oekonomie", "die-woche/rubrik/kunst-kritik", 
   "die-woche/rubrik/mikroskop", "die-woche/rubrik/begegnungen", 
   "die-woche/rubrik/metropole", "die-woche/rubrik/sport", "die-woche/rubrik/reise") %>% 
-  purrr::map_dfr(~nd_go_thr_columns(., startdate = "2022-01-01")) -> valid_links
+  purrr::map_dfr(~nd_go_thr_columns(., startdate = "2021-12-31")) -> valid_links
 
 valid_links <- dplyr::distinct(valid_links)
 
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Neues Deutschland", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Neues Deutschland.RDS")
 
 
 

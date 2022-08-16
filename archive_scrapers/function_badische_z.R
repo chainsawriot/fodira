@@ -22,13 +22,14 @@ bad_z_getlink <- function(html){
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//section[contains(@class, 'row grid-12')]//div[contains(@class, 'column large__12 medium__6 small__6')]//ul[1]/li[contains(@class, 'media-box__article__box__item')][1]/a[1]") %>% 
-    rvest::html_attr("href") -> item_link
+    rvest::html_attr("href") %>% paste0("https://www.badische-zeitung.de",.)-> item_link
 
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//h2[contains(@class, 'media-box__article media-box__article__titel')]") %>%
     rvest::html_text(., trim = TRUE) %>% 
     stringr::str_extract("[0-9]+\\. [A-Za-zäöü]+ [0-9]+") %>% 
-    as.Date(. , tryFormat = "%d. %B %Y") -> item_pubdate
+    stringr::str_replace(., "März", "March") %>%
+    lubridate::dmy() -> item_pubdate
   
 
   
@@ -76,8 +77,14 @@ bad_z_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-bad_z_go_thr_archive(startdate = "2021-12-31") -> valid_links
+bad_z_go_thr_archive(startdate = "2021-12-01") -> valid_links
 
 unique(valid_links$item_pubdate)
 # remDr$close()
 # z <- rD$server$stop()
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Badische Zeitung", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Badische Zeitung.RDS")

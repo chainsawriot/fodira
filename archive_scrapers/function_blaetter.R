@@ -6,7 +6,7 @@ pjs_session <- Session$new(port = pjs_instance$port)
 
 
 #Sys.setlocale("LC_TIME", "C")
-#Sys.setlocale("LC_TIME", "de_DE")
+Sys.setlocale("LC_TIME", "de_DE")
 
 #function for geting links from page
 blaetter_getlink <- function(html){
@@ -30,8 +30,8 @@ blaetter_getlink_url <- function(url){
 }
 
 blaetter_go_thr_archive <- function(startdate){
-  format(seq(as.Date("2022-01-01"), Sys.Date()+10, by="months"), "%Y/%B") %>%
-    stringr::str_replace(., "M.rz", "Maerz") -> V1
+  format(seq(as.Date(startdate), Sys.Date()+10, by="months"), "%Y/%B") %>%
+    stringr::str_replace(., "M.+rz", "Maerz") -> V1
   
   V1 %>% as.character() %>%
     paste0("https://www.blaetter.de/ausgabe/", .) %>%
@@ -40,8 +40,14 @@ blaetter_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-valid_links <- blaetter_go_thr_archive("2022-01-01")
+valid_links <- blaetter_go_thr_archive("2021-12-01")
 
+valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
+  dplyr::mutate(pub = "blaetter.de", description = NA, pubdate = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "blaetter.de.RDS")
 
 
 

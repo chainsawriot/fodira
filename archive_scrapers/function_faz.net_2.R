@@ -73,8 +73,14 @@ faz_go_thr_archive <- function(startdate, enddate){
   
   
 
-faz_go_thr_archive("2022-01-01", Sys.Date())-> valid_links
+faz_go_thr_archive("2021-12-01", Sys.Date())-> valid_links
 
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "FAZ", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "FAZ.RDS")
 
  remDr$close()
  z <- rD$server$stop()

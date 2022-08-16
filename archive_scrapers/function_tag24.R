@@ -165,17 +165,23 @@ tag24_go_thr_topics <- function(startdate, n){
 
 
 
-tag24_go_thr_topics("2021-12-31", 1:5)-> valid_links_1
-tag24_go_thr_topics("2022-12-31", 6:10)-> valid_links_2
-tag24_go_thr_topics("2022-12-31", 11:15)-> valid_links_3
-tag24_go_thr_topics("2022-12-31", 16:20)-> valid_links_4
-tag24_go_thr_topics("2022-12-31", 21:25)-> valid_links_5
-tag24_go_thr_topics("2022-12-31", 26:29)-> valid_links_6
+tag24_go_thr_topics("2021-12-01", 1:5)-> valid_links_1
+tag24_go_thr_topics("2021-12-01", 6:10)-> valid_links_2
+tag24_go_thr_topics("2021-12-01", 11:15)-> valid_links_3
+tag24_go_thr_topics("2021-12-01", 16:20)-> valid_links_4
+tag24_go_thr_topics("2021-12-01", 21:25)-> valid_links_5
+tag24_go_thr_topics("2021-12-01", 26:29)-> valid_links_6
 
 valid_links <- dplyr::distinct(rbind(valid_links_1, valid_links_2, valid_links_3,
                                      valid_links_4, valid_links_5, valid_links_6))
 
-saveRDS(valid_links, "tag24_1.RDS")
+valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
+  dplyr::mutate(pub = "Tag24", description = NA, pubdate = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Tag24.RDS")
+
+#saveRDS(valid_links, "tag24_1.RDS")
 
 remDr$close()
 z <- rD$server$stop()

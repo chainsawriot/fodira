@@ -163,7 +163,7 @@ nordb_getlink <- function(category, startdate){
 
 #function for geting links from page
 
-save.image(file = "nordb_4.RData")
+#save.image(file = "nordb_4.RData")
 
 c("politik") %>%
   purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links1
@@ -231,7 +231,7 @@ c("wirtschaft") %>%
 c("panorama") %>%
   purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links21
 
-save.image(file= "nordb_2.RData")
+#save.image(file= "nordb_2.RData")
 
 c("kultur") %>%
   purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links22

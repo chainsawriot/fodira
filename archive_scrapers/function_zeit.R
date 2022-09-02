@@ -6,7 +6,9 @@ require(magrittr)
 fprof <- makeFirefoxProfile(list(permissions.default.image = 21))
 rD <- RSelenium::rsDriver(browser = "firefox", 
                           #chromever = "103.0.5060.134", 
-                          port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), 
+                          port = sample(c(#5678L, 
+                                          #5679L, #5680L, #5681L, 
+                                          5682L), size = 1), 
                           #phantomver = "2.1.1",
                           extraCapabilities = fprof,
                           check = TRUE, verbose = FALSE)
@@ -57,7 +59,8 @@ zeit_getlink <- function(html){
   rvest::read_html(html) %>% 
   #  html %>%
     rvest::html_elements(xpath = "//article[contains(@class, 'newsteaser')]//time[contains(@class, 'newsteaser__time')]") %>% 
-    rvest::html_text(trim = TRUE) %>% stringr::str_replace(., "Heute, .+", format(Sys.Date(), "%d. %m. %Y")) %>% as.Date(., tryFormat= "%d. %m. %Y") -> item_pubdate
+    rvest::html_text(trim = TRUE) %>% stringr::str_replace(., "Heute, .+", format(Sys.Date(), "%d. %m. %Y")) %>% 
+    lubridate::dmy() -> item_pubdate
   
   if(length(item_pubdate) < length(item_title)){
     l <- item_pubdate[order(item_pubdate, decreasing = TRUE)][1]
@@ -81,7 +84,7 @@ zeit_getlink <- function(html){
     rvest::html_attr("href")  -> item_link
 
   if(length(item_link)>0){
-    item_pubdate <- "2022-01-01"
+    item_pubdate <- lubridate::ymd("2022-01-01")
     
     df <- rbind(df, data.frame(item_title, item_link, item_pubdate))
   }
@@ -103,11 +106,12 @@ zeit_getlink <- function(html){
     rvest::html_text(trim = TRUE) %>% 
     stringr::str_replace(., "Vor .+ Stunden", format(Sys.Date(), "%d. %B %Y")) %>%
     stringr::str_replace(., "Vor .+ Stunde", format(Sys.Date(), "%d. %B %Y")) %>%
-    stringr::str_replace(., "Vor 1 Tag", format((Sys.Date()-1), "%d. %B %Y")) %>%
-    stringr::str_replace(., "Vor 2 Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>% 
+    stringr::str_replace(., "Vor .+ Tag", format((Sys.Date()-1), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor .+ Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>% 
     stringr::str_replace(., "Vor .+ Minuten", format(Sys.Date(), "%d. %B %Y")) %>%
     stringr::str_replace(., "Vor .+ Minute", format(Sys.Date(), "%d. %B %Y")) %>%
-    as.Date(., tryFormat= c("%d. %m. %Y", "%d. %B %Y")) -> item_pubdate
+    stringr::str_replace(., "M.rz", "March") %>%
+    lubridate::dmy() -> item_pubdate
   
   if(length(item_pubdate) < length(item_title)){
     l <- item_pubdate[order(item_pubdate, decreasing = TRUE)][1]
@@ -134,11 +138,12 @@ zeit_getlink <- function(html){
     rvest::html_text(trim = TRUE) %>% 
     stringr::str_replace(., "Vor .+ Stunden", format(Sys.Date(), "%d. %B %Y")) %>%
     stringr::str_replace(., "Vor .+ Stunde", format(Sys.Date(), "%d. %B %Y")) %>%
-    stringr::str_replace(., "Vor 1 Tag", format((Sys.Date()-1), "%d. %B %Y")) %>%
-    stringr::str_replace(., "Vor 2 Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>% 
+    stringr::str_replace(., "Vor .+ Tag", format((Sys.Date()-1), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor .+ Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>% 
     stringr::str_replace(., "Vor .+ Minuten", format(Sys.Date(), "%d. %B %Y")) %>%
     stringr::str_replace(., "Vor .+ Minute", format(Sys.Date(), "%d. %B %Y")) %>%
-    as.Date(., tryFormat= c("%d. %m. %Y", "%d. %B %Y")) -> item_pubdate
+    stringr::str_replace(., "M.rz", "March") %>%
+    lubridate::dmy() -> item_pubdate
   
   if(length(item_pubdate) < length(item_title)){
     l <- item_pubdate[order(item_pubdate, decreasing = TRUE)][1]
@@ -165,11 +170,12 @@ zeit_getlink <- function(html){
     rvest::html_text(trim = TRUE) %>%
     stringr::str_replace(., "Vor .+ Stunden", format(Sys.Date(), "%d. %B %Y")) %>%
     stringr::str_replace(., "Vor .+ Stunde", format(Sys.Date(), "%d. %B %Y")) %>%
-    stringr::str_replace(., "Vor 1 Tag", format((Sys.Date()-1), "%d. %B %Y")) %>%
-    stringr::str_replace(., "Vor 2 Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>% 
+    stringr::str_replace(., "Vor .+ Tag", format((Sys.Date()-1), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor .+ Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>% 
     stringr::str_replace(., "Vor .+ Minuten", format(Sys.Date(), "%d. %B %Y")) %>%
     stringr::str_replace(., "Vor .+ Minute", format(Sys.Date(), "%d. %B %Y")) %>%
-    as.Date(., tryFormat= c("%d. %m. %Y", "%d. %B %Y")) -> item_pubdate
+    stringr::str_replace(., "M.rz", "March") %>%
+    lubridate::dmy() -> item_pubdate
   
   if(length(item_pubdate) < length(item_title)){
     l <- item_pubdate[order(item_pubdate, decreasing = TRUE)][1]
@@ -198,11 +204,12 @@ zeit_getlink <- function(html){
     rvest::html_text(trim = TRUE) %>%
     stringr::str_replace(., "Vor .+ Stunden", format(Sys.Date(), "%d. %B %Y")) %>%
     stringr::str_replace(., "Vor .+ Stunde", format(Sys.Date(), "%d. %B %Y")) %>%
-    stringr::str_replace(., "Vor 1 Tag", format((Sys.Date()-1), "%d. %B %Y")) %>%
-    stringr::str_replace(., "Vor 2 Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>% 
+    stringr::str_replace(., "Vor .+ Tag", format((Sys.Date()-1), "%d. %B %Y")) %>%
+    stringr::str_replace(., "Vor .+ Tagen", format(Sys.Date()-2, "%d. %B %Y")) %>% 
     stringr::str_replace(., "Vor .+ Minuten", format(Sys.Date(), "%d. %B %Y")) %>%
     stringr::str_replace(., "Vor .+ Minute", format(Sys.Date(), "%d. %B %Y")) %>%
-    as.Date(., tryFormat= c("%d. %m. %Y", "%d. %B %Y")) -> item_pubdate
+    stringr::str_replace(., "M.rz", "March") %>%
+    lubridate::dmy() -> item_pubdate
   
   if(length(item_pubdate) < length(item_title)){
     l <- item_pubdate[order(item_pubdate, decreasing = TRUE)][1]
@@ -328,9 +335,59 @@ zeit_go_thr_topics <- function(startdate, n){
 
 
 
-zeit_go_thr_topics("2021-12-31", 1:10)-> valid_links_1
+zeit_go_thr_topics("2021-12-01", 1)-> valid_links_1
+zeit_go_thr_topics("2021-12-01", 2)-> valid_links_2
+zeit_go_thr_topics("2021-12-01", 3)-> valid_links_3
+zeit_go_thr_topics("2021-12-01", 4)-> valid_links_4
+zeit_go_thr_topics("2021-12-01", 5)-> valid_links_5
+zeit_go_thr_topics("2021-12-01", 6)-> valid_links_6
+zeit_go_thr_topics("2021-12-01", 7)-> valid_links_7
+zeit_go_thr_topics("2021-12-01", 8)-> valid_links_8
+zeit_go_thr_topics("2021-12-01", 9)-> valid_links_9
+zeit_go_thr_topics("2021-12-01", 10)-> valid_links_10
+zeit_go_thr_topics("2021-12-01", 11)-> valid_links_11
+zeit_go_thr_topics("2021-12-01", 12)-> valid_links_12
+zeit_go_thr_topics("2021-12-01", 13)-> valid_links_13
+zeit_go_thr_topics("2021-12-01", 14)-> valid_links_14
+zeit_go_thr_topics("2021-12-01", 15)-> valid_links_15
+zeit_go_thr_topics("2021-12-01", 16)-> valid_links_16
+zeit_go_thr_topics("2021-12-01", 17)-> valid_links_17
+zeit_go_thr_topics("2021-12-01", 18)-> valid_links_18
+zeit_go_thr_topics("2021-12-01", 19)-> valid_links_19
+zeit_go_thr_topics("2021-12-01", 20)-> valid_links_20
+zeit_go_thr_topics("2021-12-01", 21)-> valid_links_21
+zeit_go_thr_topics("2021-12-01", 22)-> valid_links_22
+zeit_go_thr_topics("2021-12-01", 23)-> valid_links_23
+zeit_go_thr_topics("2021-12-01", 24)-> valid_links_24
+zeit_go_thr_topics("2021-12-01", 25)-> valid_links_25
+zeit_go_thr_topics("2021-12-01", 26)-> valid_links_26
+zeit_go_thr_topics("2021-12-01", 27)-> valid_links_27
 
-valid_links <- dplyr::distinct(valid_links)
+
+valid_links <- dplyr::distinct(rbind(valid_links_1, valid_links_10, 
+                                     valid_links_11, valid_links_12, 
+                                     valid_links_13, 
+                                     valid_links_14, valid_links_15, 
+                                     valid_links_16, 
+                                     valid_links_17, 
+                                     valid_links_18, valid_links_19, 
+                                     valid_links_2, 
+                                     valid_links_20, valid_links_21, 
+                                     valid_links_22, valid_links_23, valid_links_24, 
+                                     valid_links_25, valid_links_26, valid_links_27, 
+                                     valid_links_3, valid_links_4, 
+                                     valid_links_5, valid_links_6, valid_links_7, 
+                                     valid_links_8, 
+                                     valid_links_9), item_link,
+                               .keep_all = TRUE)
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Zeit", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+
+saveRDS(valid_links, "Zeit.RDS")
+
 
  remDr$close()
  z <- rD$server$stop()

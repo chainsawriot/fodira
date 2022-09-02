@@ -8,7 +8,7 @@ Sys.setlocale("LC_TIME", "de_DE")
 
 #function for geting links from page
 ppq_getlink <- function(html){
-  html <- pjs_session$getUrl()
+  #html <- remDr$getPageSource()[[1]]
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'blog-posts hfeed')]//h2[contains(@class, 'date-header')]") %>% length() -> j
@@ -38,7 +38,7 @@ ppq_getlink <- function(html){
       rep(. , length(item_link_)) -> item_pubdate_
     item_pubdate <- c(item_pubdate, item_pubdate_)
   }
-    df <- data.frame(item_title, item_link, item_pubdate = item_pubdate[2:length(item_pubdate)])
+    df <- data.frame(item_title, item_link, item_pubdate = item_pubdate[2:(length(item_link)+1)])
     return(df)
 }
 # 
@@ -65,6 +65,12 @@ ppq_go_thr_archive <- function(startdate){
 }
 
 ppq_go_thr_archive("2021-12-01") -> valid_links
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "Politplatschquatsch", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "Politplatschquatsch.RDS")
 
 remDr$close()
 z <- rD$server$stop()

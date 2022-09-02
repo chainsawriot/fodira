@@ -150,8 +150,8 @@ nordb_getlink <- function(category, startdate){
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//section[contains(@class, 'modul modul--newslist')]/div") %>% length() -> n
   
-  remDr$close()
-  z <- rD$server$stop()
+  # remDr$close()
+  # z <- rD$server$stop()
   
   (1:n) %>% purrr::map_df(~nord_gothr_largechunk(html=html, .)) -> df
   
@@ -163,10 +163,10 @@ nordb_getlink <- function(category, startdate){
 
 #function for geting links from page
 
-#save(valid_links1, file = "nordb.RData")
+#save.image(file = "nordb_4.RData")
 
 c("politik") %>%
-  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links29
+  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links1
 
 c("region/polizeiberichte") %>%
  purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links2
@@ -189,7 +189,7 @@ c("region/forchheim") %>%
 
 ###########################################
 c("region/fuerth") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-02-10")) -> valid_links8
+  purrr::map_df(~nordb_getlink(. , "2022-02-18")) -> valid_links8
 
 c("region/gunzenhausen") %>%
   purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links9
@@ -231,6 +231,8 @@ c("wirtschaft") %>%
 c("panorama") %>%
   purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links21
 
+#save.image(file= "nordb_2.RData")
+
 c("kultur") %>%
   purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links22
 
@@ -252,7 +254,21 @@ c("tv") %>%
 c("sport") %>%
   purrr::map_df(~nordb_getlink(. , "2021-12-31")) -> valid_links28
 
-save.image("nordb_.RData")
 
-remDr$close()
-z <- rD$server$stop()
+#save.image("nordb_.RData")
+
+valid_links <- dplyr::distinct(rbind(valid_links1, valid_links10, valid_links11, valid_links12,
+                valid_links13, valid_links14, valid_links15, valid_links16,
+                valid_links17, valid_links18, valid_links19, valid_links2,
+                valid_links20, valid_links21, valid_links22,
+                valid_links23, valid_links24, valid_links25, valid_links26,
+                valid_links27, valid_links28, valid_links3, 
+                valid_links4,         
+                valid_links5,  valid_links6,  valid_links7,  valid_links8, 
+                valid_links9))
+
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
+  dplyr::mutate(pub = "nordbayern.de", description = NA) %>%
+  dplyr::select(pub, link, pubdate, title, description) -> valid_links
+
+saveRDS(valid_links, "nordbayern.de.RDS")

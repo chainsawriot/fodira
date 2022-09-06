@@ -14,6 +14,19 @@ debug <- args[3]
 library(magrittr)
 input <- rio::import(csv)
 
+
+.detect_atom <- function(x) {
+    any(grepl("^entry", colnames(x)))
+}
+
+## entry_last_updated -> "item_pub_date"
+## entry_title -> "item_title"
+## entry_url -> "item_link"
+## entry_summary -> "item_description"
+.convert_atom <- function(x) {
+    dplyr::rename(x, item_title = `entry_title`, item_link = `entry_url`, item_pub_date = `entry_last_updated`, item_description = `entry_summary`)
+}
+
 .silent_parse <- function(url, id = NA, debug = NA) {
     if (!is.na(debug)) {
         message(url)
@@ -21,6 +34,9 @@ input <- rio::import(csv)
     suppressMessages(res <- tidyRSS::tidyfeed(url))
     res$id <- id
     res$url <- url
+    if (.detect_atom(res)) {
+        res <- .convert_atom(res)
+    }
     if (!"item_pub_date" %in% colnames(res)) {
         res$item_pub_date <- NA
     }
@@ -36,6 +52,7 @@ res <- purrr::map2(input$url, input$page, purrr::safely(.silent_parse), debug = 
 ## input$url[19]
 
 ## res %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>%  purrr::discard(~"item_pub_date" %in% colnames(.)) -> error_stuff
+
 
 res %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% purrr::map(~dplyr::select(., dplyr::any_of(c("id", "item_link", "item_title", "item_pub_date", "item_description")))) %>% dplyr::bind_rows() -> valid_links
 

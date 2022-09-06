@@ -4,8 +4,7 @@ library(magrittr)
 args <- commandArgs(trailingOnly=TRUE)
 
 .get_urls <- function(con) {
-    DBI::dbGetQuery(con, "SELECT link FROM articles where htmlfile is null using sample 30")$link
-
+    DBI::dbGetQuery(con, "SELECT link FROM articles where htmlfile is null and (pubdate > '2021-12-30' or pubdate is null) using sample 30")$link
 }
 
 if (length(args) == 0) {

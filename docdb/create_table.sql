@@ -9,3 +9,8 @@ htmlfile VARCHAR,
 text VARCHAR,
 insert_timestamp TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE failedurls(
+link VARCHAR,
+insert_timestamp TIMESTAMP NOT NULL DEFAULT NOW()
+);

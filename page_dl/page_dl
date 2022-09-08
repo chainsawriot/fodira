@@ -5,7 +5,7 @@ args <- commandArgs(trailingOnly=TRUE)
 
 USUAL_SQL <- "SELECT link FROM articles where htmlfile is null and (pubdate > '2021-12-30' or pubdate is null) using sample 30"
 
-SAFE_SQL <- "select link from articles where pub in ('Epoch Times', 'Bild', 'Tagesschau', 'Heute', 'Freitag', 'T-Online') and (pubdate > '2021-12-30' or pubdate is null) using sample 100;"
+SAFE_SQL <- "select link from articles where pub in ('Bild', 'Tagesschau', 'Heute', 'Freitag', 'T-Online') and (pubdate > '2021-12-30' or pubdate is null) using sample 100;"
 
 .get_urls <- function(con, sql) {
     DBI::dbGetQuery(con, sql)$link

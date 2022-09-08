@@ -16,10 +16,10 @@ if (length(args) == 0) {
 } else if (args[1] == "db") {
     db <- Sys.getenv("ARTICLE_DB")
     con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db , read_only = FALSE)
-    if (args[2] == "safe") {
-        urls <- .get_urls(con, SAFE_SQL)
-    } else {
+    if (is.na(args[2])) {
         urls <- .get_urls(con, USUAL_SQL)
+    } else if (args[2] == "safe") {
+        urls <- .get_urls(con, SAFE_SQL)
     }
     DBI::dbDisconnect(con, shutdown = TRUE)
 } else {

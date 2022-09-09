@@ -1,0 +1,15 @@
+#!/usr/bin/env Rscript
+
+library(magrittr)
+OUTPUT_FILE <- "res.RDS"
+
+res <- readRDS(OUTPUT_FILE)
+
+if (nrow(res) > 0) {
+    db <- Sys.getenv("ARTICLE_DB")
+    con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db , read_only = FALSE)
+    for (i in seq_len(nrow(res))) {
+        DBI::dbExecute(con, "update articles set htmlfile = ? where link = ?", list(res[i, "fname"], res[i, "url"]))
+    }
+    DBI::dbDisconnect(con, shutdown = TRUE)
+}

@@ -7,6 +7,8 @@ USUAL_SQL <- "SELECT link FROM articles where htmlfile is null and (pubdate > '2
 
 SAFE_SQL <- "select link from articles where pub in ('Bild', 'Tagesschau', 'Heute', 'Freitag', 'T-Online') and (pubdate > '2021-12-30' or pubdate is null) using sample 100;"
 
+OUTPUT_FILE <- "res.RDS"
+
 .get_urls <- function(con, sql) {
     DBI::dbGetQuery(con, sql)$link
 }
@@ -15,7 +17,7 @@ if (length(args) == 0) {
     urls <- readLines(file("stdin"))
 } else if (args[1] == "db") {
     db <- Sys.getenv("ARTICLE_DB")
-    con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db , read_only = FALSE)
+    con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db , read_only = TRUE)
     if (is.na(args[2])) {
         urls <- .get_urls(con, USUAL_SQL)
     } else if (args[2] == "safe") {
@@ -61,13 +63,4 @@ res <- purrr::map(urls, purrr::safely(.scrape), remDr = remDr) %>% purrr::discar
 remDr$close()
 z <- rD$server$stop()
 
-if (args[1] == "db" & nrow(res) > 0) {
-    db <- Sys.getenv("ARTICLE_DB")
-    con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db , read_only = FALSE)
-    for (i in seq_len(nrow(res))) {
-        DBI::dbExecute(con, "update articles set htmlfile = ? where link = ?", list(res[i, "fname"], res[i, "url"]))
-    }
-    DBI::dbDisconnect(con, shutdown = TRUE)
-}
-
-res
+saveRDS(res, OUTPUT_FILE)

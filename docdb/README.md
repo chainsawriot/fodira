@@ -76,10 +76,24 @@ Convert `pubdate` to ISODate
 db.articles.updateMany({}, [{"$set": {"pubdate": { "$toDate": "$pubdate"}}}]);
 ```
 
+Create the Indexes at `pubdate` and `pub`
+
+```js
+db.articles.createIndex({"pubdate": 1})
+db.articles.createIndex({"pub": 1})
+```
+
+Remove all records with `link` being empty and create unique index
+
+```js
+db.articles.deleteMany({"link": ""})
+db.articles.createIndex({"link": 1}, {"unique": true})
+```
+
 Now it is fine at the raw migration of the data.
 
 ```js
-db.articles.find();
+db.articles.find({"pub": "Heute"});
 ```
 
 4. Renaming HTMLs

@@ -1,15 +1,21 @@
 #!/usr/bin/env Rscript
 
-library(magrittr)
+## library(magrittr)
 OUTPUT_FILE <- "res.RDS"
 
 res <- readRDS(OUTPUT_FILE)
 
 if (nrow(res) > 0) {
-    db <- Sys.getenv("ARTICLE_DB")
-    con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db , read_only = FALSE)
+    con <- mongolite::mongo("articles", db = "main")
+    fs <- mongolite::gridfs(db = "main", prefix = "html")
     for (i in seq_len(nrow(res))) {
-        DBI::dbExecute(con, "update articles set htmlfile = ? where link = ?", list(res[i, "fname"], res[i, "url"]))
+        htmlpath <- file.path(Sys.getenv("ARTICLE_DIR"), res$fname[i])
+        if (file.exists(htmlpath)) {
+            query <- paste0('{"link": "', res[i, "url"],'"}')
+            update <- paste0('{"$set": { "htmlfile": "', res[i, "fname"],'"}}')
+            con$update(query, update)
+            ## push GridFS
+            fs$upload(htmlpath)
+        }
     }
-    DBI::dbDisconnect(con, shutdown = TRUE)
 }

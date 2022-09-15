@@ -3,27 +3,26 @@
 library(magrittr)
 args <- commandArgs(trailingOnly=TRUE)
 
-USUAL_SQL <- "SELECT link FROM articles where htmlfile is null and (pubdate > '2021-12-30' or pubdate is null) using sample 30"
-
-SAFE_SQL <- "select link from articles where pub in ('Bild', 'Tagesschau', 'Heute', 'Freitag', 'T-Online') and (pubdate > '2021-12-30' or pubdate is null) using sample 100;"
-
 OUTPUT_FILE <- "res.RDS"
 
-.get_urls <- function(con, sql) {
-    DBI::dbGetQuery(con, sql)$link
+## Zeit won't work
+.get_urls <- function(con, safe) {
+    if (safe) {
+        con$aggregate('[ {"$match": {"htmlfile": "", "pub" : { "$in": ["Bild", "Tagesschau", "Heute", "Freitag", "T-Online"]}}}, { "$sample": { "size": 30} }]')$link
+    } else {
+        con$aggregate('[ {"$match": {"htmlfile": "", "pub": { "$nin": ["Zeit"]}}}, { "$sample": { "size": 30} }]')$link
+    }
 }
 
 if (length(args) == 0) {
     urls <- readLines(file("stdin"))
 } else if (args[1] == "db") {
-    db <- Sys.getenv("ARTICLE_DB")
-    con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db , read_only = TRUE)
+    con <- mongolite::mongo("articles", db = "main")
     if (is.na(args[2])) {
-        urls <- .get_urls(con, USUAL_SQL)
+        urls <- .get_urls(con, safe = FALSE)
     } else if (args[2] == "safe") {
-        urls <- .get_urls(con, SAFE_SQL)
+        urls <- .get_urls(con, safe = TRUE)
     }
-    DBI::dbDisconnect(con, shutdown = TRUE)
 } else {
     urls <- args
 }
@@ -44,7 +43,7 @@ remDr <- rD[["client"]]
 # 20s
 remDr$setTimeout(type = "page load", milliseconds = 20000)
 
-.scrape <- function(url, remDr, sleep = 1) {
+.scrape <- function(url, remDr, sleep = sample(seq(0, 1, .1), size = 1)) {
     message(url)
     if (is.na(url)) {
         return(tibble::tibble(url = NA, fname = NA))
@@ -52,7 +51,8 @@ remDr$setTimeout(type = "page load", milliseconds = 20000)
     remDr$navigate(url)
     src <- remDr$getPageSource()
     url_hash <- digest::sha1(url, digits = 40)
-    fname <- paste0(url_hash, "_" ,Sys.time(), ".html")
+    current_time <- gsub(" ", "_", Sys.time())
+    fname <- paste0(url_hash, "_" ,current_time, ".html")
     writeLines(src[[1]], file.path(Sys.getenv("ARTICLE_DIR"), fname))
     Sys.sleep(sleep)
     return(tibble::tibble(url = url, fname = fname))

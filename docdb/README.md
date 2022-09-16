@@ -45,10 +45,13 @@ The steps to migrate:
 duckdb -c "copy articles to 'articles.csv' (header, delimiter ',');" articles.duckdb
 ```
 
-2. Manipulate the csv with the following: We don't need `id`, `insert_timestamp`; also, replace the space in `htmlfile` with underscore
+2. Manipulate the csv with the following: We don't need `id`, `insert_timestamp`; also, replace the space in `htmlfile` with underscore. We also take this opportunity to fix some inconsistencies in the database.
+
 
 ```sh
-Rscript -e 'library(magrittr); rio::import("articles.csv") %>% dplyr::select(-id, -insert_timestamp) %>% dplyr::mutate(htmlfile = stringr::str_replace(htmlfile, " ", "_")) %>% rio::export("articles_clean.csv")'
+##Rscript -e 'library(magrittr); rio::import("articles.csv") %>% dplyr::select(-id, -insert_timestamp) %>% dplyr::mutate(htmlfile = stringr::str_replace(htmlfile, " ", "_")) %>% rio::export("articles_clean.csv")'
+
+Rscript clean.R
 ```
 
 2. Import the CSV to the database `articles` in MongoDB
@@ -76,17 +79,11 @@ Convert `pubdate` to ISODate
 db.articles.updateMany({}, [{"$set": {"pubdate": { "$toDate": "$pubdate"}}}]);
 ```
 
-Create the Indexes at `pubdate` and `pub`
+Create the indexes at `pubdate` and `pub` and unique index on `link`
 
 ```js
 db.articles.createIndex({"pubdate": 1})
 db.articles.createIndex({"pub": 1})
-```
-
-Remove all records with `link` being empty and create unique index
-
-```js
-db.articles.deleteMany({"link": ""})
 db.articles.createIndex({"link": 1}, {"unique": true})
 ```
 

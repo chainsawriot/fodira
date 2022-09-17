@@ -23,7 +23,7 @@ if (length(args) == 0) {
     link <- readRDS(link_file)
     con <- mongolite::mongo("articles", db = "main")
     for (i in seq_len(nrow(link))) {
-        existing_link <- con$find(paste0('{"link": "', x[i, "link"], '"}'))
+        existing_link <- con$find(paste0('{"link": "', link[i, "link"], '"}'))
         if (debug) {
             message(link[i, "link"])
             if (nrow(existing_link) == 0) {

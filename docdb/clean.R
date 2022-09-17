@@ -14,4 +14,8 @@ excluded_hosts <- c("plus.tagesspiegel.deFALSCHERLINKhtml", "GuMo.html", "bit.ly
 
 qlink %>% filter(str_detect(link, "^http")) %>% bind_rows(vice) %>% arrange(id) %>% mutate(host = purrr::map_chr(link, ~httr::parse_url(.)$hostname)) %>% filter(!host %in% excluded_hosts) %>% select(-host) -> final
 
-final %>% dplyr::select(-id, -insert_timestamp) %>% dplyr::mutate(htmlfile = stringr::str_replace(htmlfile, " ", "_")) %>% rio::export("articles_clean.csv")
+final %>% count(link) %>% filter(n != 1) -> duplicated_links
+
+final %>% filter(link %in% duplicated_links$link) %>% group_by(link) %>% sample_n(1) -> Dedup
+
+final %>% dplyr::select(-id, -insert_timestamp) %>% filter(!link %in% duplicated_links$link) %>% bind_rows(Dedup) %>% dplyr::mutate(htmlfile = stringr::str_replace(htmlfile, " ", "_")) %>% rio::export("articles_clean.csv")

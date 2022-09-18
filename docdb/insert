@@ -1,0 +1,44 @@
+#!/usr/bin/env Rscript
+
+## `links` should be a list of rds files with the standard format.
+
+args <- commandArgs(trailingOnly = TRUE)
+if ("debug" %in% args) {
+    debug <- TRUE
+    args <- setdiff(args, "debug")
+} else {
+    debug <- FALSE
+}
+
+if (length(args) == 0) {
+    link_files <- readLines(file("stdin"))
+} else {
+    link_files <- args
+}
+
+## basically, it will only insert when the link is not already in ARTICLE_DB.
+## Otherwise, it will not be inserted again.
+
+.insert <- function(link_file, debug) {
+    link <- readRDS(link_file)
+    con <- mongolite::mongo("articles", db = "main")
+    for (i in seq_len(nrow(link))) {
+        existing_link <- con$find(paste0('{"link": "', link[i, "link"], '"}'))
+        if (debug) {
+            message(link[i, "link"])
+            if (nrow(existing_link) == 0) {
+                message("is a new link.")
+            }
+        }
+        if (nrow(existing_link) == 0) {
+            to_be_inserted <- as.data.frame(link[i,])
+            if (lubridate::tz(to_be_inserted$pubdate) != "UTC") {
+                to_be_inserted$pubdate <- lubridate::with_tz(to_be_inserted$pubdate, "UTC")
+            }
+            con$insert(to_be_inserted)
+        }
+    }
+    return(invisible(link_file))
+}
+
+purrr::walk(link_files, .insert, debug = debug)

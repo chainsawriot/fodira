@@ -1,12 +1,31 @@
 #!/usr/bin/env Rscript
 
+library(magrittr)
 args <- commandArgs(trailingOnly=TRUE)
+
+OUTPUT_FILE <- "res.RDS"
+
+## Zeit won't work
+.get_urls <- function(con, safe) {
+    if (safe) {
+        con$aggregate('[ {"$match": {"htmlfile": "", "pub" : { "$in": ["Bild", "Tagesschau", "Heute", "Freitag", "T-Online"]}}}, { "$sample": { "size": 30} }]')$link
+    } else {
+        con$aggregate('[ {"$match": {"htmlfile": "", "pub": { "$nin": ["Zeit"]}}}, { "$sample": { "size": 30} }]')$link
+    }
+}
+
 if (length(args) == 0) {
     urls <- readLines(file("stdin"))
+} else if (args[1] == "db") {
+    con <- mongolite::mongo("articles", db = "main")
+    if (is.na(args[2])) {
+        urls <- .get_urls(con, safe = FALSE)
+    } else if (args[2] == "safe") {
+        urls <- .get_urls(con, safe = TRUE)
+    }
 } else {
     urls <- args
 }
-
 
 if (Sys.getenv("ARTICLE_DIR") == "") {
     stop("Please set `ARTICLE_DIR`!")
@@ -21,8 +40,10 @@ ff_options <- list("moz:firefoxOptions" = list(args = list('--headless')))
 rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE,
                           extraCapabilities = ff_options)
 remDr <- rD[["client"]]
+# 20s
+remDr$setTimeout(type = "page load", milliseconds = 20000)
 
-.scrape <- function(url, remDr, sleep = 1) {
+.scrape <- function(url, remDr, sleep = sample(seq(0, 1, .1), size = 1)) {
     message(url)
     if (is.na(url)) {
         return(tibble::tibble(url = NA, fname = NA))
@@ -30,16 +51,16 @@ remDr <- rD[["client"]]
     remDr$navigate(url)
     src <- remDr$getPageSource()
     url_hash <- digest::sha1(url, digits = 40)
-    fname <- paste0(url_hash, "_" ,Sys.time(), ".html")
+    current_time <- gsub(" ", "_", Sys.time())
+    fname <- paste0(url_hash, "_" ,current_time, ".html")
     writeLines(src[[1]], file.path(Sys.getenv("ARTICLE_DIR"), fname))
     Sys.sleep(sleep)
     return(tibble::tibble(url = url, fname = fname))
 }
 
-res <- purrr::map_dfr(urls, .scrape, remDr = remDr)
+res <- purrr::map(urls, purrr::safely(.scrape), remDr = remDr) %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% dplyr::bind_rows()
 
 remDr$close()
 z <- rD$server$stop()
 
-## Should push this back to the DB
-res
+saveRDS(res, OUTPUT_FILE)

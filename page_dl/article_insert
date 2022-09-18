@@ -1,0 +1,21 @@
+#!/usr/bin/env Rscript
+
+## library(magrittr)
+OUTPUT_FILE <- "res.RDS"
+
+res <- readRDS(OUTPUT_FILE)
+
+if (nrow(res) > 0) {
+    con <- mongolite::mongo("articles", db = "main")
+    fs <- mongolite::gridfs(db = "main", prefix = "html")
+    for (i in seq_len(nrow(res))) {
+        htmlpath <- file.path(Sys.getenv("ARTICLE_DIR"), res$fname[i])
+        if (file.exists(htmlpath)) {
+            query <- paste0('{"link": "', res[i, "url"],'"}')
+            update <- paste0('{"$set": { "htmlfile": "', res[i, "fname"],'"}}')
+            con$update(query, update)
+            ## push GridFS
+            fs$upload(htmlpath)
+        }
+    }
+}

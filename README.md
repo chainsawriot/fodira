@@ -44,5 +44,6 @@ Edit the config file `/etc/mongod.conf` to point dbPath to `/data/mongodb`
 Start the service
 
 ```sh
-sudo systemctl enable mongod`
+sudo systemctl enable mongod
 ```
+

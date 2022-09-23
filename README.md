@@ -51,3 +51,33 @@ Start the service
 sudo systemctl enable mongod
 ```
 
+## Page scraping
+
+1. Install Firefox
+
+It is better to install Firefox from the offical mozilla ppa rather than the snap package of Ubuntu.
+
+```sh
+sudo add-apt-repository ppa:mozillateam/ppa
+sudo apt install firefox
+firefox --version # testing
+```
+
+2. Install JRE, JDK, and rJava
+
+```sh
+sudo apt-get install -y default-jre
+sudo apt-get install -y default-jdk
+sudo R CMD javareconf
+Rscript -e "install.packages('rJava')"
+```
+
+3. Install the RSelenium binary
+
+```R
+ff_options <- list("moz:firefoxOptions" = list(args = list('--headless')))
+
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = TRUE, verbose = FALSE,
+                          extraCapabilities = ff_options)
+z <- rD$server$stop()
+```

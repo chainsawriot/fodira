@@ -16,32 +16,11 @@ if (length(args) == 0) {
     link_files <- args
 }
 
-## basically, it will only insert when the link is not already in ARTICLE_DB.
-## Otherwise, it will not be inserted again.
-
 .insert <- function(link_file, debug, newlinks_fname = "newlinks.RDS") {
-    link <- readRDS(link_file)
-    newlink <- tibble::tibble()
-    con <- mongolite::mongo("articles", db = "main")
-    for (i in seq_len(nrow(link))) {
-        existing_link <- con$find(paste0('{"link": "', link[i, "link"], '"}'))
-        if (debug) {
-            message(link[i, "link"])
-            if (nrow(existing_link) == 0) {
-                message("is a new link.")
-            }
-        }
-        if (nrow(existing_link) == 0) {
-            to_be_inserted <- as.data.frame(link[i,])
-            if (lubridate::tz(to_be_inserted$pubdate) != "UTC") {
-                to_be_inserted$pubdate <- lubridate::with_tz(to_be_inserted$pubdate, "UTC")
-            }
-            con$insert(to_be_inserted)
-            newlink <- dplyr::bind_rows(newlink, to_be_inserted)
-        }
-    }
+    links <- readRDS(link_file)
+    newlinks <- fodira::insert_doc_link(links, debug = debug, db = "main", collection = "articles")
     if (!is.null(newlinks_fname)) {
-        saveRDS(newlink, newlinks_fname)
+        saveRDS(newlinks, newlinks_fname)
     }
     return(invisible(link_file))
 }

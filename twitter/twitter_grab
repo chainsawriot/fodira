@@ -33,4 +33,4 @@ all_users <- DBI::dbGetQuery(con, "SELECT distinct user_username FROM tweets")
     unlink(output_dir, recursive = TRUE)
 }
 
-purrr::walk(handles, .scrape)
+purrr::walk(handles, purrr::safely(.scrape, quiet = FALSE))

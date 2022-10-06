@@ -1,6 +1,6 @@
 Package: fodira
 Title: Common Functions for the FoDiRa Project
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     person("Chung-hong", "Chan", , "chainsawtiney@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6232-7530"))
@@ -8,12 +8,15 @@ Description: A bunch of common functions for the FoDiRa project.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Imports: 
     dplyr,
     httr,
     lubridate,
+    magrittr,
     mongolite,
+    purrr,
+    RSelenium,
     tibble
 Suggests: 
     testthat (>= 3.0.0)

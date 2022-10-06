@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-library(magrittr)
+library(fodira)
 args <- commandArgs(trailingOnly=TRUE)
 
 OUTPUT_FILE <- "res.RDS"
@@ -31,36 +31,6 @@ if (Sys.getenv("ARTICLE_DIR") == "") {
     stop("Please set `ARTICLE_DIR`!")
 }
 
-## debug
-## urls <- "https://www.bild.de/regional/hamburg/hamburg-aktuell/soltau-auf-dem-weg-in-den-knast-nach-dem-pinkeln-schuettelte-er-die-polizisten-a-80708066.bild.html?wtmc=ob.feed"
-## Sys.setenv("ARTICLE_DIR" = "~/dev/fodira/page_dl/html")
-
-ff_options <- list("moz:firefoxOptions" = list(args = list('--headless')))
-
-rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE,
-                          extraCapabilities = ff_options)
-remDr <- rD[["client"]]
-# 20s
-remDr$setTimeout(type = "page load", milliseconds = 20000)
-
-.scrape <- function(url, remDr, sleep = sample(seq(0, 1, .1), size = 1)) {
-    message(url)
-    if (is.na(url)) {
-        return(tibble::tibble(url = NA, fname = NA))
-    }
-    remDr$navigate(url)
-    src <- remDr$getPageSource()
-    url_hash <- digest::sha1(url, digits = 40)
-    current_time <- gsub(" ", "_", Sys.time())
-    fname <- paste0(url_hash, "_" ,current_time, ".html")
-    writeLines(src[[1]], file.path(Sys.getenv("ARTICLE_DIR"), fname))
-    Sys.sleep(sleep)
-    return(tibble::tibble(url = url, fname = fname))
-}
-
-res <- purrr::map(urls, purrr::safely(.scrape), remDr = remDr) %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% dplyr::bind_rows()
-
-remDr$close()
-z <- rD$server$stop()
+res <- fodira::scrape(urls, fodira::gen_selen(), verbose = TRUE, close_selen = TRUE)
 
 saveRDS(res, OUTPUT_FILE)

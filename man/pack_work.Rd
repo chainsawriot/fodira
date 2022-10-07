@@ -7,17 +7,17 @@
 pack_work(output_file = "job.tar.gz", rds, output_dir, delete = FALSE)
 }
 \arguments{
+\item{output_file}{archive}
+
 \item{rds}{rds file}
 
 \item{output_dir}{html directory}
 
 \item{delete}{whether to delete \code{rds} and \code{output_dir} after packing}
-
-\item{outfile}{archive}
 }
 \value{
-\code{output_file}, invisibily
+\code{output_file}, invisibily.
 }
 \description{
-Pack the job from \code{work_dl}
+Pack the job from \code{work_dl} as a single tar.gz
 }

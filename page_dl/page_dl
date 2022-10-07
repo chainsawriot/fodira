@@ -31,6 +31,6 @@ if (Sys.getenv("ARTICLE_DIR") == "") {
     stop("Please set `ARTICLE_DIR`!")
 }
 
-res <- fodira::scrape(urls, fodira::gen_selen(), verbose = TRUE, close_selen = TRUE)
+res <- fodira::scrape(urls, verbose = TRUE)
 
 saveRDS(res, OUTPUT_FILE)

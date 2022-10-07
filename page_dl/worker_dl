@@ -1,0 +1,19 @@
+#!/usr/bin/env Rscript
+
+library(fodira)
+args <- commandArgs(trailingOnly=TRUE)
+
+## arg[1]: rds from get_test_link.R
+## arg[2]: output rds
+## arg[3]: HTML
+
+urls <- readRDS(args[1])
+
+if (is.na(args[3])) {
+    output_dir <- Sys.getenv("ARTICLE_DIR")
+} else {
+    output_dir <- args[3]
+}
+
+res <- fodira::scrape(urls, verbose = TRUE, output_dir = output_dir)
+saveRDS(res, args[2])

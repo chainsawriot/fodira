@@ -1,3 +1,7 @@
+#' Generate an instance of self-contained Selenium instance
+#'
+#' @param headless whether to generate a headless instance (no GUI)
+#' @return an instance of Selenium instance, a list containing both the Selenium Server and the Remote Driver
 #' @export
 gen_selen <- function(headless = TRUE) {
     ff_options <- list()
@@ -35,8 +39,23 @@ gen_selen <- function(headless = TRUE) {
     return(tibble::tibble(url = url, fname = fname))
 }
 
+#' Scrape urls and put it in the output directory
+#'
+#' @param urls a vector or URLs
+#' @param selen an instance of Selenium from [gen_selen()]. If it is NULL, a new instance is generated and close automatically, i.e. `close_selen` is TRUE
+#' @param output_dir a directory to hold HTML files
+#' @param sleep sleep time between each collection
+#' @param write whether to really write the HTML file
+#' @param verbose whether to display debug information
+#' @param close_selen whether to close the Selenium instance, to TRUE if `selen` is null
+#' @param headless whether to generate a headless instance, if `selen` is null
+#' @return a dataframe with urls and filenames; if `write` is TRUE, HTML files are written to `output_dir`. All failed urls will be skipped.
 #' @export
-scrape <- function(urls, selen, output_dir = Sys.getenv("ARTICLE_DIR"), sleep = 1, write = TRUE, verbose = FALSE, close_selen = FALSE) {
+scrape <- function(urls, selen = NULL, output_dir = Sys.getenv("ARTICLE_DIR"), sleep = 1, write = TRUE, verbose = FALSE, close_selen = FALSE, headless = TRUE) {
+    if (is.null(selen)) {
+        selen <- gen_selen(headless = headless)
+        close_selen <- TRUE
+    }
     res <- purrr::map(urls, purrr::safely(.scrape), selen = selen, output_dir = output_dir, sleep = sleep, write = write, verbose = verbose) %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% dplyr::bind_rows()
     if (close_selen) {
         selen$remDr$close()

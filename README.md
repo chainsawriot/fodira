@@ -14,27 +14,41 @@ The project depends on the following envvars. Please set these envvars in the *r
 
 The project needs R (for most of the data collection) and node (for [readability](https://github.com/mozilla/readability)).
 
-## Server setup guide (RSS Part)
+## Server/worker setup guide
 
 It is better to use Ubuntu 20.04 LTS at the moment, due to the installation issues of MongoDB on 22.04 LTS.
 
 1. System dependecies
 
 ```sh
-sudo apt install libcurl4-openssl-dev libssl-dev libxml2-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libssl-dev libsasl2-dev -y
+sudo apt update -qq
+sudo apt install libcurl4-openssl-dev libssl-dev libxml2-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libssl-dev libsasl2-dev software-properties-common dirmngr -y
 ```
 
 2. R packages
 
+**DON'T USE THE r-core provided by Ubuntu; it is currently version pre-4** (#14)
+
 Install R according to [this guide](https://cran.r-project.org/bin/linux/ubuntu/)
+
+From the guide: 
+
+```sh
+# update indices
+wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | sudo tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
+# add the R 4.0 repo from CRAN -- adjust 'focal' to 'groovy' or 'bionic' as needed
+sudo add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/" -y
+sudo apt install --no-install-recommends r-base -y
+```
 
 And then
 
 ```r
-install.packages(c("tidyverse", "rio", "devtools", "tidyRSS", "mongolite"))
+install.packages(c("tidyverse", "rio", "remotes", "tidyRSS", "mongolite"))
+remotes::install_github("chainsawriot/fodira")
 ```
 
-3. Mongodb
+### Installation of MongoDB (Server only)
 
 Install Mongodb according to [this guide](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/)
 
@@ -51,11 +65,13 @@ Start the service
 sudo systemctl enable mongod
 ```
 
-## Page scraping
+### Page scraping
 
 1. Install Firefox
 
-It is better to install Firefox from the offical mozilla ppa rather than the snap package of Ubuntu.
+**DON'T USE THE SNAP PACKAGE**
+
+Install Firefox from the offical Mozilla PPA
 
 ```sh
 sudo add-apt-repository ppa:mozillateam/ppa
@@ -69,7 +85,7 @@ firefox --version # testing
 sudo apt-get install -y default-jre
 sudo apt-get install -y default-jdk
 sudo R CMD javareconf
-Rscript -e "install.packages('rJava')"
+Rscript -e "install.packages(c('rJava', 'RSelenium'))"
 ```
 
 3. Install the RSelenium binary

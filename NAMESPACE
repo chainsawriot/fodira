@@ -2,9 +2,11 @@
 
 export("%>%")
 export(gen_selen)
+export(harmonize_output)
 export(insert_doc_link)
 export(modify_url)
 export(pack_work)
 export(scrape)
 importFrom(magrittr,"%>%")
+importFrom(rlang,.data)
 importFrom(utils,tar)

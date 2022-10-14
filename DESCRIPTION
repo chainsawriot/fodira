@@ -19,6 +19,7 @@ Imports:
     magrittr,
     mongolite,
     purrr,
+    rlang,
     RSelenium,
     tibble
 Suggests: 

@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-## install.packages(c("tidyRSS", "purrr", "dplyr"))
+library(fodira)
 
 args <- commandArgs(trailingOnly=TRUE)
 csv <- args[1]
@@ -11,9 +11,7 @@ debug <- args[3]
 ##csv <- "rss_list.csv"
 #debug <- "12"
 
-library(magrittr)
-input <- rio::import(csv)
-
+suppressMessages(input <- rio::import(csv))
 
 .detect_atom <- function(x) {
     any(grepl("^entry", colnames(x)))
@@ -53,10 +51,10 @@ res <- purrr::map2(input$url, input$page, purrr::safely(.silent_parse), debug = 
 
 ## res %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>%  purrr::discard(~"item_pub_date" %in% colnames(.)) -> error_stuff
 
-
 res %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% purrr::map(~dplyr::select(., dplyr::any_of(c("id", "item_link", "item_title", "item_pub_date", "item_description")))) %>% dplyr::bind_rows() -> valid_links
 
-valid_links %>% dplyr::rename(pub = `id`, link = `item_link`, pubdate = `item_pub_date`, title = `item_title`, description = `item_description`) -> output
+valid_links %>% dplyr::rename(pub = `id`, link = `item_link`, pubdate = `item_pub_date`, title = `item_title`, description = `item_description`) %>%
+    fodira::harmonize_output() -> output
 
 if (!is.na(output_filename)) {
     saveRDS(output, output_filename)

@@ -7,3 +7,4 @@
 ^archive_scrapers
 ^LICENSE\.md$
 ^\.github$
+^docker

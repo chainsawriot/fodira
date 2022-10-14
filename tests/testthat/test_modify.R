@@ -10,3 +10,35 @@ test_that("modify", {
     y4 <- modify_url(rt_url, replace_domains = "test.rtde.me")
     expect_equal(y4, "https://test.rtde.me/international/148141-sex-auf-verlangen-ex-mitarbeiterin/")
 })
+
+test_that("harmonize", {
+    output <- readRDS("../testdata/newlinks.RDS")
+    x1 <- harmonize_output(output)
+    x2 <- harmonize_output(output, pubs_require_cleaning = c("Bild"))
+    x3 <- harmonize_output(output, remove_duplicates = FALSE)
+    expect_true(nrow(output) == nrow(x3))
+    expect_true(nrow(output) > nrow(x1))
+    expect_true(nrow(x2) > nrow(x1))
+    bild_dirty_url <- "https://www.bild.de/geld/wirtschaft/wirtschaft/inflation-im-september-in-deutschland-lebensmittel-fast-20prozent-teurer-81607510.bild.html?wtmc=ob.feed"
+    bild_clean_url <- "https://www.bild.de/geld/wirtschaft/wirtschaft/inflation-im-september-in-deutschland-lebensmittel-fast-20prozent-teurer-81607510.bild.html"
+    expect_false(bild_dirty_url %in% x1$link)
+    expect_true(bild_clean_url %in% x1$link)
+    expect_false(bild_dirty_url %in% x2$link)
+    expect_true(bild_clean_url %in% x2$link)
+    expect_false(bild_dirty_url %in% x3$link)
+    expect_true(bild_clean_url %in% x3$link)
+    ## sanity
+    expect_true(bild_dirty_url %in% output$link)
+    stern_dirty_url <- "https://www.stern.de/reise/fernreisen/iguaz%C3%BA-wasserfaelle-fuehren-zehnmal-so-viel-wasser-wie-normalerweise-32811188.html?utm_campaign=alle&utm_medium=rss-feed&utm_source=standard"
+    stern_clean_url <- "https://www.stern.de/reise/fernreisen/iguaz%C3%BA-wasserfaelle-fuehren-zehnmal-so-viel-wasser-wie-normalerweise-32811188.html"
+    expect_false(stern_dirty_url %in% x1$link)
+    expect_true(stern_clean_url %in% x1$link)
+    ## Stern's urls are not cleaned in x2
+    expect_false(stern_clean_url %in% x2$link)
+    expect_true(stern_dirty_url %in% x2$link)
+    expect_false(stern_dirty_url %in% x3$link)
+    expect_true(stern_clean_url %in% x3$link)
+    ## sanity
+    expect_false(stern_clean_url %in% output$link)
+    expect_true(stern_dirty_url %in% output$link)    
+})

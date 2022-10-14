@@ -6,8 +6,14 @@
 #' @param replace_domains character vector, when is not NULL, one domain from this vector is chosen to replace the hostname of the input url
 #' @return a modified url
 #' @author Chung-hong Chan
+#' @importFrom rlang .data
 #' @export
 modify_url <- function(url, rm_query = TRUE, replace_domains = NULL) {
+    purrr::map_chr(url, .modify_url, rm_query = rm_query, replace_domains = replace_domains)
+}
+
+## Being vectorized above
+.modify_url <- function(url, rm_query = TRUE, replace_domains = NULL) {
     parsed_url <- httr::parse_url(url)
     if (rm_query) {
         parsed_url$query <- NULL
@@ -16,4 +22,23 @@ modify_url <- function(url, rm_query = TRUE, replace_domains = NULL) {
         parsed_url$hostname <- sample(replace_domains, 1)
     }
     return(httr::build_url(parsed_url))
+}
+
+#' Harmonize output from either rss aggregator or archive scrapers
+#'
+#' This harmonizes the output by cleaning the links of some selected outlets and remove entries with duplicated links. The cleaning involves the removal of query strings in links using [modify_url()].
+#' 
+#' @param output data.frame in the standardized output format
+#' @param pubs_require_cleaning a vector of outlets requiring cleaning, default to Bild, Merkur, Stern
+#' @param remove_duplicates whether to remove deplicated entries with duplicated links
+#' @return a cleaned data.frame
+#' @export
+harmonize_output <- function(output, pubs_require_cleaning  = c("Bild", "Merkur", "Stern"), remove_duplicates = TRUE) {
+    output$link <- dplyr::case_when(output$pub %in% pubs_require_cleaning ~ modify_url(output$link, rm_query = TRUE),
+                                    TRUE ~ output$link)
+    if (remove_duplicates) {
+        return(dplyr::distinct(output, .data$link, .keep_all = TRUE))
+    } else {
+        return(output)
+    }
 }

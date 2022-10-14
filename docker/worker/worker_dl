@@ -1,0 +1,24 @@
+#!/usr/bin/env Rscript
+
+library(fodira)
+args <- commandArgs(trailingOnly=TRUE)
+
+## arg[1]: rds from get_test_link.R
+## args[2]: output job name, e.g. job.tar.gz
+## args[3]: HTML dir, e.g. test
+
+urls <- readRDS(args[1])
+
+if (is.na(args[3])) {
+    output_dir <- Sys.getenv("ARTICLE_DIR")
+} else {
+    output_dir <- args[3]
+}
+
+if (!is.na(args[3]) & !dir.exists(output_dir)) {
+    dir.create(output_dir)
+}
+
+res <- fodira::scrape(urls, verbose = TRUE, output_dir = output_dir)
+saveRDS(res, "output.RDS")
+fodira::pack_work(args[2], rds = "output.RDS", output_dir = output_dir, delete = TRUE)

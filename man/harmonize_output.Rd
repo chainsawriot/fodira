@@ -6,7 +6,7 @@
 \usage{
 harmonize_output(
   output,
-  pubs_require_cleaning = c("Bild", "Merkur", "Stern"),
+  pubs_require_cleaning = c("Bild", "Merkur", "Stern", "Spiegel"),
   remove_duplicates = TRUE
 )
 }

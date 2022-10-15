@@ -9,7 +9,7 @@ modify_url(url, rm_query = TRUE, replace_domains = NULL)
 \arguments{
 \item{url}{character, input url}
 
-\item{rm_query}{logical, whether to remove the query part}
+\item{rm_query}{logical, whether to remove the queries (?) and fragments (#)}
 
 \item{replace_domains}{character vector, when is not NULL, one domain from this vector is chosen to replace the hostname of the input url}
 }

@@ -6,19 +6,21 @@
 \usage{
 harmonize_output(
   output,
-  pubs_require_cleaning = c("Bild", "Merkur", "Stern", "Spiegel"),
+  pubs_require_cleaning = c("nordbayern.de", "Spiegel", "Bild", "Berliner Zeitung",
+    "Stuttgarter Zeitung", "HNA", "Merkur", "Stern", "Klasse gegen Klasse",
+    "Tagesspiegel", "DieUnbestechlichen", "Heute"),
   remove_duplicates = TRUE
 )
 }
 \arguments{
-\item{output}{data.frame in the standardized output format}
+\item{output}{data.frame in the standardized docdb format}
 
-\item{pubs_require_cleaning}{a vector of outlets requiring cleaning, default to Bild, Merkur, Stern}
+\item{pubs_require_cleaning}{a vector of outlets requiring cleaning}
 
 \item{remove_duplicates}{whether to remove deplicated entries with duplicated links}
 }
 \value{
-a cleaned data.frame
+a cleaned data.frame in the docdb format
 }
 \description{
 This harmonizes the output by cleaning the links of some selected outlets and remove entries with duplicated links. The cleaning involves the removal of query strings in links using \code{\link[=modify_url]{modify_url()}}.

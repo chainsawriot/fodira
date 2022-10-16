@@ -30,12 +30,12 @@ modify_url <- function(url, rm_query = TRUE, replace_domains = NULL) {
 #' This harmonizes the output by cleaning the links of some selected outlets and remove entries with duplicated links. The cleaning involves the removal of query strings in links using [modify_url()].
 #' 
 #' @param output data.frame in the standardized docdb format
-#' @param pubs_require_cleaning a vector of outlets requiring cleaning
+#' @param pub a vector of outlets requiring cleaning
 #' @param remove_duplicates whether to remove deplicated entries with duplicated links
 #' @return a cleaned data.frame in the docdb format
 #' @export
-harmonize_output <- function(output, pubs_require_cleaning  = c("nordbayern.de", "Spiegel", "Bild", "Berliner Zeitung", "Stuttgarter Zeitung", "HNA", "Merkur", "Stern", "Klasse gegen Klasse", "Tagesspiegel", "DieUnbestechlichen", "Heute"), remove_duplicates = TRUE) {
-    output$link <- dplyr::case_when(output$pub %in% pubs_require_cleaning ~ modify_url(output$link, rm_query = TRUE),
+harmonize_output <- function(output, pub  = c("nordbayern.de", "Spiegel", "Bild", "Berliner Zeitung", "Stuttgarter Zeitung", "HNA", "Merkur", "Stern", "Klasse gegen Klasse", "Tagesspiegel", "DieUnbestechlichen", "Heute"), remove_duplicates = TRUE) {
+    output$link <- dplyr::case_when(output$pub %in% pub ~ modify_url(output$link, rm_query = TRUE),
                                     TRUE ~ output$link)
     if (remove_duplicates) {
         return(dplyr::distinct(output, .data$link, .keep_all = TRUE))

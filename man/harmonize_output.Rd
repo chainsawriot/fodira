@@ -6,7 +6,7 @@
 \usage{
 harmonize_output(
   output,
-  pubs_require_cleaning = c("nordbayern.de", "Spiegel", "Bild", "Berliner Zeitung",
+  pub = c("nordbayern.de", "Spiegel", "Bild", "Berliner Zeitung",
     "Stuttgarter Zeitung", "HNA", "Merkur", "Stern", "Klasse gegen Klasse",
     "Tagesspiegel", "DieUnbestechlichen", "Heute"),
   remove_duplicates = TRUE
@@ -15,7 +15,7 @@ harmonize_output(
 \arguments{
 \item{output}{data.frame in the standardized docdb format}
 
-\item{pubs_require_cleaning}{a vector of outlets requiring cleaning}
+\item{pub}{a vector of outlets requiring cleaning}
 
 \item{remove_duplicates}{whether to remove deplicated entries with duplicated links}
 }

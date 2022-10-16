@@ -17,7 +17,7 @@ test_that("modify", {
 test_that("harmonize", {
     output <- readRDS("../testdata/newlinks.RDS")
     x1 <- harmonize_output(output)
-    x2 <- harmonize_output(output, pubs_require_cleaning = c("Bild"))
+    x2 <- harmonize_output(output, pub = c("Bild"))
     x3 <- harmonize_output(output, remove_duplicates = FALSE)
     expect_true(nrow(output) == nrow(x3))
     expect_true(nrow(output) > nrow(x1))

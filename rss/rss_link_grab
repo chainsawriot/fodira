@@ -1,17 +1,32 @@
 #!/usr/bin/env Rscript
 
+'Fodira RSS Scraper
+
+Usage:
+  rss_link_grab <input> [<output>] [--verbose]
+  rss_link_grab (-h | --help)
+  rss_link_grab (-v | --version)
+
+Options:
+  -h --help     Show this screen.
+  -v --version     Show version.
+  --verbose     Display messages.
+
+' -> doc
+
+args <- docopt::docopt(doc, version = 'Fodira RSS Scraper 0.0.2')
+
 library(fodira)
 
-args <- commandArgs(trailingOnly=TRUE)
-csv <- args[1]
-output_filename <- args[2]
-debug <- args[3]
-## for debug
-##csv <- "rss_list_complete.xlsx"
-##csv <- "rss_list.csv"
-#debug <- "12"
+input_filename <- args$`<input>`
+output_filename <- args$`<output>`
+verbose <- args$verbose
 
-suppressMessages(input <- rio::import(csv))
+if (!verbose) {
+    suppressMessages(input <- rio::import(input_filename))
+} else {
+    input <- rio::import(input_filename)
+}
 
 .detect_atom <- function(x) {
     any(grepl("^entry", colnames(x)))
@@ -25,8 +40,8 @@ suppressMessages(input <- rio::import(csv))
     dplyr::rename(x, item_title = `entry_title`, item_link = `entry_url`, item_pub_date = `entry_last_updated`, item_description = `entry_summary`)
 }
 
-.silent_parse <- function(url, id = NA, debug = NA) {
-    if (!is.na(debug)) {
+.silent_parse <- function(url, id = NA, verbose = FALSE) {
+    if (verbose) {
         message(url)
     }
     suppressMessages(res <- tidyRSS::tidyfeed(url))
@@ -41,7 +56,7 @@ suppressMessages(input <- rio::import(csv))
     return(res)
 }
 
-res <- purrr::map2(input$url, input$page, purrr::safely(.silent_parse), debug = debug)
+res <- purrr::map2(input$url, input$page, purrr::safely(.silent_parse), verbose = verbose)
 
 ## input$url[purrr::map_lgl(res, ~!is.null(.$error))]
 
@@ -56,7 +71,7 @@ res %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% purrr::m
 valid_links %>% dplyr::rename(pub = `id`, link = `item_link`, pubdate = `item_pub_date`, title = `item_title`, description = `item_description`) %>%
     fodira::harmonize_output() -> output
 
-if (!is.na(output_filename)) {
+if (!is.null(output_filename)) {
     saveRDS(output, output_filename)
 } else {
     output

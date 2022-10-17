@@ -1,20 +1,36 @@
 #!/usr/bin/env Rscript
 
 ## `links` should be a list of rds files with the standard format.
+'Insert docdb-formated RDS file into the DB
 
-args <- commandArgs(trailingOnly = TRUE)
-if ("debug" %in% args) {
-    debug <- TRUE
-    args <- setdiff(args, "debug")
-} else {
-    debug <- FALSE
-}
+Usage:
+  insert <file> [--verbose] [--newlinks=<nl>]
+  insert (-h | --help)
+  insert (-v | --version)
 
-if (length(args) == 0) {
-    link_files <- readLines(file("stdin"))
-} else {
-    link_files <- args
-}
+Options:
+  -h --help     Show this screen.
+  -v --version     Show version.
+  --newlinks=<nl>     Output file for new links [default: newlinks.RDS]
+  --verbose     Display messages.
+
+' -> doc
+
+args <- docopt::docopt(doc, version = 'insert 0.0.2')
+
+## args <- commandArgs(trailingOnly = TRUE)
+## if ("debug" %in% args) {
+##     debug <- TRUE
+##     args <- setdiff(args, "debug")
+## } else {
+##     debug <- FALSE
+## }
+
+## if (length(args) == 0) {
+##     link_files <- readLines(file("stdin"))
+## } else {
+##     link_files <- args
+## }
 
 .insert <- function(link_file, debug, newlinks_fname = "newlinks.RDS") {
     links <- readRDS(link_file)
@@ -25,4 +41,4 @@ if (length(args) == 0) {
     return(invisible(link_file))
 }
 
-purrr::walk(link_files, .insert, debug = debug)
+.insert(link_file = args$file, debug = args$verbose, newlinks_fname = args$newlinks)

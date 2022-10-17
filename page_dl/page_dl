@@ -1,36 +1,49 @@
 #!/usr/bin/env Rscript
+#!/usr/bin/env Rscript
+
+'Fodira Page Downloader
+
+Usage:
+  page_dl db [--safe] [--output=<op>] [--size=<sz>] [--head] [--verbose]
+  page_dl <url>... [--output=<op>] [--head] [--verbose]
+  page_dl (-h | --help)
+  page_dl --version
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+  --verbose     Display messages.
+  --safe        Only scrape urls from "safe" sources
+  --head        Switch off headless mode
+  --output=<op>     Output file for metadata [default: metadata.RDS].
+  --size=<sz>       Number of urls to fetch [default: 30]
+
+' -> doc
+
+args <- docopt::docopt(doc, version = 'Fodira Page Downloader 0.0.2')
 
 library(fodira)
-args <- commandArgs(trailingOnly=TRUE)
-
-OUTPUT_FILE <- "res.RDS"
 
 ## Zeit won't work
-.get_urls <- function(con, safe) {
+.get_urls <- function(con, safe, size) {
     if (safe) {
-        con$aggregate('[ {"$match": {"htmlfile": "", "pub" : { "$in": ["Bild", "Tagesschau", "Heute", "Freitag", "T-Online"]}}}, { "$sample": { "size": 30} }]')$link
+        con$aggregate(paste0('[ {"$match": {"htmlfile": "", "pub" : { "$in": ["Bild", "Tagesschau", "Heute", "Freitag", "T-Online"]}}}, { "$sample": { "size": ', size, '} }]'))$link
     } else {
-        con$aggregate('[ {"$match": {"htmlfile": "", "pub": { "$nin": ["Zeit"]}}}, { "$sample": { "size": 30} }]')$link
+        con$aggregate(paste0('[ {"$match": {"htmlfile": "", "pub": { "$nin": ["Zeit"]}}}, { "$sample": { "size": ', size, '} }]'))$link
     }
 }
 
-if (length(args) == 0) {
-    urls <- readLines(file("stdin"))
-} else if (args[1] == "db") {
+if (args$db) {
     con <- mongolite::mongo("articles", db = "main")
-    if (is.na(args[2])) {
-        urls <- .get_urls(con, safe = FALSE)
-    } else if (args[2] == "safe") {
-        urls <- .get_urls(con, safe = TRUE)
-    }
+    urls <- .get_urls(con, safe = args$safe, size = args$size)
 } else {
-    urls <- args
+    urls <- args$url
 }
 
 if (Sys.getenv("ARTICLE_DIR") == "") {
     stop("Please set `ARTICLE_DIR`!")
 }
 
-res <- fodira::scrape(urls, verbose = TRUE)
+res <- fodira::scrape(urls, verbose = args$verbose, headless = !args$head)
 
-saveRDS(res, OUTPUT_FILE)
+saveRDS(res, args$output)

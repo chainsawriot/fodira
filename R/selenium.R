@@ -16,7 +16,7 @@ gen_selen <- function(headless = TRUE) {
     return(list(rD = rD, remDr = remDr))
 }
 
-.scrape <- function(url, selen, output_dir = Sys.getenv("ARTICLE_DIR"), sleep = sample(seq(0, 1, .1), size = 1), write = TRUE, verbose = FALSE) {
+.scrape <- function(url, selen, output_dir = Sys.getenv("ARTICLE_DIR"), sleep = sample(seq(0, 1, .1), size = 1), write = TRUE, verbose = FALSE, push = FALSE, db = "main", collection = "articles", prefix = "html", delete = TRUE) {
     if (verbose) {
         message(url)
     }
@@ -36,6 +36,12 @@ gen_selen <- function(headless = TRUE) {
         }
     }
     Sys.sleep(sleep)
+    if (push) {
+        if (verbose) {
+            cat(paste("Pushing:", fname, "\n"))
+        }
+        z <- push_html(url = url, fname = fname, output_dir = output_dir, db = db, collection = collection, prefix = prefix, delete = delete)
+    }
     return(tibble::tibble(url = url, fname = fname))
 }
 
@@ -49,14 +55,16 @@ gen_selen <- function(headless = TRUE) {
 #' @param verbose whether to display debug information
 #' @param close_selen whether to close the Selenium instance, to TRUE if `selen` is null
 #' @param headless whether to generate a headless instance, if `selen` is null
+#' @param push whether to update the url and push the html file to the DB
 #' @return a dataframe with urls and filenames; if `write` is TRUE, HTML files are written to `output_dir`. All failed urls will be skipped.
 #' @export
-scrape <- function(urls, selen = NULL, output_dir = Sys.getenv("ARTICLE_DIR"), sleep = 1, write = TRUE, verbose = FALSE, close_selen = FALSE, headless = TRUE) {
+#' @inheritParams push_html
+scrape <- function(urls, selen = NULL, output_dir = Sys.getenv("ARTICLE_DIR"), sleep = 1, write = TRUE, verbose = FALSE, close_selen = FALSE, headless = TRUE, push = FALSE, db = "main", collection = "articles", prefix = "html", delete = TRUE) {
     if (is.null(selen)) {
         selen <- gen_selen(headless = headless)
         close_selen <- TRUE
     }
-    res <- purrr::map(urls, purrr::safely(.scrape), selen = selen, output_dir = output_dir, sleep = sleep, write = write, verbose = verbose) %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% dplyr::bind_rows()
+    res <- purrr::map(urls, purrr::safely(.scrape), selen = selen, output_dir = output_dir, sleep = sleep, write = write, verbose = verbose, push = push, db = db, collection = collection, prefix = prefix, delete = delete) %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% dplyr::bind_rows()
     if (close_selen) {
         selen$remDr$close()
         z <- selen$rD$server$stop()

@@ -12,7 +12,12 @@ scrape(
   write = TRUE,
   verbose = FALSE,
   close_selen = FALSE,
-  headless = TRUE
+  headless = TRUE,
+  push = FALSE,
+  db = "main",
+  collection = "articles",
+  prefix = "html",
+  delete = TRUE
 )
 }
 \arguments{
@@ -31,6 +36,16 @@ scrape(
 \item{close_selen}{whether to close the Selenium instance, to TRUE if \code{selen} is null}
 
 \item{headless}{whether to generate a headless instance, if \code{selen} is null}
+
+\item{push}{whether to update the url and push the html file to the DB}
+
+\item{db}{MongoDB db}
+
+\item{collection}{MongoDB collection}
+
+\item{prefix}{MongoDB GridFS prefix}
+
+\item{delete}{whether to delete the HTML files afterwards.}
 }
 \value{
 a dataframe with urls and filenames; if \code{write} is TRUE, HTML files are written to \code{output_dir}. All failed urls will be skipped.

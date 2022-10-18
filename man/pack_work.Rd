@@ -21,3 +21,6 @@ pack_work(output_file = "job.tar.gz", rds, output_dir, delete = FALSE)
 \description{
 Pack the job from \code{work_dl} as a single tar.gz
 }
+\author{
+Chung-hong Chan
+}

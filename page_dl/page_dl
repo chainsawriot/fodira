@@ -3,9 +3,9 @@
 'Fodira Page Downloader
 
 Usage:
-  page_dl db [--safe] [--output=<op>] [--size=<sz>] [--nopush] [--head] [--verbose]
-  page_dl <url>... [--output=<op>] [--head] [--nopush] [--verbose]
-  page_dl --input=<ip> [--output=<op>] [--head] [--nopush] [--verbose]
+  page_dl db [--safe] [--size=<sz>] [--nopush] [--head] [--verbose]
+  page_dl <url>... [--head] [--nopush] [--verbose]
+  page_dl --input=<ip> [--head] [--nopush] [--verbose]
   page_dl (-h | --help)
   page_dl --version
 
@@ -17,7 +17,6 @@ Options:
   --head        Switch off headless mode
   --nopush      Do not push the metadata and html to the DB
   --input=<ip>       Input RDS file with a "link" column
-  --output=<op>     Output file for metadata [default: metadata.RDS].
   --size=<sz>       Number of urls to fetch from DB [default: 30]
 
 ' -> doc
@@ -52,6 +51,10 @@ if (Sys.getenv("ARTICLE_DIR") == "") {
     stop("Please set `ARTICLE_DIR`!")
 }
 
-res <- fodira::scrape(urls, verbose = args$verbose, headless = !args$head, push = !args$nopush)
+## Chunk the URLs into 50 apiece; so that Selenium will reset every 50 urls
+chunk <- function(x, n) split(x, ceiling(seq_along(x) / n))
+chunked_urls <- chunk(urls, 50)
 
-saveRDS(res, args$output)
+safe_scrape <- purrr::safely(fodira::scrape)
+
+res <- purrr::walk(chunked_urls, ~safe_scrape(., verbose = args$verbose, headless = !args$head, push = !args$nopush))

@@ -55,7 +55,7 @@ if (Sys.getenv("ARTICLE_DIR") == "") {
 res <- fodira::scrape(urls, verbose = args$verbose, headless = !args$head)
 
 if (!args$nopush) {
-    fodira::push_html(res)
+    fodira::push_html_scrape(res)
 }
 
 saveRDS(res, args$output)

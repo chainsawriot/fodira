@@ -3,9 +3,9 @@
 'Fodira Page Downloader
 
 Usage:
-  page_dl db [--safe] [--output=<op>] [--size=<sz>] [--head] [--verbose]
-  page_dl <url>... [--output=<op>] [--head] [--verbose]
-  page_dl --input=<ip> [--output=<op>] [--head] [--verbose]
+  page_dl db [--safe] [--output=<op>] [--size=<sz>] [--nopush] [--head] [--verbose]
+  page_dl <url>... [--output=<op>] [--head] [--nopush] [--verbose]
+  page_dl --input=<ip> [--output=<op>] [--head] [--nopush] [--verbose]
   page_dl (-h | --help)
   page_dl --version
 
@@ -15,6 +15,7 @@ Options:
   --verbose     Display messages.
   --safe        Only scrape urls from "safe" sources
   --head        Switch off headless mode
+  --nopush      Do not push the metadata and html to the DB
   --input=<ip>       Input RDS file with a "link" column
   --output=<op>     Output file for metadata [default: metadata.RDS].
   --size=<sz>       Number of urls to fetch from DB [default: 30]
@@ -52,5 +53,9 @@ if (Sys.getenv("ARTICLE_DIR") == "") {
 }
 
 res <- fodira::scrape(urls, verbose = args$verbose, headless = !args$head)
+
+if (!args$nopush) {
+    fodira::push_html(res)
+}
 
 saveRDS(res, args$output)

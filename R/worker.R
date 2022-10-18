@@ -46,3 +46,18 @@ get_links <- function(fname = NULL, size = 300, safe = FALSE, collection = "arti
         return(invisible(fname))
     }
 }
+
+request_links <- function(fname, host = Sys.getenv("FODIRA_HOST"), size = 300, safe = FALSE, verbose = TRUE, check = TRUE) {
+    if (host == "") {
+        stop("Host can't be empty. If you are using the default, please set the envvar `FODIRA_HOST`.")
+    }
+    .session <- ssh::ssh_connect(host)
+    ssh::ssh_exec_wait(.session, glue::glue("Rscript -e 'fodira::get_link(fname = \"{fname}\", size = {size}, safe = {safe})'", fname = fname, size = size, safe = safe))
+    ssh::scp_download(.session, fname, verbose = verbose)
+    ssh::ssh_exec_wait(.session, glue::glue("rm {fname}", fname = fname))
+    ssh::ssh_disconnect(.session)
+    if (check) {
+        stopifnot(file.exists(fname))
+    }
+    return(invisible(fname))
+}

@@ -14,6 +14,7 @@ Depends:
 Imports: 
     digest,
     dplyr,
+    glue,
     httr,
     lubridate,
     magrittr,
@@ -26,7 +27,6 @@ Imports:
     tidyRSS
 Suggests: 
     docopt,
-    glue,
     progress,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

@@ -11,6 +11,7 @@ The project depends on the following envvars. Please set these envvars in the *r
 1. `TWITTER_BEARER`: Twitter Bearer Token
 2. `TWEET_DB`: __Absolute path__ to the DuckDB file holding all tweets
 3. `ARTICLE_DIR`: __Absolute path__ to the *temporary* directory holding html files
+4. `FODIRA_HOST`: For workers: ssh server string
 
 The project needs R (for most of the data collection) and node (for [readability](https://github.com/mozilla/readability)).
 

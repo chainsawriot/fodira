@@ -1,11 +1,11 @@
 #!/usr/bin/env Rscript
-#!/usr/bin/env Rscript
 
 'Fodira Page Downloader
 
 Usage:
   page_dl db [--safe] [--output=<op>] [--size=<sz>] [--head] [--verbose]
   page_dl <url>... [--output=<op>] [--head] [--verbose]
+  page_dl --input=<ip> [--output=<op>] [--head] [--verbose]
   page_dl (-h | --help)
   page_dl --version
 
@@ -15,27 +15,34 @@ Options:
   --verbose     Display messages.
   --safe        Only scrape urls from "safe" sources
   --head        Switch off headless mode
+  --input=<ip>       Input RDS file with a "link" column
   --output=<op>     Output file for metadata [default: metadata.RDS].
-  --size=<sz>       Number of urls to fetch [default: 30]
+  --size=<sz>       Number of urls to fetch from DB [default: 30]
 
 ' -> doc
+
 
 args <- docopt::docopt(doc, version = 'Fodira Page Downloader 0.0.2')
 
 library(fodira)
+
+UNSAFE_PUBS <- c("Zeit", "Saarbrücker Zeitung", "RT deutsch")
 
 ## Zeit won't work
 .get_urls <- function(con, safe, size) {
     if (safe) {
         con$aggregate(paste0('[ {"$match": {"htmlfile": "", "pub" : { "$in": ["Bild", "Tagesschau", "Heute", "Freitag", "T-Online"]}}}, { "$sample": { "size": ', size, '} }]'))$link
     } else {
-        con$aggregate(paste0('[ {"$match": {"htmlfile": "", "pub": { "$nin": ["Zeit"]}}}, { "$sample": { "size": ', size, '} }]'))$link
+        con$aggregate(paste0('[ {"$match": {"htmlfile": "", "pub": { "$nin": [', paste0(purrr::map_chr(UNSAFE_PUBS, ~paste0('"', ., '"')), collapse = ", ") , ']}}}, { "$sample": { "size": ', size, '} }]'))$link
     }
 }
 
 if (args$db) {
     con <- mongolite::mongo("articles", db = "main")
     urls <- .get_urls(con, safe = args$safe, size = args$size)
+} else if (!is.null(args$input)) {
+    input <- readRDS(args$input) %>% dplyr::filter(!pub %in% UNSAFE_PUBS)
+    urls <- sample(input$link) ## shuffling to prevent scraping from the same domain too fast
 } else {
     urls <- args$url
 }

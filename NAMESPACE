@@ -2,6 +2,7 @@
 
 export("%>%")
 export(gen_selen)
+export(generate_hash)
 export(get_links)
 export(harmonize_output)
 export(insert_doc_link)

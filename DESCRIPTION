@@ -23,6 +23,7 @@ Imports:
     rlang,
     RSelenium,
     ssh,
+    stringi,
     tibble,
     tidyRSS
 Suggests: 

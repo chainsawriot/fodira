@@ -19,6 +19,18 @@ pack_work <- function(output_file = "job.tar.gz", rds, output_dir, delete = FALS
     return(invisible(output_file))
 }
 
+#' Genrate a random hash
+#'
+#' This function generates a random hash that can be used as a burner file name
+#' @param ending the ending of the hash
+#' @param length the length of the random part
+#' @return a hash
+#' @author Chung-hong Chan
+#' @export
+generate_hash <- function(ending = ".RDS", length = 40) {
+    paste0(stringi::stri_rand_strings(1, length, '[A-Za-z0-1]'), ending)
+}
+
 #' Get links (urls) from the DB
 #'
 #' This function gets links (urls) from the DB where the field `htmlfile` is empty, i.e. not yet scraped.
@@ -32,7 +44,11 @@ pack_work <- function(output_file = "job.tar.gz", rds, output_dir, delete = FALS
 #' @return either a vector of links (if `fname` is null) or the `fname` invisibly
 #' @author Chung-hong Chan
 #' @export
+<<<<<<< HEAD
 get_links <- function(fname = NULL, size = 300, safe = FALSE, collection = "articles", db = "main", unsafe_pubs = c("Zeit", "Saarbrücker Zeitung", "RT deutsch")) {
+=======
+get_links <- function(fname = NULL, size = 300, safe = FALSE, collection = "articles", db = "main", unsafe_pubs = c("Zeit", "Saarbr\u00fccker Zeitung", "RT deutsch")) {
+>>>>>>> master
     con <- mongolite::mongo(collection = collection, db = db)
     if (safe) {
         links <- con$aggregate(paste0('[ {"$match": {"htmlfile": "", "pub" : { "$in": ["Bild", "Tagesschau", "Heute", "Freitag", "T-Online"]}}}, { "$sample": { "size": ', size, '} }]'))$link
@@ -46,6 +62,7 @@ get_links <- function(fname = NULL, size = 300, safe = FALSE, collection = "arti
         return(invisible(fname))
     }
 }
+<<<<<<< HEAD
 
 request_links <- function(fname, host = Sys.getenv("FODIRA_HOST"), size = 300, safe = FALSE, verbose = TRUE, check = TRUE) {
     if (host == "") {
@@ -61,3 +78,5 @@ request_links <- function(fname, host = Sys.getenv("FODIRA_HOST"), size = 300, s
     }
     return(invisible(fname))
 }
+=======
+>>>>>>> master

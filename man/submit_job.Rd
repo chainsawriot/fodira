@@ -22,6 +22,8 @@ submit_job(
 
 \item{check}{whether to check for the existence of the file \code{fname} after the SSH session}
 
+\item{delete}{whether to delete \code{job_fname} after submission}
+
 \item{host_directory}{path to upload to in the host}
 }
 \value{

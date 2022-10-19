@@ -25,7 +25,8 @@ Imports:
     ssh,
     stringi,
     tibble,
-    tidyRSS
+    tidyRSS,
+    utils
 Suggests: 
     docopt,
     progress,

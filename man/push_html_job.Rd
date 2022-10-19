@@ -22,7 +22,7 @@ push_html_job(
 
 \item{prefix}{MongoDB GridFS prefix}
 
-\item{delete}{whether to delete the HTML files afterwards.}
+\item{delete}{whether to delete \code{job_fname} after the insertion}
 }
 \description{
 Insert output from \code{\link[=pack_work]{pack_work()}} to MongoDB

@@ -92,6 +92,7 @@ request_links <- function(fname = generate_hash(), host = Sys.getenv("FODIRA_HOS
 #' This is a function mostly for workers to return a job packed with [pack_work()] back to the host. Please make sure you have passwordless access to the remote host, i.e. your public key is in the remote host. By default, it will return to the "finished_job" directory in the host
 #' @param job_fname job file name from [pack_work()]
 #' @param host_directory path to upload to in the host
+#' @param delete whether to delete `job_fname` after submission
 #' @return return 0 if everything is alright
 #' @author Chung-hong Chan
 #' @inheritParams request_links

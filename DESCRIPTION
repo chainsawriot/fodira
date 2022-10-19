@@ -21,6 +21,7 @@ Imports:
     purrr,
     rlang,
     RSelenium,
+    stringi,
     tibble,
     tidyRSS
 Suggests: 

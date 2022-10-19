@@ -38,8 +38,7 @@ UNSAFE_PUBS <- c("Zeit", "Saarbrücker Zeitung", "RT deutsch")
 }
 
 if (args$db) {
-    con <- mongolite::mongo("articles", db = "main")
-    urls <- .get_urls(con, safe = args$safe, size = args$size)
+    urls <- fodira::get_links(safe = args$safe, size = args$size)
 } else if (!is.null(args$input)) {
     input <- readRDS(args$input) %>% dplyr::filter(!pub %in% UNSAFE_PUBS)
     urls <- sample(input$link) ## shuffling to prevent scraping from the same domain too fast

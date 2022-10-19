@@ -80,3 +80,23 @@ push_html_scrape <- function(output, output_dir = Sys.getenv("ARTICLE_DIR"), db 
     }
     return(invisible(uploaded_files))
 }
+
+#' Insert output from [pack_work()] to MongoDB
+#' This function takes the output from [pack_work()] and inserts it to the MongoDB (default to main.articles and main.html). Concretely, it updates the `htmlfile` field of the matching records and pushes the HTML files into MongoDB's GridFS.
+#' @param job_fname path of the job (a tar.gz file) from [pack_work()]
+#' @param delete whether to delete `job_fname` after the insertion
+#' @author Chung-hong Chan
+#' @export
+#' @inheritParams push_html
+push_html_job <- function(job_fname, db = "main", collection = "articles", prefix = "html", delete = TRUE) {
+    random_temp_path <- file.path(tempdir(), generate_hash(ending = ""))
+    suppressMessages(utils::untar(job_fname, exdir = random_temp_path))
+    all_files <- list.files(random_temp_path, full.names = TRUE, recursive = TRUE)
+    output <- readRDS(grep("output\\.RDS$", all_files, value = TRUE))
+    output_html <- dirname(sample(grep("html", all_files, value = TRUE), 1))
+    res <- push_html_scrape(output = output, output_dir = output_html, db = db, collection = collection, prefix = prefix, delete = delete)
+    if (delete) {
+        unlink(job_fname)
+    }
+    return(invisible(res))
+}

@@ -1,24 +1,39 @@
 #!/usr/bin/env Rscript
 
+'Fodira Page Downloader
+
+Usage:
+  worker_dl [--safe] [--size=<sz>] [--head] [--verbose]
+  worker_dl (-h | --help)
+  worker_dl --version
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+  --verbose     Display messages.
+  --safe        Only scrape urls from "safe" sources
+  --head        Switch off headless mode
+  --size=<sz>       Number of urls to fetch from DB [default: 100]
+
+' -> doc
+
 library(fodira)
-args <- commandArgs(trailingOnly=TRUE)
 
-## arg[1]: rds from get_test_link.R
-## args[2]: output job name, e.g. job.tar.gz
-## args[3]: HTML dir, e.g. test
+args <- docopt::docopt(doc, version = 'Fodira Worker 0.0.1')
 
-urls <- readRDS(args[1])
+links_file <- fodira::request_links(size = as.numeric(args$size), safe = args$safe, verbose = args$verbose, check = TRUE)
 
-if (is.na(args[3])) {
-    output_dir <- Sys.getenv("ARTICLE_DIR")
-} else {
-    output_dir <- args[3]
-}
+urls <- readRDS(links_file)
 
-if (!is.na(args[3]) & !dir.exists(output_dir)) {
+current_temp <- tempdir()
+output_dir <- file.path(current_temp, "html")
+
+if (!dir.exists(output_dir)) {
     dir.create(output_dir)
 }
 
-res <- fodira::scrape(urls, verbose = TRUE, output_dir = output_dir)
-saveRDS(res, "output.RDS")
-fodira::pack_work(args[2], rds = "output.RDS", output_dir = output_dir, delete = TRUE)
+res <- fodira::scrape(urls, verbose = args$verbose, output_dir = output_dir, headless = !args$head, push = FALSE)
+output_rds <- file.path(current_temp, "output.RDS")
+saveRDS(res, output_rds)
+job_fname <- fodira::pack_work(file.path(current_temp, generate_hash(".tar.gz")), rds = output_rds, output_dir = output_dir, delete = TRUE)
+fodira::submit_job(job_fname, verbose = args$verbose)

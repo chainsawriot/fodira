@@ -1,6 +1,6 @@
 Package: fodira
 Title: Common Functions for the FoDiRa Project
-Version: 0.0.4
+Version: 0.0.5
 Authors@R: 
     person("Chung-hong", "Chan", , "chainsawtiney@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6232-7530"))
@@ -14,6 +14,7 @@ Depends:
 Imports: 
     digest,
     dplyr,
+    glue,
     httr,
     lubridate,
     magrittr,
@@ -21,12 +22,13 @@ Imports:
     purrr,
     rlang,
     RSelenium,
+    ssh,
     stringi,
     tibble,
-    tidyRSS
+    tidyRSS,
+    utils
 Suggests: 
     docopt,
-    glue,
     progress,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

@@ -114,3 +114,4 @@ submit_job <- function(job_fname, host = Sys.getenv("FODIRA_HOST"), verbose = FA
     }
     return(0)
 }
+

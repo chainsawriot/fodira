@@ -3,7 +3,7 @@
 'Fodira Page Downloader
 
 Usage:
-  worker_dl [--safe] [--size=<sz>] [--head] [--verbose]
+  worker_dl [--safe] [--newlinks] [--size=<sz>] [--head] [--verbose]
   worker_dl (-h | --help)
   worker_dl --version
 
@@ -12,6 +12,7 @@ Options:
   --version     Show version.
   --verbose     Display messages.
   --safe        Only scrape urls from "safe" sources
+  --newlinks    Scrape the new links from the host
   --head        Switch off headless mode
   --size=<sz>       Number of urls to fetch from DB [default: 100]
 
@@ -21,9 +22,14 @@ library(fodira)
 
 args <- docopt::docopt(doc, version = 'Fodira Worker 0.0.1')
 
-links_file <- fodira::request_links(size = as.numeric(args$size), safe = args$safe, verbose = args$verbose, check = TRUE)
-
-urls <- readRDS(links_file)
+if (!args$newlinks) {
+    links_file <- fodira::request_links(size = as.numeric(args$size), safe = args$safe, verbose = args$verbose, check = TRUE)
+    urls <- readRDS(links_file)
+} else {
+    ## Overide everything
+    links_file <- fodira::request_links(exact_fname = "newlinks.RDS", verbose = args$verbose, check = TRUE)    
+    urls <- readRDS(links_file) %>% dplyr::filter(!pub %in% c("Zeit", "Saarbr\u00fccker Zeitung", "RT deutsch")) %>% dplyr::pull(link) %>% sample()
+}
 
 current_temp <- tempdir()
 output_dir <- file.path(current_temp, "html")
@@ -32,7 +38,14 @@ if (!dir.exists(output_dir)) {
     dir.create(output_dir)
 }
 
-res <- fodira::scrape(urls, verbose = args$verbose, output_dir = output_dir, headless = !args$head, push = FALSE)
+chunk <- function(x, n) split(x, ceiling(seq_along(x) / n))
+chunked_urls <- chunk(urls, 50)
+
+safe_scrape <- purrr::safely(fodira::scrape)
+
+res <- purrr::map(chunked_urls, ~safe_scrape(., verbose = args$verbose, output_dir = output_dir, headless = !args$head, push = FALSE)) %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% dplyr::bind_rows()
+
+##res <- fodira::scrape(urls, verbose = args$verbose, output_dir = output_dir, headless = !args$head, push = FALSE)
 output_rds <- file.path(current_temp, "output.RDS")
 saveRDS(res, output_rds)
 job_fname <- fodira::pack_work(file.path(current_temp, generate_hash(".tar.gz")), rds = output_rds, output_dir = output_dir, delete = TRUE)

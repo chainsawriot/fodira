@@ -66,21 +66,27 @@ get_links <- function(fname = NULL, size = 300, safe = FALSE, collection = "arti
 #' @param host host string in the format of "username@ipaddress", default to the envvar "FODIRA_HOST"
 #' @param verbose whether to display messages
 #' @param check whether to check for the existence of the file `fname` after the SSH session
+#' @param exact_fname exact file to be collect from host
 #' @return the actual path of the saved RDS file
 #' @author Chung-hong Chan
 #' @inheritParams get_links
 #' @export
-request_links <- function(fname = generate_hash(), host = Sys.getenv("FODIRA_HOST"), size = 300, safe = FALSE, verbose = TRUE, check = TRUE) {
+request_links <- function(fname = generate_hash(), host = Sys.getenv("FODIRA_HOST"), size = 300, safe = FALSE, verbose = TRUE, check = TRUE, exact_fname) {
     if (host == "") {
         stop("Host can't be empty. If you are using the default, please set the envvar `FODIRA_HOST`.")
     }
-    .session <- ssh::ssh_connect(host, verbose = verbose)
-    ssh::ssh_exec_wait(.session, glue::glue("Rscript -e 'fodira::get_links(fname = \"{fname}\", size = {size}, safe = {safe})'", fname = fname, size = size, safe = safe))
     current_tempdir <- tempdir()
-    ssh::scp_download(.session, files = fname, to = current_tempdir, verbose = verbose)
-    ssh::ssh_exec_wait(.session, glue::glue("rm {fname}", fname = fname))
+    .session <- ssh::ssh_connect(host, verbose = verbose)
+    if (!missing(exact_fname)) {
+        ssh::scp_download(.session, files = exact_fname, to = current_tempdir, verbose = verbose)
+        output_path <- file.path(current_tempdir, exact_fname)
+    } else {
+        ssh::ssh_exec_wait(.session, glue::glue("Rscript -e 'fodira::get_links(fname = \"{fname}\", size = {size}, safe = {safe})'", fname = fname, size = size, safe = safe))
+        ssh::scp_download(.session, files = fname, to = current_tempdir, verbose = verbose)
+        ssh::ssh_exec_wait(.session, glue::glue("rm {fname}", fname = fname))
+        output_path <- file.path(current_tempdir, fname)
+    }
     ssh::ssh_disconnect(.session)
-    output_path <- file.path(current_tempdir, fname)
     if (check) {
         stopifnot(file.exists(output_path))
     }

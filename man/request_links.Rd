@@ -10,7 +10,8 @@ request_links(
   size = 300,
   safe = FALSE,
   verbose = TRUE,
-  check = TRUE
+  check = TRUE,
+  exact_fname
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ request_links(
 \item{verbose}{whether to display messages}
 
 \item{check}{whether to check for the existence of the file \code{fname} after the SSH session}
+
+\item{exact_fname}{exact file to be collect from host}
 }
 \value{
 the actual path of the saved RDS file

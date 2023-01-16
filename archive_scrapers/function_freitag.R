@@ -61,8 +61,8 @@ valid_links_3 <- purrr::map_dfr("kultur", .scrape, max_pages = 35)
 valid_links_4 <- purrr::map_dfr("gruenes-wissen", .scrape, max_pages = 35)
 valid_links_5 <- purrr::map_dfr("debatte", .scrape, max_pages = 35)
 
-dplyr::distinct(rbind(valid_links, valid_links2, valid_links_3, 
-                      valid_links4, valid_links_5)) -> valid_links
+dplyr::distinct(rbind(valid_links_1, valid_links_2, valid_links_3, 
+                      valid_links_4, valid_links_5)) -> valid_links
 
 
 

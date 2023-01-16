@@ -166,7 +166,7 @@ valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2))
 # remDr$close()
 # z <- rD$server$stop()
 
-NTV %>% dplyr::distinct() %>% 
+valid_links %>% dplyr::distinct() %>% 
   dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "NTV", description = NA) %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links

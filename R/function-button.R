@@ -181,3 +181,4 @@ webElem <- .waitfindElem(xpath =  "//div[contains(@class, 'option__accbtn box__a
 # 
 # 
 # remDr$close()
+# z <- rD$server$stop()

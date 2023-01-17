@@ -88,7 +88,7 @@
     }
   }
   if (clickaway == "Bild" || clickaway == "Berliner Zeitung" || clickaway == "Cicero" || clickaway == "FAZ" ||
-      clickaway == "Freitag"){
+      clickaway == "Freitag" || clickaway == "KN" || clickaway == "LVZ"){
     webElem <-NULL
     webElem <- .waitfindElem(xpath =  "//iframe[contains(@title, 'SP Consent Message')]", remDr=remDr)
     if(!is.null(webElem)){
@@ -165,8 +165,6 @@
       webElem$clickElement()
     }
   }
-
-
   if (clickaway == "Hildesheimer Allgemeine Zeitung"){
     webElem <-NULL
     webElem <- .waitfindElem(xpath =  "//button[contains(@class, '_10ihg6sc')]", remDr=remDr)
@@ -204,7 +202,7 @@
     }
   }
   
-  if (clickaway == "Jouwatch"){
+  if (clickaway == "Jouwatch" || clickaway == "Klasse gegen Klasse"){
     webElem <-NULL
     Sys.sleep(.5)
     webElem <- .waitfindElem(xpath =  "//button[contains(@class, 'cmplz-accept')]", remDr=remDr)
@@ -234,6 +232,16 @@
     }
   }
   
+  if (clickaway == "NeoPresse"){
+    webElem <-NULL
+    
+    webElem <- .waitfindElem(xpath =  "//a[contains(@class, 'cc-dismiss')]", remDr=remDr)
+    #loop until element is found
+    if(!is.null(webElem)){
+      webElem$clickElement()
+    }
+  }
+  
   if (clickaway == "Zeit"){
     webElem <-NULL
     webElem <- .waitfindElem(xpath =  "//iframe[contains(@title, 'SP Consent Message')]", remDr=remDr)
@@ -257,8 +265,8 @@
 
 # rD <- RSelenium::rsDriver(browser = "firefox",
 #                           #chromever = "103.0.5060.134",
-#                           port = sample(c(#5678L,
-#                             #5679L, #5680L, #5681L,
+#                           port = sample(c(5678L,
+#                             5679L, 5680L, 5681L,
 #                             5682L), size = 1),
 #                           #phantomver = "2.1.1",
 #                           #extraCapabilities = fprof,
@@ -348,7 +356,29 @@
 # remDr$navigate("https://jungle.world/artikel/2023/02/profitorientierter-notstand")
 # .clickaway(clickaway = "Jungle World", remDr = remDr)
 # 
+# remDr$navigate("https://www.kn-online.de/lokales/kiel/ukraine-krieg-beschert-seehafen-kiel-einen-rueckgang-beim-umschlag-OVMMGBEF5ZKOA2HBGZNPQMSV4Y.html")
+# .clickaway(clickaway = "KN", remDr = remDr)
 # 
+# remDr$navigate("https://www.klassegegenklasse.org/polizeigewalt-und-antisemitismusvorwuerfe-in-luetzerath/")
+# .clickaway(clickaway = "Klasse gegen Klasse", remDr = remDr)
+# 
+# # remDr$navigate("https://lowerclassmag.com/2022/12/25/das-war-ein-gezielter-angriff-auf-die-aktivitaten-der-kurdischen-freiheitsbewegung-in-europa-mord-anschlag-paris/")
+# # .clickaway(clickaway = "lowerclassmagazine", remDr = remDr) #no popup
+# 
+# remDr$navigate("https://www.lvz.de/lokales/nordsachsen/oschatz/streik-in-nordsachsen-mittwoch-und-donnerstag-stehen-viele-busse-still-KGP7OV4Z4EGNK6WEVX4G77SNXY.html")
+# .clickaway(clickaway = "LVZ", remDr = remDr)
+# 
+# #remDr$navigate("https://www.merkur.de/politik/boris-pistorius-neuer-verteidigungsminister-loest-lambrecht-ab-92033359.html")
+# # .clickaway(clickaway = "Merkur", remDr = remDr) # -->shadow-root closed
+# 
+# # remDr$navigate("https://www.mmnews.de/2-uncategorised/193004-neuer-rbb-skandal-1-4-millionen-euro-fuer-rechtsberater")
+# # .clickaway(clickaway = "Mmnews", remDr = remDr) # no popup
+# 
+# # remDr$navigate("https://www.nachdenkseiten.de/?p=92612")
+# # .clickaway(clickaway = "Nachdenkseiten", remDr = remDr) # no popup
+# 
+# remDr$navigate("https://www.neopresse.com/editorial/diese-notenbanken-erhoehen-ihre-goldbestaende/")
+# .clickaway(clickaway = "NeoPresse", remDr = remDr)
 # 
 # 
 # 

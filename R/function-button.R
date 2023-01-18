@@ -8,7 +8,25 @@
                         error = function(e){NULL})
     if(!is.null(webElem)){
       trytime <- 0
-     # print("found")
+      # print("found")
+    } else {
+      trytime <- trytime - 0.1
+      Sys.sleep(0.1)
+    }
+  }
+  return(webElem)
+}
+
+### waitfindElems waits for an element to load before clicking it,
+### returns multiple elements
+
+.waitfindElems <- function(xpath, trytime = 3, remDr=remDr){
+  while (trytime > 0) {
+    webElem <- tryCatch({remDr$findElements(using = "xpath", xpath)},
+                        error = function(e){NULL})
+    if(!is.null(webElem)){
+      trytime <- 0
+      # print("found")
     } else {
       trytime <- trytime - 0.1
       Sys.sleep(0.1)
@@ -78,17 +96,10 @@
       webElem$clickElement()
     }
   }
-
-  if (clickaway == "Berliner Morgenpost"){
-    webElem <-NULL
-    webElem <- .waitfindElem(xpath =  "//a[contains(@class, 'cmpboxbtn cmpboxbtnyes cmptxt_btn_yes')]", remDr=remDr)
-    #loop until element is found
-    if(!is.null(webElem)){
-      webElem$clickElement()
-    }
-  }
   if (clickaway == "Bild" || clickaway == "Berliner Zeitung" || clickaway == "Cicero" || clickaway == "FAZ" ||
-      clickaway == "Freitag" || clickaway == "KN" || clickaway == "LVZ"){
+      clickaway == "Freitag" || clickaway == "KN" || clickaway == "LVZ" || clickaway == "Nordkurier" ||
+      clickaway == "NTV" || clickaway == "Ostsee-Zeitung" || clickaway == "RND" || clickaway == "Stern" ||
+      clickaway == "SZ" || clickaway == "Tag24" || clickaway == "TAZ" || clickaway == "Vice" || clickaway == "Welt"){
     webElem <-NULL
     webElem <- .waitfindElem(xpath =  "//iframe[contains(@title, 'SP Consent Message')]", remDr=remDr)
     if(!is.null(webElem)){
@@ -97,6 +108,19 @@
       webElem <- .waitfindElem(xpath = "//button[contains(@class, 'sp_choice_type_11')]", remDr=remDr)
       if(!is.null(webElem)){
         webElem$clickElement()
+      }
+    }
+    remDr$switchToFrame(NULL)
+  }
+  if (clickaway == "Telepolis"){
+    webElem <-NULL
+    webElem <- .waitfindElem(xpath =  "//iframe[contains(@title, 'SP Consent Message')]", remDr=remDr)
+    if(!is.null(webElem)){
+      remDr$switchToFrame(webElem)
+      
+      webElem <- .waitfindElems(xpath = "//button[contains(@class, 'sp_choice_type_11')]", remDr=remDr)
+      if(!is.null(webElem)){
+        webElem[[2]]$clickElement()
       }
     }
     remDr$switchToFrame(NULL)
@@ -135,7 +159,7 @@
       webElem$clickElement()
     }
   }
-  if (clickaway == "Focus" || clickaway == "Handelsblatt"){
+  if (clickaway == "Focus" || clickaway == "Handelsblatt" || clickaway == "Tagesspiegel"){
     webElem <-NULL
     webElem <- .waitfindElem(xpath =  "//iframe[contains(@title, 'Iframe title')]", remDr=remDr)
     if(!is.null(webElem)){
@@ -144,6 +168,18 @@
       webElem <- .waitfindElem(xpath = "//button[contains(@class, 'sp_choice_type_11')]", remDr=remDr)
       if(!is.null(webElem)){
         webElem$clickElement()
+      }
+    }
+    remDr$switchToFrame(NULL)
+  }
+  if (clickaway == "T-Online"){
+    webElem <-NULL
+    webElem <- .waitfindElem(xpath =  "//iframe[contains(@id, 'sp_message_iframe_741194')]", remDr=remDr)
+    if(!is.null(webElem)){
+      remDr$switchToFrame(webElem)
+      webElem <- .waitfindElems(xpath = "//button[contains(@class, 'sp_choice_type_11')]", remDr=remDr)
+      if(!is.null(webElem)){
+        webElem[[2]]$clickElement()
       }
     }
     remDr$switchToFrame(NULL)
@@ -173,7 +209,8 @@
       webElem$clickElement()
     }
   }
-  if (clickaway == "Hamburger MoPo"){
+  if (clickaway == "Berliner Morgenpost" || clickaway == "Hamburger MoPo" || clickaway == "TA" || 
+      clickaway == "WAZ" || clickaway == "Weser Kurier"){
     webElem <-NULL
     webElem <- .waitfindElem(xpath =  "//a[contains(@class, 'cmptxt_btn_yes')]", remDr=remDr)
     #loop until element is found
@@ -202,7 +239,7 @@
     }
   }
   
-  if (clickaway == "Jouwatch" || clickaway == "Klasse gegen Klasse"){
+  if (clickaway == "Jouwatch" || clickaway == "Klasse gegen Klasse" || clickaway == "Zuerst"){
     webElem <-NULL
     Sys.sleep(.5)
     webElem <- .waitfindElem(xpath =  "//button[contains(@class, 'cmplz-accept')]", remDr=remDr)
@@ -212,7 +249,7 @@
     }
   }
   
-  if (clickaway == "Junge Freiheit"){
+  if (clickaway == "Junge Freiheit" || clickaway == "DieUnbestechlichen"){
     webElem <-NULL
     
     webElem <- .waitfindElem(xpath =  "//a[contains(@class, '_brlbs-btn-accept-all')]", remDr=remDr)
@@ -241,6 +278,121 @@
       webElem$clickElement()
     }
   }
+
+  # if (clickaway == "Neues Deutschland"){
+  #   Sys.sleep(1)
+  #   webElem <-NULL
+  #   webElem <- .waitfindElem_shadow(path =  'div[class="cmp_button cmp_button_bg"]', remDr=remDr)
+  #   #loop until element is found
+  #   if(!is.null(webElem)){
+  #     webElem$clickElement()
+  #   }
+  # }
+  # # shadow-root - doesn't work!
+  
+  if (clickaway == "nordbayern.de"){
+    webElem <-NULL
+    
+    webElem <- .waitfindElem(xpath =  "//a[contains(@class, 'cmpboxbtnyes')]", remDr=remDr)
+    #loop until element is found
+    if(!is.null(webElem)){
+      webElem$clickElement()
+    }
+  }
+  
+  if (clickaway == "Opposition24"){
+    webElem <-NULL
+    
+    webElem <- .waitfindElem(xpath =  "//button[contains(@id, 'cc-cookie-accept')]", remDr=remDr)
+    #loop until element is found
+    if(!is.null(webElem)){
+      webElem$clickElement()
+    }
+  }
+  
+  if (clickaway == "Ossietzky"){
+    webElem <-NULL
+    Sys.sleep(2)
+    webElem <- .waitfindElem(xpath =  "//div[contains(@class, 'module_column sub_column col4-1 tb_6yys554 last')]", remDr=remDr)
+    #loop until element is found
+    if(!is.null(webElem)){
+      webElem$clickElement()
+    }
+  }
+  
+  if (clickaway == "Politplatschquatsch"){
+    webElem <-NULL
+    Sys.sleep(2)
+    webElem <- .waitfindElem(xpath =  "//a[contains(@id, 'cookieChoiceDismiss')]", remDr=remDr)
+    #loop until element is found
+    if(!is.null(webElem)){
+      webElem$clickElement()
+    }
+  }
+  
+  if (clickaway == "Pravda TV"){
+    webElem <-NULL
+    Sys.sleep(2)
+    webElem <- .waitfindElem(xpath =  "//button[contains(@class, ' css-5a47r')]", remDr=remDr)
+    #loop until element is found
+    if(!is.null(webElem)){
+      webElem$clickElement()
+      webElem <- .waitfindElem(xpath =  "//div[contains(@class, 'qc-cmp2-buttons-desktop')]/button[contains(@class, ' css-k8o10q')]", remDr=remDr)
+      if(!is.null(webElem)){
+        webElem$clickElement()
+      }
+    }
+  }
+  
+  if (clickaway == "Stuttgarter Zeitung"){
+    webElem <-NULL
+    webElem <- .waitfindElem(xpath =  "//iframe[contains(@title, 'Consent Message')]", remDr=remDr)
+    if(!is.null(webElem)){
+      remDr$switchToFrame(webElem)
+      
+      webElem <- .waitfindElem(xpath = "//button[contains(@class, 'sp_choice_type_11')]", remDr=remDr)
+      if(!is.null(webElem)){
+        webElem$clickElement()
+      }
+    }
+    remDr$switchToFrame(NULL)
+  }
+  
+  if (clickaway == "Tichys Einblick"){
+    webElem <-NULL
+    webElem <- .waitfindElem(xpath =  "//iframe[contains(@title, 'Iframe title')]", remDr=remDr)
+    if(!is.null(webElem)){
+      remDr$switchToFrame(webElem)
+      
+      webElem <- .waitfindElem(xpath = "//button[contains(@class, 'sp_choice_type_11')]", remDr=remDr)
+      if(!is.null(webElem)){
+        webElem$clickElement()
+      }
+    }
+    remDr$switchToFrame(NULL)
+    
+    webElem <- .waitfindElem(xpath = "//div[contains(@class, 'link-continue-reading')]/a", remDr=remDr)
+    if(!is.null(webElem)){
+      webElem$clickElement()
+    }
+
+  }
+  
+  if (clickaway == "TRT"){
+    webElem <-NULL
+    webElem <- .waitfindElem(xpath =  "//button[contains(@class, '_hj-ONMkJ__MinimizedWidgetMessage__close')]", remDr=remDr)
+    #loop until element is found
+    if(!is.null(webElem)){
+      webElem$clickElement()
+    }
+    
+    
+    webElem <- .waitfindElem(xpath =  "//div[contains(@class, 'gdprCloser')]", remDr=remDr)
+    #loop until element is found
+    if(!is.null(webElem)){
+      webElem$clickElement()
+    }
+  }
   
   if (clickaway == "Zeit"){
     webElem <-NULL
@@ -255,7 +407,6 @@
     }
     remDr$switchToFrame(NULL)
   }
-
 }
 
 
@@ -380,7 +531,116 @@
 # remDr$navigate("https://www.neopresse.com/editorial/diese-notenbanken-erhoehen-ihre-goldbestaende/")
 # .clickaway(clickaway = "NeoPresse", remDr = remDr)
 # 
+# # remDr$navigate("https://www.nd-aktuell.de/artikel/1170197.krieg-in-der-ukraine-friedensbewegung-im-dilemma.html")
+# # .clickaway(clickaway = "Neues Deutschland", remDr = remDr) # -->shadow-root closed
+# 
+# remDr$navigate("https://www.nordbayern.de/politik/markus-soder-andert-meinung-und-schliesst-nun-dritte-amtszeit-nicht-aus-1.12915104")
+# .clickaway(clickaway = "nordbayern.de", remDr = remDr) 
+# 
+# remDr$navigate("https://www.nordkurier.de/neustrelitz/so-viele-besucher-wie-nie-zuvor-im-tiergarten-neustrelitz-1851066501.html")
+# .clickaway(clickaway = "Nordkurier", remDr = remDr) 
+# 
+# remDr$navigate("https://www.n-tv.de/politik/Ukrainischer-Innenminister-stirbt-bei-Hubschrauberabsturz-article23852170.html")
+# .clickaway(clickaway = "NTV", remDr = remDr) 
+# 
+# remDr$navigate("https://opposition24.com/spekulatius/luftbesteuerung-eine-mehr-als-100-jahre-alte-idee/")
+# .clickaway(clickaway = "Opposition24", remDr = remDr) 
+# 
+# remDr$navigate("https://www.ossietzky.net/artikel/25-jahre-ossietzky/")
+# .clickaway(clickaway = "Ossietzky", remDr = remDr) 
+# 
+# remDr$navigate("https://www.ossietzky.net/artikel/25-jahre-ossietzky/")
+# .clickaway(clickaway = "Ossietzky", remDr = remDr) 
+# 
+# remDr$navigate("https://www.ostsee-zeitung.de/lokales/nordwestmecklenburg/wismar/wismar-problem-mit-hundekot-in-neu-gestalteter-strasse-schaeden-an-den-pflanzen-ICFO2WJBBFFHDCCL57NYAU7XIM.html")
+# .clickaway(clickaway = "Ostsee-Zeitung", remDr = remDr)
+# 
+# # remDr$navigate("https://www.pi-news.net/2023/01/deutsche-bundespolizei-acab-heisst-jetzt-all-cops-are-beautiful/")
+# # .clickaway(clickaway = "PI News", remDr = remDr) # no popup
+# 
+# remDr$navigate("https://www.politplatschquatsch.com/2023/01/lutzerath-fashion-style-kohlschwarze.html")
+# .clickaway(clickaway = "Politplatschquatsch", remDr = remDr)
+# 
+# remDr$navigate("https://www.pravda-tv.com/2023/01/sogar-der-fuehrende-kardiologe-von-saudi-arabien-forderte-dazu-auf-die-covid-impfstoffe-aufgrund-schwerer-herzerkrankungen-einzustellen/")
+# .clickaway(clickaway = "Pravda TV", remDr = remDr)
+# 
+# # remDr$navigate("https://www.redglobe.de/2023/01/hausdurchsuchungen-gegen-radio-dreyeckland-frontalangriff-auf-die-pressefreiheit/")
+# # .clickaway(clickaway = "Redglobe", remDr = remDr) # kein Popup
+# 
+# remDr$navigate("https://www.rnd.de/politik/was-die-ruestungsindustrie-vom-neuen-verteidigungsminister-erwartet-OZMXSQECBND73DM7ISPK3AOMBY.html")
+# .clickaway(clickaway = "RND", remDr = remDr)
+# 
+# # remDr$navigate("https://rp-online.de/politik/deutschland/netz-amuesiert-sich-aehnlichkeit-zwischen-laschet-und-pistorius_aid-83209861")
+# # .clickaway(clickaway = "RP Online", remDr = remDr) # no popup
+# # 
+# # remDr$navigate("https://www.rubikon.news/artikel/wolfe-wider-willen")
+# # .clickaway(clickaway = "Rubikon", remDr = remDr) # no popup
+# # 
+# # remDr$navigate("https://www.saarbruecker-zeitung.de/blaulicht/geldtransporter-ueberfall-saarlouis-zwei-verdaechtige-sind-in-frankreich-beruechtigt_aid-83218401")
+# # .clickaway(clickaway = "Saarbrücker Zeitung", remDr = remDr) # no popup
+# # 
+# # remDr$navigate("http://www.scharf-links.de/47.0.html?&tx_ttnews[tt_news]=81715&tx_ttnews[backPid]=56&cHash=0593ab7ebe")
+# # .clickaway(clickaway = "scharf links", remDr = remDr) # no popup
+# # 
+# # remDr$navigate("https://www.spiegel.de/ausland/energiekrise-in-portugal-eltern-muessen-entscheiden-wer-frieren-soll-a-08a51ec1-d4dd-467e-ac9c-51eada4484cb")
+# # .clickaway(clickaway = "Spiegel", remDr = remDr) # no popup
+# 
+# remDr$navigate("https://www.stern.de/politik/ausland/wagner-truppe--soeldner-flieht-nach-norwegen--was-er-zu-berichten-weiss-33106314.html")
+# .clickaway(clickaway = "Stern", remDr = remDr) 
+# 
+# remDr$navigate("https://www.stuttgarter-zeitung.de/inhalt.schnee-in-stuttgart-landeshauptstadt-im-winterkleid.a2be3050-309b-461e-901a-9c125373be74.html")
+# .clickaway(clickaway = "Stuttgarter Zeitung", remDr = remDr) 
+# 
+# remDr$navigate("https://www.sueddeutsche.de/politik/innenminister-ukraine-hubschrauberabsturz-selenskij-kiew-1.5734212")
+# .clickaway(clickaway = "SZ", remDr = remDr) 
+# 
+# remDr$navigate("https://www.t-online.de/nachrichten/ukraine/id_100113202/ukraine-krieg-ist-das-nur-der-anfang-fuer-putin-ist-der-krieg-noch-lange-nicht-vorbei.html")
+# .clickaway(clickaway = "T-Online", remDr = remDr) 
+# 
+# remDr$navigate("https://www.tag24.de/nachrichten/politik/deutschland/politiker/winfried-kretschmann/war-noch-fataler-vergleicht-kretschmann-missbrauchs-skandal-mit-holocaust-2722294")
+# .clickaway(clickaway = "Tag24", remDr = remDr) 
+# 
+# # remDr$navigate("https://www.tagesschau.de/ausland/europa/ukraine-innenminister-hubschrauberabsturz-103.html")
+# # .clickaway(clickaway = "Tagesschau", remDr = remDr) # no popup
+# 
+# remDr$navigate("https://www.tagesspiegel.de/internationales/unfall-in-der-region-kiew-ukrainischer-innenminister-bei-hubschrauberabsturz-getotet-9199227.html")
+# .clickaway(clickaway = "Tagesspiegel", remDr = remDr) 
+# 
+# remDr$navigate("https://taz.de/Festnahme-bei-Protest-nahe-Luetzerath/!5909806/")
+# .clickaway(clickaway = "TAZ", remDr = remDr) 
+# 
+# remDr$navigate("https://www.telepolis.de/features/Davos-Elite-Weltrettung-aus-der-Business-Perspektive-7462054.html")
+# .clickaway(clickaway = "Telepolis", remDr = remDr) 
+# 
+# remDr$navigate("https://www.thueringer-allgemeine.de/leben/gesundheit-medizin/covid-19-war-2021-in-thueringen-haeufigste-todesursache-id237402083.html")
+# .clickaway(clickaway = "TA", remDr = remDr) 
+# 
+# remDr$navigate("https://www.tichyseinblick.de/meinungen/union-politische-volks-demenz-als-kalkuel/")
+# .clickaway(clickaway = "Tichys Einblick", remDr = remDr) 
+# 
+# remDr$navigate("https://www.trtdeutsch.com/politik-welt/pentagon-turkiye-wichtiger-partner-und-verbundeter-11734405")
+# .clickaway(clickaway = "TRT", remDr = remDr) 
+# 
+# remDr$navigate("https://dieunbestechlichen.com/2023/01/twitter-files-jede-verschwoerungstheorie-ist-wahr-geworden/")
+# .clickaway(clickaway = "DieUnbestechlichen", remDr = remDr) 
+# 
+# remDr$navigate("https://www.vice.com/de/article/xgyjvn/zeit-verbrechen-wir-haben-sabine-rueckert-gefragt-wie-sie-runterkommt")
+# .clickaway(clickaway = "Vice", remDr = remDr) 
+# 
+# remDr$navigate("https://www.waz.de/staedte/gelsenkirchen/angriff-auf-mutter-gelsenkirchener-im-ausland-festgenommen-id237401795.html")
+# .clickaway(clickaway = "WAZ", remDr = remDr) 
+# 
+# remDr$navigate("https://www.welt.de/politik/deutschland/article243289779/Kanzler-in-Davos-Scholz-sagt-Ukraine-dauerhafte-deutsche-Unterstuetzung-zu.html")
+# .clickaway(clickaway = "Welt", remDr = remDr) 
+# 
+# remDr$navigate("https://www.weser-kurier.de/bremen/politik/bremen-mehr-kinder-mit-scharlach-erkrankungen-doc7oj67ny1j50rl0x1oy5")
+# .clickaway(clickaway = "Weser Kurier", remDr = remDr) 
+# 
+# remDr$navigate("https://zuerst.de/2023/01/18/kroatischer-praesident-kritisiert-usa-und-nato-absurder-stellvertreterkrieg/")
+# .clickaway(clickaway = "Zuerst", remDr = remDr) 
+# 
 # 
 # 
 # remDr$close()
 # z <- rD$server$stop()
+

@@ -24,7 +24,7 @@ gen_selen <- function(headless = TRUE) {
         return(tibble::tibble(url = NA, fname = NA))
     }
     selen$remDr$navigate(url)
-    purrr::safely(.clickaway(clickaway = pub, remDr = selen$remDr))
+    purrr::safely(.clickaway(clickaway = clickaway, remDr = selen$remDr))
     src <- selen$remDr$getPageSource()
     url_hash <- digest::sha1(url, digits = 40)
     current_time <- gsub(" ", "_", Sys.time())
@@ -66,7 +66,14 @@ scrape <- function(urls, pubs = "", selen = NULL, output_dir = Sys.getenv("ARTIC
         selen <- gen_selen(headless = headless)
         close_selen <- TRUE
     }
-  clickway <- pubs ### add: only call clickaway on first visit
+  if (pubs == ""){
+    clickaway1 <- ifelse(stringr::str_detect(urls, pattern = "zeit.de"), "Zeit", "")
+    clickaway2 <- ifelse(stringr::str_detect(urls, pattern = "saarbruecker-zeitung.de"), "Saarbrücker Zeitung", "")
+    clickaway <- paste0(clickaway1, clickaway2)
+  } else {
+    clickaway <- pubs ### add: only call clickaway on first visit
+  }
+  
     res <- purrr::map2(urls, clickaway, purrr::safely(.scrape), selen = selen, output_dir = output_dir, sleep = sleep, write = write, verbose = verbose, push = push, db = db, collection = collection, prefix = prefix, delete = delete) %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% dplyr::bind_rows()
     if (close_selen) {
         selen$remDr$close()

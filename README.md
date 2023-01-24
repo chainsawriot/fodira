@@ -23,7 +23,7 @@ It is better to use Ubuntu 20.04 LTS at the moment, due to the installation issu
 
 ```sh
 sudo apt update -qq
-sudo apt install libcurl4-openssl-dev libssl-dev libxml2-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libssl-dev libsasl2-dev software-properties-common dirmngr -y
+sudo apt install libcurl4-openssl-dev libssl-dev libxml2-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libssl-dev libsasl2-dev software-properties-common dirmngr libssh-dev -y
 ```
 
 2. R packages
@@ -45,7 +45,7 @@ sudo apt install --no-install-recommends r-base-dev -y
 And then
 
 ```r
-install.packages(c("tidyverse", "rio", "remotes", "tidyRSS", "mongolite"))
+install.packages(c("tidyverse", "rio", "remotes", "tidyRSS", "mongolite", "docopt"))
 remotes::install_github("chainsawriot/fodira")
 ```
 
@@ -96,5 +96,11 @@ ff_options <- list("moz:firefoxOptions" = list(args = list('--headless')))
 
 rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = TRUE, verbose = FALSE,
                           extraCapabilities = ff_options)
+##rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = TRUE, verbose = TRUE,
+##                          extraCapabilities = ff_options)
+
+## becareful of this issue
+## https://github.com/ropensci/wdman/issues/31#issuecomment-1336651660
+
 z <- rD$server$stop()
 ```

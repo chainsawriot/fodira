@@ -26,9 +26,9 @@ Imports:
     stringi,
     tibble,
     tidyRSS,
+    docopt,
     utils
 Suggests: 
-    docopt,
     progress,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

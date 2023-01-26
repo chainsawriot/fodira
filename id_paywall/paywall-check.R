@@ -28,8 +28,34 @@ check_paywall <- function(html, pub = ""){
   }
   
   
-
+  if (pub == "Handelsblatt") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'o-paywall__content')]") %>% 
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
   
+  
+  
+  if (pub == "Bild") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'offer-module')]") %>% 
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+    if (!value) {
+      html %>% rvest::html_elements(xpath = "//body[contains(@id, 'article')]//div/div/h2") %>% 
+        rvest::html_text() -> text_
+      if(length(text_)>0){
+        if(text_ == "Warum sehe ich BILD.de nicht?"){
+          value <- TRUE
+        } else {
+          value <- FALSE
+        }
+      }else {
+        value <- FALSE
+      }
+
+      
+    }
+  }
   return(value)
 }
 
@@ -59,5 +85,8 @@ checkfunction_2 <- function(tab, folder) {
 
 `tab-sue-han`$paywall <- checkfunction_2(tab=`tab-sue-han`, folder = "c://paywall_check/html-sue-han")
 
+`tab-ton-bild`$paywall <- checkfunction_2(tab=`tab-ton-bild`, folder = "c://paywall_check/html-ton-bild")
 
-test <- rvest::read_html("https://www.stern.de/panorama/stern-crime/wunstorf-in-trauer--viele-fragen-nach-toetung-von-14-jaehrigem-33137330.html")
+
+test <- rvest::read_html("C://paywall_check/html-ton-bild/bf348d08fcb7c24ccd5a1ab084ca673c274d100f_2022-12-21_13_02_14.html")
+

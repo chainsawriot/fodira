@@ -1,5 +1,3 @@
-`tab-cic-vi` <- readRDS("c://paywall_check/tab-cic-vi.RDS")
-
 require(magrittr)
 
 check_paywall <- function(html, pub = ""){
@@ -21,6 +19,14 @@ check_paywall <- function(html, pub = ""){
     value <- !identical(text_, character(0))
   }
   
+  if (pub == "FAZ") {
+    html %>% rvest::html_elements(xpath = "//section[contains(@class, 'atc-ContainerPaywall')]") %>% 
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  
+  
   if (pub == "SZ") {
     html %>% rvest::html_elements(xpath = "//offer-page") %>% 
       rvest::html_text() -> text_
@@ -34,7 +40,14 @@ check_paywall <- function(html, pub = ""){
     value <- !identical(text_, character(0))
   }
   
+  if (pub == "Welt") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'contains_walled_content')]") %>% 
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
   
+  
+
   
   if (pub == "Bild") {
     html %>% rvest::html_elements(xpath = "//div[contains(@class, 'offer-module')]") %>% 
@@ -86,6 +99,10 @@ checkfunction_2 <- function(tab, folder) {
 `tab-sue-han`$paywall <- checkfunction_2(tab=`tab-sue-han`, folder = "c://paywall_check/html-sue-han")
 
 `tab-ton-bild`$paywall <- checkfunction_2(tab=`tab-ton-bild`, folder = "c://paywall_check/html-ton-bild")
+
+`tab-welt-faz`$paywall <- checkfunction_2(tab=`tab-welt-faz`, folder = "c://paywall_check/html-welt-faz")
+
+
 
 
 test <- rvest::read_html("C://paywall_check/html-ton-bild/bf348d08fcb7c24ccd5a1ab084ca673c274d100f_2022-12-21_13_02_14.html")

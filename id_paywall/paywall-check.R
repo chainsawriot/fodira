@@ -46,6 +46,94 @@ check_paywall <- function(html, pub = ""){
     value <- !identical(text_, character(0))
   }
   
+  if (pub == "Berliner Zeitung") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'paywall_overlay__CR1uO')]") %>% 
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  if (pub == "RP Online") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'park-paywall-content')]") %>% 
+      rvest::html_text() -> text_
+    if(identical(text_, character(0))) {
+      html %>% rvest::html_elements(xpath = "//div[contains(@class, 'park-paywall-content')]") %>% 
+        rvest::html_text() -> text_
+    }
+    if(identical(text_, character(0))) {
+      html %>% rvest::html_elements(xpath = "//p[contains(@class, 'text-blurred')]") %>% 
+        rvest::html_text() -> text_
+    }
+    value <- !identical(text_, character(0))
+  }
+  
+  if (pub == "Hildesheimer Allgemeine Zeitung") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'o-paywall')]") %>% 
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  
+  if (pub == "TA") {
+    html %>% rvest::html_elements(xpath = "//p[contains(@class, 'obfuscated')]") %>% 
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  # if (pub == "nordbayern.de") {
+  #   html %>% rvest::html_elements(xpath = "//div[contains(@class, 'paywall')]") %>% 
+  #     rvest::html_text() -> text_
+  #   value <- !identical(text_, character(0))
+  # }
+  
+  if (pub == "Stuttgarter Zeitung") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@id, 'taboola-below-paid-article-thumbnails')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  if (pub == "Tagesspiegel") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'article--paid')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  if (pub == "Berliner Morgenpost") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@id, 'paywall-container')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  if (pub == "WAZ") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@id, 'paywall-container')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  
+  if (pub == "Allgemeine Zeitung") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'storyElementWrapper__paywallContainer')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+    if(!value) {
+      html %>% rvest::html_elements(xpath = "//div[contains(@class, 'vrm-cce__paywall')]") %>% 
+        rvest::html_text() -> text_
+      value <- !identical(text_, character(0))
+    }
+  }
+  
+ 
+  if (pub == "Weser Kurier") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'paywall__overlay')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  if (pub == "Hamburger MoPo") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@id, 'paywall')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
   
 
   
@@ -103,7 +191,31 @@ checkfunction_2 <- function(tab, folder) {
 `tab-welt-faz`$paywall <- checkfunction_2(tab=`tab-welt-faz`, folder = "c://paywall_check/html-welt-faz")
 
 
+`tab-beze-nordk`$paywall <- checkfunction_2(tab=`tab-beze-nordk`, 
+                                            folder = "c://paywall_check/regional_sample/html-beze-nordk")
+
+`tab-haz-rp`$paywall <- checkfunction_2(tab=`tab-haz-rp`, 
+                                        folder = "c://paywall_check/regional_sample/html-haz-rp")
 
 
-test <- rvest::read_html("C://paywall_check/html-ton-bild/bf348d08fcb7c24ccd5a1ab084ca673c274d100f_2022-12-21_13_02_14.html")
+`tab-kn-ta`$paywall <- checkfunction_2(tab=`tab-kn-ta`, 
+                                        folder = "c://paywall_check/regional_sample/html-kn-ta")
+
+`tab-me-nordb`$paywall <- checkfunction_2(tab=`tab-me-nordb`, 
+                                       folder = "c://paywall_check/regional_sample/html-me-nordb")
+
+`tab-st-ba`$paywall <- checkfunction_2(tab=`tab-st-ba`, 
+                                       folder = "c://paywall_check/regional_sample/html-st-ba")
+
+`tab-tag-bemo`$paywall <- checkfunction_2(tab=`tab-tag-bemo`, 
+                                          folder = "c://paywall_check/regional_sample/html-tag-bemo")
+
+`tab-waz-allg`$paywall <- checkfunction_2(tab=`tab-waz-allg`, 
+                                          folder = "c://paywall_check/regional_sample/html-waz-allg")
+
+
+`tab-we-hamo`$paywall <- checkfunction_2(tab=`tab-we-hamo`, 
+                                          folder = "c://paywall_check/regional_sample/html-we-hamo")
+
+test <- rvest::read_html("C://paywall_check/regional_sample/html-haz-rp/37fe189d4aa0029a90f79872e82f0cc9d3ccd6f4_2022-10-31_18_48_28.html")
 

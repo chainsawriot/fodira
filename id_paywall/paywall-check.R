@@ -140,7 +140,20 @@ check_paywall <- function(html, pub = ""){
     value <- !identical(text_, character(0))
   }
   
+  # if (pub == "Badische Zeitung") {
+  #   html %>% rvest::html_elements(xpath = "//section[contains(@id, 'regWalli')]") %>%
+  #     rvest::html_text() -> text_
+  #   value <- !identical(text_, character(0))
+  # }
+  # 
+  # if (pub == "Hildesheimer Allgemeine Zeitung") {
+  #   html %>% rvest::html_elements(xpath = "//div[contains(@class, 'o-paywall')]") %>%
+  #     rvest::html_text() -> text_
+  #   value <- !identical(text_, character(0))
+  # }
   
+  
+  o-paywall
   
 
   

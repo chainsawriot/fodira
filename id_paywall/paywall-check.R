@@ -140,6 +140,82 @@ check_paywall <- function(html, pub = ""){
     value <- !identical(text_, character(0))
   }
   
+  if (pub == "Achse des Guten") {
+    html %>% rvest::html_elements(xpath = "//title") %>%
+      rvest::html_text() -> text_
+    value <- identical(text_, "403 Forbidden")
+  }
+  
+  if (pub == "akweb") {
+    html %>% rvest::html_elements(xpath = "//section[contains(@class, 'wp-block-ak-subscription')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  
+  if (pub == "Epoch Times") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@id, 'premium-content')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  if (pub == "Freitag") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'c-paywall-banner')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  if (pub == "DWN") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'message notice')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+    if(identical(text_, character(0))) {
+      html %>% rvest::html_elements(xpath = "//div[contains(@class, 'gustly')]") %>% 
+        rvest::html_text() -> text_
+    }
+    value <- !identical(text_, character(0))
+    
+    if(identical(text_, character(0))) {
+      html %>% rvest::html_elements(xpath = "//div[contains(@id, 'article-teaser-blocks')]") %>% 
+        rvest::html_text() -> text_
+    }
+    value <- !identical(text_, character(0))
+    
+  }
+  
+  if (pub == "Compact") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@id, 'wpmem_restricted_msg')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  
+  if (pub == "Junge Freiheit") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'paywall-content-block')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  if (pub == "Jungle World") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'subscription-only-block')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  if (pub == "Junge Welt") {
+    html %>% rvest::html_elements(xpath = "//a[contains(@title, 'Onlineabo abschließen')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  
+  
+  
+  
+  
+  
+   
+  
   # if (pub == "Badische Zeitung") {
   #   html %>% rvest::html_elements(xpath = "//section[contains(@id, 'regWalli')]") %>%
   #     rvest::html_text() -> text_
@@ -153,7 +229,9 @@ check_paywall <- function(html, pub = ""){
   # }
   
   
-  o-paywall
+  
+  
+
   
 
   
@@ -245,5 +323,32 @@ checkfunction_2 <- function(tab, folder) {
 `tab-lvz-tag24`$paywall <- checkfunction_2(tab=`tab-lvz-tag24`, 
                                          folder = "c://paywall_check/regional_sample/html-lvz-tag24")
 
-test <- rvest::read_html("C://paywall_check/regional_sample/html-haz-rp/37fe189d4aa0029a90f79872e82f0cc9d3ccd6f4_2022-10-31_18_48_28.html")
+`tab-ach-fr`$paywall <- checkfunction_2(tab=`tab-ach-fr`, 
+                                           folder = "c://paywall_check/alternative_sample/html-ach-fr")
+
+`tab-akw-f21`$paywall <- checkfunction_2(tab=`tab-akw-f21`, 
+                                         folder = "c://paywall_check/alternative_sample/html-akw-f21")
+
+`tab-ep-mm`$paywall <- checkfunction_2(tab=`tab-ep-mm`, 
+                                       folder = "c://paywall_check/alternative_sample/html-ep-mm")
+
+
+`tab-fr-rg`$paywall <- checkfunction_2(tab=`tab-fr-rg`, 
+                                       folder = "c://paywall_check/alternative_sample/html-fr-rg")
+
+
+
+`tab-jou-dwn`$paywall <- checkfunction_2(tab=`tab-jou-dwn`, 
+                                       folder = "c://paywall_check/alternative_sample/html-jou-dwn")
+
+
+`tab-ju-co`$paywall <- checkfunction_2(tab=`tab-ju-co`, 
+                                       folder = "c://paywall_check/alternative_sample/html-ju-co")
+
+`tab-jung-nds`$paywall <- checkfunction_2(tab=`tab-jung-nds`, 
+                                          folder = "c://paywall_check/alternative_sample/html-jung-nds")
+
+`tab-jw-nd`$paywall <- checkfunction_2(tab=`tab-jw-nd`, 
+                                          folder = "c://paywall_check/alternative_sample/html-jw-nd")
+
 

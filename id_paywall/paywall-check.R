@@ -134,6 +134,13 @@ check_paywall <- function(html, pub = ""){
     value <- !identical(text_, character(0))
   }
   
+  if (pub == "RND" || pub == "Ostsee-Zeitung" || pub == "LVZ" || pub == "KN") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'paywalledContent')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
+  
+  
   
 
   
@@ -216,6 +223,14 @@ checkfunction_2 <- function(tab, folder) {
 
 `tab-we-hamo`$paywall <- checkfunction_2(tab=`tab-we-hamo`, 
                                           folder = "c://paywall_check/regional_sample/html-we-hamo")
+
+
+`tab-hna-osz`$paywall <- checkfunction_2(tab=`tab-hna-osz`, 
+                                         folder = "c://paywall_check/regional_sample/html-hna-osz")
+
+
+`tab-lvz-tag24`$paywall <- checkfunction_2(tab=`tab-lvz-tag24`, 
+                                         folder = "c://paywall_check/regional_sample/html-lvz-tag24")
 
 test <- rvest::read_html("C://paywall_check/regional_sample/html-haz-rp/37fe189d4aa0029a90f79872e82f0cc9d3ccd6f4_2022-10-31_18_48_28.html")
 

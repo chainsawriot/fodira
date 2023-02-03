@@ -79,11 +79,11 @@ check_paywall <- function(html, pub = ""){
     value <- !identical(text_, character(0))
   }
   
-  # if (pub == "nordbayern.de") {
-  #   html %>% rvest::html_elements(xpath = "//div[contains(@class, 'paywall')]") %>% 
-  #     rvest::html_text() -> text_
-  #   value <- !identical(text_, character(0))
-  # }
+  if (pub == "nordbayern.de") {
+    html %>% rvest::html_elements(xpath = "//div[contains(@class, 'paywall')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
   
   if (pub == "Stuttgarter Zeitung") {
     html %>% rvest::html_elements(xpath = "//div[contains(@id, 'taboola-below-paid-article-thumbnails')]") %>%
@@ -208,11 +208,26 @@ check_paywall <- function(html, pub = ""){
     value <- !identical(text_, character(0))
   }
   
+  if (pub == "Jacobin") {
+    html %>% rvest::html_elements(xpath = "//input[contains(@id, 'username')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+    if(identical(text_, character(0))) {
+      html %>% rvest::html_elements(xpath = "//svg[contains(@class, 'spinner__svg')]") -> text_
+      value <- (length(text_) > 0)
+      }
+    
+  }
+  
+  if (pub == "blaetter.de") {
+    html %>% rvest::html_elements(xpath = "//a[contains(@class, 'button--buy')]") %>%
+      rvest::html_text() -> text_
+    value <- !identical(text_, character(0))
+  }
   
   
   
-  
-  
+
   
    
   
@@ -227,9 +242,18 @@ check_paywall <- function(html, pub = ""){
   #     rvest::html_text() -> text_
   #   value <- !identical(text_, character(0))
   # }
-  
-  
-  
+  #
+  # if (pub == "Saarbrücker Zeitung") {
+  #   html %>% rvest::html_elements(xpath = "//span[contains(@title, 'Jetzt weiterlesen!')]") %>%
+  #     rvest::html_text() -> text_
+  #   value <- !identical(text_, character(0))
+  # }
+  #
+  # if (pub == "Zeit") {
+  #   html %>% rvest::html_elements(xpath = "//aside[contains(@id, 'paywall')]") %>%
+  #     rvest::html_text() -> text_
+  #   value <- !identical(text_, character(0))
+  # }
   
 
   
@@ -349,6 +373,15 @@ checkfunction_2 <- function(tab, folder) {
                                           folder = "c://paywall_check/alternative_sample/html-jung-nds")
 
 `tab-jw-nd`$paywall <- checkfunction_2(tab=`tab-jw-nd`, 
-                                          folder = "c://paywall_check/alternative_sample/html-jw-nd")
+                                       folder = "c://paywall_check/alternative_sample/html-jw-nd")
+
+`tab-lc-jcbn`$paywall <- checkfunction_2(tab=`tab-lc-jcbn`, 
+                                         folder = "c://paywall_check/alternative_sample/html-lc-jcbn")
+
+`tab-os-bl`$paywall <- checkfunction_2(tab=`tab-os-bl`, 
+                                       folder = "c://paywall_check/alternative_sample/html-os-bl")
+
+`tab-nby`$paywall <- checkfunction_2(tab=`tab-nby`, 
+                                       folder = "c://paywall_check/alternative_sample/html-nby")
 
 

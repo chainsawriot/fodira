@@ -9,7 +9,7 @@ push_html_job(
   job_fname,
   db = "main",
   collection = "articles",
-  prefix = "html",
+  prefix = "S3://fodira-html/",
   delete = TRUE
 )
 }
@@ -20,7 +20,7 @@ push_html_job(
 
 \item{collection}{MongoDB collection}
 
-\item{prefix}{MongoDB GridFS prefix}
+\item{prefix}{S3 path}
 
 \item{delete}{whether to delete \code{job_fname} after the insertion}
 }

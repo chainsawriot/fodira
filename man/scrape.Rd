@@ -43,7 +43,7 @@ scrape(
 
 \item{collection}{MongoDB collection}
 
-\item{prefix}{MongoDB GridFS prefix}
+\item{prefix}{S3 path}
 
 \item{delete}{whether to delete the HTML files afterwards.}
 }

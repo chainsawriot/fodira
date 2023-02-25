@@ -6,9 +6,9 @@
 \usage{
 harmonize_output(
   output,
-  pub = c("nordbayern.de", "Spiegel", "Bild", "Berliner Zeitung",
-    "Stuttgarter Zeitung", "HNA", "Merkur", "Stern", "Klasse gegen Klasse",
-    "Tagesspiegel", "DieUnbestechlichen", "Heute"),
+  pub = c("nordbayern.de", "Spiegel", "Bild", "Berliner Zeitung", "Stuttgarter Zeitung",
+    "HNA", "Merkur", "Stern", "Klasse gegen Klasse", "Tagesspiegel",
+    "DieUnbestechlichen", "Heute"),
   remove_duplicates = TRUE
 )
 }

@@ -47,9 +47,9 @@ generate_hash <- function(ending = ".RDS", length = 40) {
 get_links <- function(fname = NULL, size = 300, safe = FALSE, collection = "articles", db = "main", unsafe_pubs = c("Zeit", "Saarbr\u00fccker Zeitung", "RT deutsch")) {
     con <- mongolite::mongo(collection = collection, db = db)
     if (safe) {
-        links <- con$aggregate(paste0('[ {"$match": {"htmlfile": "", "pub" : { "$in": ["Bild", "Tagesschau", "Heute", "Freitag", "T-Online"]}}}, { "$sample": { "size": ', size, '} }]'))$link
+        links <- con$aggregate(paste0('[ {"$match": {"$or": [{"htmlfile": ""}, {"htmlfile": {"$exists": false}}], "pub" : { "$in": ["Bild", "Tagesschau", "Heute", "Freitag", "T-Online"]}}}, { "$sample": { "size": ', size, '} }]'))$link
     } else {
-        links <- con$aggregate(paste0('[ {"$match": {"htmlfile": "", "pub": { "$nin": [', paste0(purrr::map_chr(unsafe_pubs, ~paste0('"', ., '"')), collapse = ", ") , ']}}}, { "$sample": { "size": ', size, '} }]'))$link
+        links <- con$aggregate(paste0('[ {"$match": {"$or": [{"htmlfile": ""}, {"htmlfile": {"$exists": false}}], "pub": { "$nin": [', paste0(purrr::map_chr(unsafe_pubs, ~paste0('"', ., '"')), collapse = ", ") , ']}}}, { "$sample": { "size": ', size, '} }]'))$link
     }
     if (is.null(fname)) {
         return(links)

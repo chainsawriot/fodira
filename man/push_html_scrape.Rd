@@ -10,7 +10,7 @@ push_html_scrape(
   output_dir = Sys.getenv("ARTICLE_DIR"),
   db = "main",
   collection = "articles",
-  prefix = "html",
+  prefix = "S3://fodira-html/",
   delete = TRUE
 )
 }
@@ -23,7 +23,7 @@ push_html_scrape(
 
 \item{collection}{MongoDB collection}
 
-\item{prefix}{MongoDB GridFS prefix}
+\item{prefix}{S3 path}
 
 \item{delete}{whether to delete the HTML files afterwards.}
 }

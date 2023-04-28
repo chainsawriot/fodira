@@ -52,7 +52,7 @@ push_html <- function(url, fname, output_dir = Sys.getenv("ARTICLE_DIR"), db = "
 	## upload to S3
         res <- system2("s3cmd", args = c("put", htmlpath, prefix))
 	if (res != 0) {
-          stop("S3 Upload failed.")
+            stop("S3 Upload failed.")
         }
         if (delete) {
           unlink(htmlpath)

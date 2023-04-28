@@ -66,6 +66,16 @@ Start the service
 sudo systemctl enable mongod
 ```
 
+### DO Spaces
+
+HTML files are uploaded to Digital Ocean Spaces. And that requires `s3cmd`.
+
+```sh
+sudo apt-get install s3cmd
+```
+
+Please set it up according to [the guide](https://docs.digitalocean.com/products/spaces/reference/s3cmd/) provided by Digital Ocean.
+
 ### Page scraping
 
 1. Install Firefox

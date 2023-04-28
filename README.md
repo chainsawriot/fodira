@@ -114,3 +114,4 @@ rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 568
 
 z <- rD$server$stop()
 ```
+

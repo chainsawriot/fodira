@@ -16,7 +16,7 @@ gen_selen <- function(headless = TRUE) {
     return(list(rD = rD, remDr = remDr))
 }
 
-.scrape <- function(url, clickaway = "", selen, output_dir = Sys.getenv("ARTICLE_DIR"), sleep = sample(seq(0, 1, .1), size = 1), write = TRUE, verbose = FALSE, push = FALSE, db = "main", collection = "articles", prefix = "html", delete = TRUE) {
+.scrape <- function(url, selen, output_dir = Sys.getenv("ARTICLE_DIR"), sleep = sample(seq(0, 1, .1), size = 1), write = TRUE, verbose = FALSE, push = FALSE, db = "main", collection = "articles", prefix = "html", delete = TRUE) {
     if (verbose) {
         message(url)
     }
@@ -24,7 +24,6 @@ gen_selen <- function(headless = TRUE) {
         return(tibble::tibble(url = NA, fname = NA))
     }
     selen$remDr$navigate(url)
-    purrr::safely(.clickaway(clickaway = clickaway, remDr = selen$remDr))
     src <- selen$remDr$getPageSource()
     url_hash <- digest::sha1(url, digits = 40)
     current_time <- gsub(" ", "_", Sys.time())
@@ -48,8 +47,7 @@ gen_selen <- function(headless = TRUE) {
 
 #' Scrape urls and put it in the output directory
 #'
-#' @param urls a vector of URLs
-#' @param pubs a vector of which pages we're visiting (for clicking away popups)
+#' @param urls a vector or URLs
 #' @param selen an instance of Selenium from [gen_selen()]. If it is NULL, a new instance is generated and close automatically, i.e. `close_selen` is TRUE
 #' @param output_dir a directory to hold HTML files
 #' @param sleep sleep time between each collection
@@ -61,20 +59,12 @@ gen_selen <- function(headless = TRUE) {
 #' @return a dataframe with urls and filenames; if `write` is TRUE, HTML files are written to `output_dir`. All failed urls will be skipped.
 #' @export
 #' @inheritParams push_html
-scrape <- function(urls, pubs = "", selen = NULL, output_dir = Sys.getenv("ARTICLE_DIR"), sleep = 1, write = TRUE, verbose = FALSE, close_selen = FALSE, headless = TRUE, push = FALSE, db = "main", collection = "articles", prefix = "html", delete = TRUE) {
+scrape <- function(urls, selen = NULL, output_dir = Sys.getenv("ARTICLE_DIR"), sleep = 1, write = TRUE, verbose = FALSE, close_selen = FALSE, headless = TRUE, push = FALSE, db = "main", collection = "articles", prefix = "html", delete = TRUE) {
     if (is.null(selen)) {
         selen <- gen_selen(headless = headless)
         close_selen <- TRUE
     }
-  if (pubs == ""){
-    clickaway1 <- ifelse(stringr::str_detect(urls, pattern = "zeit.de"), "Zeit", "")
-    clickaway2 <- ifelse(stringr::str_detect(urls, pattern = "saarbruecker-zeitung.de"), "Saarbrücker Zeitung", "")
-    clickaway <- paste0(clickaway1, clickaway2)
-  } else {
-    clickaway <- pubs ### add: only call clickaway on first visit
-  }
-  
-    res <- purrr::map2(urls, clickaway, purrr::safely(.scrape), selen = selen, output_dir = output_dir, sleep = sleep, write = write, verbose = verbose, push = push, db = db, collection = collection, prefix = prefix, delete = delete) %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% dplyr::bind_rows()
+    res <- purrr::map(urls, purrr::safely(.scrape), selen = selen, output_dir = output_dir, sleep = sleep, write = write, verbose = verbose, push = push, db = db, collection = collection, prefix = prefix, delete = delete) %>% purrr::discard(~!is.null(.$error)) %>% purrr::map("result") %>% dplyr::bind_rows()
     if (close_selen) {
         selen$remDr$close()
         z <- selen$rD$server$stop()

@@ -11,6 +11,8 @@ Sys.setlocale("LC_TIME", "de_DE")
 #function for geting links from page
 pi_getlink <- function(html){
 
+ # html <- pjs_session$getSource() 
+  
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'td-block-span6')]//h3//a") %>% 
     rvest::html_text(., trim = TRUE) -> item_title
@@ -23,6 +25,8 @@ pi_getlink <- function(html){
     rvest::html_elements(xpath = "//div[contains(@class, 'td-block-span6')]//time") %>% 
     rvest::html_text(., trim = TRUE) %>% 
     stringr::str_replace(., "März", "March") %>%
+    stringr::str_replace(., "Februar", "February") %>%
+    stringr::str_replace(., "Januar", "January") %>%
     lubridate::dmy() -> item_pubdate
     
     df <- data.frame(item_title, item_link, item_pubdate)
@@ -42,7 +46,7 @@ pi_go_thr_archive <- function(startdate){
   valid_links <- data.frame()
   
   while (i > 0) {
-    pi_getlink_url(paste0("https://www.pi-news.net/2022/page/", j, "/")) %>% 
+    pi_getlink_url(paste0("https://www.pi-news.net/2023/page/", j, "/")) %>% 
       subset(item_pubdate>=as.Date(startdate)) -> subset_links
     i <- nrow(subset_links)
     j <- j + 1
@@ -64,7 +68,7 @@ valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = it
   dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
 
-saveRDS(valid_links, "PI News.RDS")
+saveRDS(valid_links, "PI News_2.RDS")
 
 
 

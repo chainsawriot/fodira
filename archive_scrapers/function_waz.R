@@ -90,29 +90,35 @@ waz_go_thr_archive <- function(startdate, startn, endn){
 # df <- zeit_getlink_url("https://www.zeit.de/thema/krieg-in-ukraine", "2022-01-01")
   
   
-waz_go_thr_archive("2021-12-31", 2, 500) -> valid_links1
-waz_go_thr_archive("2021-12-31", 501, 1000) -> valid_links2
-waz_go_thr_archive("2021-12-31", 1001, 1500) -> valid_links3
+waz_go_thr_archive("2022-08-01", 2, 500) -> valid_links1
+waz_go_thr_archive("2022-08-01", 501, 1000) -> valid_links2
+waz_go_thr_archive("2022-08-01", 1001, 1500) -> valid_links3
 
-waz_go_thr_archive("2021-12-31", 1501, 2000) -> valid_links4
-waz_go_thr_archive("2021-12-31", 2001, 2500) -> valid_links5
-waz_go_thr_archive("2021-12-31", 2501, 3000) -> valid_links6
+waz_go_thr_archive("2022-08-01", 1501, 2000) -> valid_links4
+waz_go_thr_archive("2022-08-01", 2001, 2500) -> valid_links5
+waz_go_thr_archive("2022-08-01", 2501, 3000) -> valid_links6
 
-waz_go_thr_archive("2021-12-31", 3001, 3500) -> valid_links7
-waz_go_thr_archive("2021-12-31", 3501, 4000) -> valid_links8
-waz_go_thr_archive("2021-12-31", 4001, 4500) -> valid_links9
+waz_go_thr_archive("2022-08-01", 3001, 3500) -> valid_links7
+waz_go_thr_archive("2022-08-01", 3501, 4000) -> valid_links8
+waz_go_thr_archive("2022-08-01", 4001, 4500) -> valid_links9
 
-waz_go_thr_archive("2021-12-31", 4501, 5000) -> valid_links10
-waz_go_thr_archive("2021-12-31", 5001, 5500) -> valid_links11
-waz_go_thr_archive("2021-12-31", 5501, 6000) -> valid_links12
-waz_go_thr_archive("2021-12-31", 6001, 6500) -> valid_links13
-waz_go_thr_archive("2021-12-31", 6501, 7000) -> valid_links14
+waz_go_thr_archive("2022-08-01", 4501, 5000) -> valid_links10
+waz_go_thr_archive("2022-08-01", 5001, 5500) -> valid_links11
+waz_go_thr_archive("2022-08-01", 5501, 6000) -> valid_links12
+waz_go_thr_archive("2022-08-01", 6001, 6500) -> valid_links13
+waz_go_thr_archive("2022-08-01", 6501, 7000) -> valid_links14
+waz_go_thr_archive("2022-08-01", 7001, 7500) -> valid_links15
+waz_go_thr_archive("2022-08-01", 7501, 8000) -> valid_links16
+waz_go_thr_archive("2022-08-01", 8001, 8500) -> valid_links17
+waz_go_thr_archive("2022-08-01", 8501, 9000) -> valid_links18
 
-valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2, valid_links3#,
-                     #valid_links4, valid_links5, valid_links6,
-                     #valid_links7, valid_links8, valid_links9,
-                     #valid_links10, valid_links11, valid_links12,
-                     #valid_links13, valid_links14
+
+valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2, valid_links3,
+                     valid_links4, valid_links5, valid_links6,
+                     valid_links7, valid_links8, valid_links9,
+                     valid_links10, valid_links11, valid_links12,
+                     valid_links13, valid_links14, valid_links15, 
+                     valid_links16, valid_links17, valid_links18
                      ))
 
 

@@ -11,7 +11,7 @@ Sys.setlocale("LC_TIME", "de_DE")
 
 #function for geting links from page
 spiegel_getlink <- function(html){
-  html <- remDr$getPageSource()[[1]]
+  #html <- remDr$getPageSource()[[1]]
 
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//header//h2/a") %>% 
@@ -24,7 +24,8 @@ spiegel_getlink <- function(html){
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//h2[contains(@class, 'lg:mr-24 md:mr-24 sm:mx-16')]") %>%
     rvest::html_text(., trim = TRUE) %>% stringr::str_extract(., "[0-9]+[.] [A-za-zäöü]+ [0-9]+") %>%
-    as.Date(tryFormat = c("%d. %B %Y")) -> item_pubdate
+    stringr::str_replace(., "März", "March") %>%
+    lubridate::dmy() -> item_pubdate
 
     df <- data.frame(item_title, item_link, item_pubdate)
     
@@ -53,7 +54,7 @@ spiegel_go_thr_archive <- function(startdate){
 }
 
 
-spiegel_go_thr_archive(startdate = "2021-12-01") -> valid_links
+spiegel_go_thr_archive(startdate = "2022-08-01") -> valid_links
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "Spiegel", description = NA) %>%

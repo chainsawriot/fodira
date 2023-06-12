@@ -86,7 +86,7 @@ bmopo_go_thr_archive <- function(startdate){
 # df <- zeit_getlink_url("https://www.zeit.de/thema/krieg-in-ukraine", "2022-01-01")
   
   
-bmopo_go_thr_archive("2021-12-31") -> valid_links
+bmopo_go_thr_archive("2022-08-31") -> valid_links
 
 
 valid_links %>% dplyr::distinct() %>%

@@ -17,7 +17,7 @@ telepolis_getlink <- function(html){
     
     rvest::read_html(html) %>% 
       rvest::html_elements(xpath = "//li[contains(@class, 'archiv-liste__item')]//a") %>% 
-      rvest::html_attr("href")  %>% paste0("https://www.heise.de/", .)-> item_link
+      rvest::html_attr("href")  %>% paste0("https://www.heise.de", .)-> item_link
     
     rvest::read_html(html) %>% 
       rvest::html_elements(xpath = "//li[contains(@class, 'archiv-liste__item')]//time") %>% 
@@ -48,7 +48,7 @@ telepolis_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-valid_links <- telepolis_go_thr_archive("2021-12-01")
+valid_links <- telepolis_go_thr_archive("2022-08-01")
 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

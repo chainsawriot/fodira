@@ -3,14 +3,14 @@
 require(RSelenium)
 require(magrittr)
 
-fprof <- makeFirefoxProfile(list(permissions.default.image = 21))
+#fprof <- makeFirefoxProfile(list(permissions.default.image = 21))
 rD <- RSelenium::rsDriver(browser = "firefox", 
                           #chromever = "103.0.5060.134", 
                           port = sample(c(5678L, 5679L, 5680L, 5681L#, 5682L
                                           ), size = 1), 
                           #phantomver = "2.1.1",
-                          extraCapabilities = fprof,
-                          check = TRUE, verbose = FALSE)
+                          #extraCapabilities = fprof,
+                          check = FALSE, verbose = FALSE)
 
 remDr <- rD[["client"]]
 
@@ -146,12 +146,28 @@ hna_go_thr_archive("2022-03-02", "2022-06-01")-> valid_links2
 
 hna_go_thr_archive("2022-06-02", "2022-07-01")-> valid_links3
 
-hna_go_thr_archive("2022-07-02", "2022-07-20")-> valid_links4
+hna_go_thr_archive("2022-07-02", "2022-08-01")-> valid_links4
 
-hna_go_thr_archive("2022-07-20", Sys.Date())-> valid_links5
+hna_go_thr_archive("2022-08-02", "2022-09-01")-> valid_links5
+
+hna_go_thr_archive("2022-09-02", "2022-10-01")-> valid_links6
+
+hna_go_thr_archive("2022-10-02", "2022-11-01")-> valid_links7
+
+hna_go_thr_archive("2022-11-02", "2022-12-01")-> valid_links8
+
+hna_go_thr_archive("2022-12-02", "2023-01-01")-> valid_links9
+
+hna_go_thr_archive("2023-01-02", "2023-02-01")-> valid_links10
+
+hna_go_thr_archive("2023-02-02", "2023-03-01")-> valid_links11
+
+hna_go_thr_archive("2023-03-02", Sys.Date())-> valid_links12
 
 dplyr::distinct(rbind(valid_links1, valid_links2, valid_links3,
-                      valid_links4, valid_links5)) -> valid_links
+                      valid_links4, valid_links5, valid_links6,
+                      valid_links7, valid_links8, valid_links9,
+                      valid_links10, valid_links11, valid_links12)) -> valid_links
 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

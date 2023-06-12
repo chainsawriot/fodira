@@ -18,7 +18,7 @@ vice_getlink <- function(html){
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'grid__wrapper grd-row')]//a") %>% 
     rvest::html_attr("href") %>% 
-    paste0("https://www.vice.com")-> item_link
+    paste0("https://www.vice.com", .)-> item_link
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'grid__wrapper grd-row')]//div[contains(@class, 'dsp-inline-xs hed-xxs canonical__date hed-xxs')]") %>% 

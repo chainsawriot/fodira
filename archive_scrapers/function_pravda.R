@@ -23,6 +23,8 @@ pravda_getlink <- function(html){
     rvest::html_elements(xpath = "//article//time[contains(@class, 'entry-date published')]") %>% 
     rvest::html_text(., trim = TRUE) %>% 
     stringr::str_replace(., "März", "March") %>%
+    stringr::str_replace(., "Februar", "February") %>%
+    stringr::str_replace(., "Januar", "January") %>%
     lubridate::dmy() -> item_pubdate
     
     df <- data.frame(item_title, item_link, item_pubdate)

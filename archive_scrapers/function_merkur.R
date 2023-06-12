@@ -1,7 +1,8 @@
 require(RSelenium)
 require(magrittr)
 rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(#5678L, 
-  5679L, 5680L, #5681L, 
+  #5679L, 
+  5680L, #5681L, 
   5682L), size = 1), check = FALSE, verbose = FALSE)
 remDr <- rD[["client"]]
 
@@ -180,11 +181,21 @@ merkur_go_thr_archive(startdate = "2022-02-01", enddate = "2022-04-01", "") -> v
 
 merkur_go_thr_archive(startdate = "2022-04-01", enddate = "2022-06-01", "") -> valid_links3
 
-merkur_go_thr_archive(startdate = "2022-06-01", enddate = Sys.Date(), "") -> valid_links4
+merkur_go_thr_archive(startdate = "2022-06-01", enddate = "2022-08-01", "") -> valid_links4
+
+merkur_go_thr_archive(startdate = "2022-08-01", enddate = "2022-10-01", "") -> valid_links5
+
+merkur_go_thr_archive(startdate = "2022-10-01", enddate = "2022-12-01", "") -> valid_links6
+
+merkur_go_thr_archive(startdate = "2022-12-01", enddate = "2023-02-01", "") -> valid_links7
+
+merkur_go_thr_archive(startdate = "2023-02-01", enddate = Sys.Date(), "") -> valid_links8
 
 
 valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2,
-                                     valid_links3, valid_links4))
+                                     valid_links3, valid_links4,
+                                     valid_links5, valid_links6,
+                                     valid_links7, valid_links8))
 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

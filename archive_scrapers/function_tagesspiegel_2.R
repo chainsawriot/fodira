@@ -22,30 +22,41 @@ pjs_session <- Session$new(port = pjs_instance$port)
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
 
+pjs_session$go("https://www.tagesspiegel.de/politik/archiv/2022/01/01/")
+
 
 #function for geting links from page
 tagesspiegel_get_links <- function(html){
   
   #html <- remDr$getPageSource()[[1]]
-  #html <- pjs_session$getSource()
+  html <- pjs_session$getSource()
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//h2/a") %>% 
-    rvest::html_attr("title") -> item_title
+    rvest::html_elements(xpath = "//article//h3") %>% 
+    rvest::html_text(trim = TRUE) -> item_title
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//h2/a") %>% 
+    rvest::html_elements(xpath = "//article//a") %>% 
     rvest::html_attr("href") %>% paste0("https://www.tagesspiegel.de",.)-> item_link
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//h2/a//span[contains(@class, 'hcf-date')]") %>%
+    rvest::html_elements(xpath = "//main//span[contains(@class, 'Gau')]") %>%
     rvest::html_text(trim = TRUE) %>% stringr::str_extract("[0-9]+\\.[0-9]+\\.[0-9]+") %>%
     lubridate::dmy()-> item_pubdate
   
-  df <- data.frame(item_title, item_link, item_pubdate)
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//main//p[contains(@class, 'Gaw')]") %>%
+    rvest::html_text(trim = TRUE) -> item_empty
+  
+  if(length(item_empty) == 0){
+    df <- data.frame(item_title, item_link, item_pubdate)
+  } else {
+    df <- data.frame()
+  }
+  
+
   return(df)
 }
-
 
 tagesspiegel_get_url <- function(url){
   # remDr$navigate(url)
@@ -53,37 +64,58 @@ tagesspiegel_get_url <- function(url){
   # remDr$getPageSource()[[1]] %>% tagesspiegel_get_links() -> df
   pjs_session$go(url)
   print(pjs_session$getUrl())
+  #Sys.sleep(2)
   pjs_session$getSource() %>% tagesspiegel_get_links() -> df
+
   return(df)
 }
 
-tagesspiegel_go_thr_archive <- function(startdate){
+tagesspiegel_go_thr_archive <- function(sub, startdate){
 
-  tagesspiegel_get_url(paste0("https://www.tagesspiegel.de/suchergebnis/artikel/?p9049616=1")) %>%
-    subset(., item_pubdate >= as.Date(startdate))-> df
-  n <- nrow(df)
-  i <- 2
-  print(n)
-  while (n>0) {
-    tagesspiegel_get_url(paste0("https://www.tagesspiegel.de/suchergebnis/artikel/?p9049616=", i)) %>%
-      subset(., item_pubdate >= as.Date(startdate)) -> df2
-    n <- nrow(df2)
-    print(n)
-    i <- i+1
-    df <- rbind(df, df2)
-  }
+  seq(as.Date(startdate), Sys.Date(), by="days") %>% 
+    format.Date(format="/%Y/%m/%d/") -> V1
   
-  return(df)
+  
+  V1 %>%
+    paste0("https://www.tagesspiegel.de/", sub, "/archiv", .) %>%
+    purrr::map_df(~tagesspiegel_get_url(.)) -> valid_links
+  
+  return(valid_links)
 }
 
-# df <- zeit_getlink_url("https://www.zeit.de/thema/krieg-in-ukraine", "2022-01-01")
-  
-  
-tagesspiegel_go_thr_archive("2021-12-01") -> valid_links
+
+tagesspiegel_go_thr_archive("politik", "2022-01-01") -> valid_links1
+
+tagesspiegel_go_thr_archive("internationales", "2022-01-01") -> valid_links2
+
+tagesspiegel_go_thr_archive("berlin", "2022-01-01") -> valid_links3
+
+tagesspiegel_go_thr_archive("gesellschaft", "2022-01-01") -> valid_links4
+
+tagesspiegel_go_thr_archive("wirtschaft", "2022-01-01") -> valid_links5
+
+tagesspiegel_go_thr_archive("kultur", "2022-01-01") -> valid_links6
+
+tagesspiegel_go_thr_archive("wissen", "2022-01-01") -> valid_links7
+
+tagesspiegel_go_thr_archive("gesundheit", "2022-01-01") -> valid_links8
+
+tagesspiegel_go_thr_archive("sport", "2022-01-01") -> valid_links9
+
+tagesspiegel_go_thr_archive("meinung", "2022-01-01") -> valid_links10
+
+tagesspiegel_go_thr_archive("potsdam", "2022-01-01") -> valid_links11
 
 
  # remDr$close()
  # z <- rD$server$stop()
+
+valid_links <- dplyr::distinct(rbind(valid_links1, valid_links10,
+                                     valid_links11, valid_links2,
+                                     valid_links3, valid_links4,
+                                     valid_links5, valid_links6,
+                                     valid_links7, valid_links8,
+                                     valid_links9))
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "Tagesspiegel", description = NA) %>%

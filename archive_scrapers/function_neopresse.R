@@ -42,7 +42,7 @@ neop_go_thr_archive <- function(startdate){
   valid_links <- data.frame()
   
   while (i > 0) {
-    neop_getlink_url(paste0("https://www.neopresse.com/2022/page/", j, "/")) %>% 
+    neop_getlink_url(paste0("https://www.neopresse.com/2023/page/", j, "/")) %>% 
       subset(item_pubdate>=as.Date(startdate)) -> subset_links
     i <- nrow(subset_links)
     j <- j + 1
@@ -63,7 +63,7 @@ valid_links %>% dplyr::rename(title = item_title, link = item_link) %>%
   dplyr::mutate(pub = "NeoPresse", description = NA, pubdate = NA) %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
-saveRDS(valid_links, "Neopresse.RDS")
+saveRDS(valid_links, "Neopresse_2.RDS")
 
 
 

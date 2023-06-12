@@ -45,7 +45,7 @@ Sys.setlocale("LC_TIME", "de_DE")
 #function for geting links from page
 tag24_getlink <- function(html){
   
-  # html <- remDr$getPageSource()[[1]]
+  html <- remDr$getPageSource()[[1]]
   # html <- pjs_session$getSource()
   # 
   rvest::read_html(html) %>%  
@@ -165,12 +165,12 @@ tag24_go_thr_topics <- function(startdate, n){
 
 
 
-tag24_go_thr_topics("2021-12-01", 1:5)-> valid_links_1
-tag24_go_thr_topics("2021-12-01", 6:10)-> valid_links_2
-tag24_go_thr_topics("2021-12-01", 11:15)-> valid_links_3
-tag24_go_thr_topics("2021-12-01", 16:20)-> valid_links_4
-tag24_go_thr_topics("2021-12-01", 21:25)-> valid_links_5
-tag24_go_thr_topics("2021-12-01", 26:29)-> valid_links_6
+tag24_go_thr_topics("2022-09-01", 1:5)-> valid_links_1
+tag24_go_thr_topics("2022-09-01", 6:10)-> valid_links_2
+tag24_go_thr_topics("2022-09-01", 11:15)-> valid_links_3
+tag24_go_thr_topics("2022-09-01", 16:20)-> valid_links_4
+tag24_go_thr_topics("2022-09-01", 21:25)-> valid_links_5
+tag24_go_thr_topics("2022-09-01", 26:29)-> valid_links_6
 
 valid_links <- dplyr::distinct(rbind(valid_links_1, valid_links_2, valid_links_3,
                                      valid_links_4, valid_links_5, valid_links_6))

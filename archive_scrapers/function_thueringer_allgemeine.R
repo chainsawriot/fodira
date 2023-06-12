@@ -29,7 +29,7 @@ Sys.setlocale("LC_TIME", "de_DE")
 th_allg_get_links <- function(html){
   
   #html <- remDr$getPageSource()[[1]]
-  html <- pjs_session$getSource()
+  #html <- pjs_session$getSource()
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//ul//article/a") %>% 
@@ -43,8 +43,13 @@ th_allg_get_links <- function(html){
     rvest::html_elements(xpath = "//span[contains(@class, 'teaser__date')]") %>%
     rvest::html_text(trim = TRUE) %>% stringr::str_extract("[0-9]+\\.[0-9]+\\.[0-9]+") %>%
     lubridate::dmy()-> item_pubdate
-  
-  df <- data.frame(item_title, item_link, item_pubdate)
+  if(item_link[1]==""){
+    df <- data.frame()
+  } else {
+
+    df <- data.frame(item_title, item_link, item_pubdate)
+  }
+
   return(df)
 }
 
@@ -86,7 +91,7 @@ th_allg_go_thr_archive <- function(startdate){
 # df <- zeit_getlink_url("https://www.zeit.de/thema/krieg-in-ukraine", "2022-01-01")
   
   
-th_allg_go_thr_archive("2021-12-01") -> valid_links
+th_allg_go_thr_archive("2022-08-01") -> valid_links
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "TA", description = NA) %>%

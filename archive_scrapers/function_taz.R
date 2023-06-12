@@ -104,7 +104,7 @@ taz_go_thr_archive <- function(startdate){
 }
 
 
-taz_go_thr_archive(startdate = "2021-12-01") -> valid_links
+taz_go_thr_archive(startdate = "2022-08-01") -> valid_links
 
 valid_links <- dplyr::distinct(valid_links)
 
@@ -116,4 +116,4 @@ valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = it
   dplyr::mutate(pub = "TAZ", description = NA) %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
-saveRDS(valid_links, "TAZ.RDS")
+saveRDS(valid_links, "TAZ_auflösen.RDS")

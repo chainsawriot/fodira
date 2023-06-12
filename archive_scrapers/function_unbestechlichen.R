@@ -1,6 +1,11 @@
 require(RSelenium)
 require(magrittr)
 
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+remDr <- rD[["client"]]
+Sys.sleep(5)
+
+
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
 
@@ -24,9 +29,6 @@ unbest_getlink <- function(html){
 }
 
 unbest_go_thr_2022 <- function(startpage){
-  rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
-  remDr <- rD[["client"]]
-  Sys.sleep(5)
   remDr$navigate(startpage)
   print(startpage)
   Sys.sleep(10)
@@ -37,7 +39,7 @@ unbest_go_thr_2022 <- function(startpage){
     rvest::html_text(., trim = TRUE) %>% stringr::str_extract(pattern = "[0-9]+")-> end
    
   valid_links <- data.frame()
-  for (i in 1:sort(end , FALSE)[1]) {
+  for (i in 1:sort(end , TRUE)[1]) {
     paste0(startpage, "page/", i, "/") %>% remDr$navigate()
     unbest_getlink(remDr$getPageSource()[[1]]) -> subset_links
     valid_links <- rbind(valid_links, subset_links)
@@ -50,8 +52,11 @@ unbest_go_thr_2022 <- function(startpage){
   return(valid_links)
 }
 
-unbest_go_thr_2022("https://dieunbestechlichen.com/2022/") -> valid_links
+unbest_go_thr_2022("https://dieunbestechlichen.com/2023/") -> valid_links_1
 
+unbest_go_thr_2022("https://dieunbestechlichen.com/2022/") -> valid_links_2
+
+valid_links <- dplyr::distinct(rbind(valid_links_1, valid_links_2))
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "DieUnbestechlichen", description = NA) %>%

@@ -25,7 +25,7 @@ tonline_getlink <- function(html){
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@data-testid, 'StreamLayout.Stream')]//article//div//a") %>% 
-    rvest::html_attr("href") %>% paste0("https://www.t-online.de/", .) -> item_link
+    rvest::html_attr("href") %>% paste0("https://www.t-online.de", .) -> item_link
   item_link <- item_link[(length(item_fin)+1):length(item_link)]
   
   # rvest::read_html(html) %>% 
@@ -111,7 +111,7 @@ tonline_go_thr_columns <- function(rubrik, startdate){
 c("finanzen/geld-vorsorge", "finanzen/unternehmen-verbraucher", "finanzen/versicherungen",
   "finanzen/immobilien-wohnen", "finanzen/beruf-karriere", "unterhaltung/stars", 
   "unterhaltung/stars/royals", "unterhaltung/kino", "unterhaltung/tv", "unterhaltung/musik") %>% 
-  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2021-12-31")) -> valid_links1
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2022-08-31")) -> valid_links1
 
 c("nachrichten/panorama/menschen-schicksale", "nachrichten/panorama/katastrophen",
   "nachrichten/panorama/kriminalitaet", "nachrichten/panorama/justiz",
@@ -119,14 +119,14 @@ c("nachrichten/panorama/menschen-schicksale", "nachrichten/panorama/katastrophen
   "nachrichten/panorama/quiz", "gesundheit/krankheiten-symptome", "gesundheit/krankheiten-symptome/coronavirus",
   "gesundheit/ernaehrung", "gesundheit/fitness", "gesundheit/gesund-leben", "gesundheit/heilmittel-medikamente",
   "gesundheit/schwangerschaft", "gesundheit/selbsttests") %>% 
-  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2021-12-31")) -> valid_links3
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2022-08-31")) -> valid_links3
 
 c("leben/corona-krise", 
   "leben/essen-und-trinken", "leben/reisen", "leben/familie", "leben/alltagswissen",
   "leben/liebe", "leben/mode-beauty", "nachhaltigkeit/klima-und-umwelt", "nachhaltigkeit/mobilitaet-und-verkehr",
   "nachhaltigkeit/heim-garten-und-wohnen", "nachhaltigkeit/energie", "nachhaltigkeit/finanzen-und-beruf",
   "nachhaltigkeit/ernaehrung", "nachhaltigkeit/konsum", "nachhaltigkeit/klima-lexikon") %>% 
-  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2021-12-31")) -> valid_links4
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2022-08-31")) -> valid_links4
 
 
 c("auto/neuheiten-fahrberichte", "auto/recht-und-verkehr", "auto/elektromobilitaet",
@@ -135,14 +135,15 @@ c("auto/neuheiten-fahrberichte", "auto/recht-und-verkehr", "auto/elektromobilita
   "heim-garten/haushaltstipps", "heim-garten/bauen", "heim-garten/wohnen", "heim-garten/energie",
   "ratgeber/deals", "ratgeber/technik", "ratgeber/haushalt-und-wohnen", "ratgeber/genuss",
   "ratgeber/leben-und-freizeit", "ratgeber/haus-und-garten", "ratgeber/gesundheit") %>% 
-  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2021-12-31")) -> valid_links5
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2022-08-31")) -> valid_links5
 
 c("nachrichten/deutschland", "nachrichten/ausland", "nachrichten/corona-krise", 
   "nachrichten/tagesanbruch", "nachrichten/ukraine", "region/berlin", "region/hamburg",
   "region/muenchen", "region/koeln", "region/frankfurt-am-main", "sport/fussball/bundesliga",
-  "sport/fussball/2-bundesliga", "sport/fussball", "sport/fussball/frauenfussball/em-2022", 
+  #"sport/fussball/2-bundesliga", 
+  "sport/fussball", "sport/fussball/frauenfussball/em-2022", 
   "sport/mehr-sport/radsport/tour-de-france", "sport/formel-1", "sport/mehr-sport") %>% 
-  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2021-12-31")) -> valid_links2
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2022-08-31")) -> valid_links2
 
 valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2,
                                      valid_links3, valid_links4,

@@ -56,6 +56,7 @@ hmopo_get_url <- function(url){
   pjs_session$go(url)
   print(pjs_session$getUrl())
   pjs_session$getSource() %>% hmopo_get_links() %>% subset -> df
+  Sys.sleep(5)
   return(df[stringr::str_detect(df$item_link, "mopo.de"),])
 }
 
@@ -85,7 +86,7 @@ hmopo_go_thr_archive <- function(maxnum){
 }
 
  
-hmopo_go_thr_archive(850) -> valid_links
+hmopo_go_thr_archive(1050) -> valid_links
 
 
  # remDr$close()

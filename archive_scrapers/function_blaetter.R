@@ -17,7 +17,7 @@ blaetter_getlink <- function(html){
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//h3/a") %>% 
-    rvest::html_attr("href") %>% paste0("https://www.blaetter.de/", .)-> item_link
+    rvest::html_attr("href") %>% paste0("https://www.blaetter.de", .)-> item_link
     
     df <- data.frame(item_title, item_link)
     return(df)

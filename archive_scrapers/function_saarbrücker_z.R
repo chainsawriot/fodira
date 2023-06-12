@@ -6,8 +6,9 @@ require(magrittr)
 rD <- RSelenium::rsDriver(browser = "firefox",
                           #chromever = "103.0.5060.134",
                           port = sample(c(#5678L, 
-                                          5679L, #5680L, #5681L, 
-                                          5682L), size = 1),
+                                          5679L#, #5680L, #5681L, 
+                                          #5682L
+                                          ), size = 1),
                           #phantomver = "2.1.1",
                           check = FALSE, verbose = FALSE)
 
@@ -35,20 +36,20 @@ Sys.setlocale("LC_TIME", "de_DE")
 
 #writeLines(html, "test.html")
 
-article_crawl <- function(i, html){
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = paste0("//ul/li[", i,"]/article/a//h2")) %>% 
-    rvest::html_text(trim = TRUE) -> item_title
-  if(length(item_title) == 0){
-    item_title <- NA
-  }
-  print(i)
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = paste0("//ul/li[", i,"]/article/a")) %>% 
-    rvest::html_attr("href") %>% paste0("https://www.saarbruecker-zeitung.de",.)-> item_link
-  df <- data.frame(item_title, item_link)
-  return(df)
-}
+# article_crawl <- function(i, html){
+#   rvest::read_html(html) %>% 
+#     rvest::html_elements(xpath = paste0("//ul/li[", i,"]/article/a//h2")) %>% 
+#     rvest::html_text(trim = TRUE) -> item_title
+#   if(length(item_title) == 0){
+#     item_title <- NA
+#   }
+#   print(i)
+#   rvest::read_html(html) %>% 
+#     rvest::html_elements(xpath = paste0("//ul/li[", i,"]/article/a")) %>% 
+#     rvest::html_attr("href") %>% paste0("https://www.saarbruecker-zeitung.de",.)-> item_link
+#   df <- data.frame(item_title, item_link)
+#   return(df)
+# }
 
 #function for geting links from page
 saarbr_get_links <- function(html){
@@ -57,30 +58,43 @@ saarbr_get_links <- function(html){
   #html <- pjs_session$getSource()
   #pjs_session$getUrl()
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = paste0("//ul/li/article/a//header")) %>% 
+    rvest::html_elements(xpath = paste0("//div[contains(@class, 'w-full')]//article//a/span")) %>% 
     rvest::html_text(trim = TRUE) -> item_title
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = paste0("//ul/li/article/a")) %>% 
+    rvest::html_elements(xpath = paste0("//div[contains(@class, 'w-full')]//article//a")) %>% 
     rvest::html_attr("href") %>% paste0("https://www.saarbruecker-zeitung.de",.)-> item_link
   
-  if(length(item_title) == length(item_link)){
-    df <- data.frame(item_title, item_link)
-  } else {
-    rvest::read_html(html) %>% 
-      rvest::html_elements(xpath = "//ul/li/article") %>% 
-      rvest::html_attr("href") %>% paste0("https://www.saarbruecker-zeitung.de",.) %>%
-      length() -> n
-    print("crawl")
-    (1:n) %>% purrr::map_df(~article_crawl(., html)) -> df
-  }
+  df <- data.frame(item_title, item_link)
+  
+  # if(length(item_title) == length(item_link)){
+  #   df <- data.frame(item_title, item_link)
+  # } else {
+  #   rvest::read_html(html) %>% 
+  #     rvest::html_elements(xpath = "//ul/li/article") %>% 
+  #     rvest::html_attr("href") %>% paste0("https://www.saarbruecker-zeitung.de",.) %>%
+  #     length() -> n
+  #   print("crawl")
+  #   (1:n) %>% purrr::map_df(~article_crawl(., html)) -> df
+  # }
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//span[contains(@class, 'park-page-headline')]") %>%
+    rvest::html_elements(xpath = "//section[contains(@class, 'relative')]/header") %>%
     rvest::html_text(trim = TRUE) %>% stringr::str_extract("[0-9]+\\. [A-Za-zäöü]+ [0-9]+") %>%
     stringr::str_replace(., "März", "March") %>%
-    # as.Date(., tryFormat = c("%d. %b %Y"))
-    lubridate::dmy()-> df$item_pubdate
+    stringr::str_replace(., "Dezember", "December") %>%
+    stringr::str_replace(., "Oktober", "October") %>%
+    stringr::str_replace(., "Januar", "January") %>%
+    stringr::str_replace(., "Februar", "February") %>%
+    stringr::str_replace(., "Mai", "May") %>%
+    stringr::str_replace(., "Juni", "June") %>%
+    stringr::str_replace(., "Juli", "July") %>%
+    lubridate::dmy() -> df$item_pubdate
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//div[contains(@class, 'w-full')]//nav//div[contains(@class, 'text-40')]") %>%
+    rvest::html_text(trim = TRUE) %>% print()
+  
   
   return(df)
 }
@@ -108,7 +122,7 @@ saarbr_go_thr_archive <- function(startdate){
 }
 
   
-saarbr_go_thr_archive("2021-12-01") -> valid_links
+saarbr_go_thr_archive("2022-08-01") -> valid_links
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "Saarbrücker Zeitung", description = NA) %>%

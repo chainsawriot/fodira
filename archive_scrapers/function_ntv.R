@@ -172,4 +172,4 @@ valid_links %>% dplyr::distinct() %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
 
-saveRDS(valid_links, "NTV.RDS")
+saveRDS(valid_links, "NTV_2.RDS")

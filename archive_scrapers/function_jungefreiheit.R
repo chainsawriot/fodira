@@ -50,7 +50,10 @@ jf_go_thr_2022 <- function(startpage){
   return(valid_links)
 }
 
-jf_go_thr_2022("https://jungefreiheit.de/2022/") -> valid_links
+jf_go_thr_2022("https://jungefreiheit.de/2022/") -> valid_links_1
+
+
+jf_go_thr_2022("https://jungefreiheit.de/2023/") -> valid_links_2
 
 jf_getlink_url <- function(url){
   remDr$navigate(url)
@@ -83,9 +86,9 @@ jf_go_thr_archive <- function(startdate){
 }
 
 
-jf_go_thr_archive("2021-12-01") -> valid_links2
+jf_go_thr_archive("2021-12-01") -> valid_links3
 
-valid_links <- dplyr::distinct(rbind(valid_links2, valid_links))
+valid_links <- dplyr::distinct(rbind(valid_links_1, valid_links_2, valid_links3))
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "Junge Freiheit", description = NA) %>%

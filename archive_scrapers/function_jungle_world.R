@@ -34,17 +34,23 @@ jungle_world_getlink_url <- function(url){
   return(jungle_world_getlink(pjs_session$getSource()))
 }
 
-jungle_world_go_thr_archive <- function(startdate){
-  V1<-format(seq(as.Date(startdate)+7, Sys.Date()+3, by="weeks"), "%Y/%U") #not elegant - how?
-  
-  V1 %>% as.character() %>%
+jungle_world_go_thr_archive <- function(dates){
+
+  dates %>% as.character() %>%
     paste0("https://jungle.world/inhalt/", .) %>%
     purrr::map_df(~jungle_world_getlink_url(.)) -> valid_links
   
   return(valid_links)
 }
 
-valid_links <- jungle_world_go_thr_archive("2022-01-01")
+valid_links <- jungle_world_go_thr_archive(c("2022/01", "2022/02", "2022/03",
+                                             "2022/04", "2022/05", "2022/06",
+                                             "2022/07", "2022/08", "2022/09",
+                                             paste0("2022/", c(10:33,35:51)),
+                                             "2023/01", "2023/02", "2023/03",
+                                             "2023/04", "2023/05", "2023/06",
+                                             "2023/07", "2023/08", "2023/09",
+                                             paste0("2023/", c(10:15))))
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "Jungle World", description = NA) %>%

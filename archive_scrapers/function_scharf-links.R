@@ -1,6 +1,7 @@
 require(RSelenium)
 require(magrittr)
-rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L
+                                                               ), size = 1), check = FALSE, verbose = FALSE)
 remDr <- rD[["client"]]
 
 #Sys.setlocale("LC_TIME", "C")

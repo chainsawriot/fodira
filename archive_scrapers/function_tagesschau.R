@@ -47,14 +47,14 @@ tagesschau_go_thr_archive <- function(startdate, enddate){
 }
 
 
-valid_links1 <- tagesschau_go_thr_archive("2021-12-10", "2022-03-01")
+valid_links1 <- tagesschau_go_thr_archive("2021-08-10", "2022-09-01")
 
-valid_links2 <- tagesschau_go_thr_archive("2022-03-01", "2022-05-01")
+valid_links2 <- tagesschau_go_thr_archive("2022-09-01", "2022-11-01")
 
 
-valid_links3 <- tagesschau_go_thr_archive("2022-05-01", "2022-06-01")
+valid_links3 <- tagesschau_go_thr_archive("2022-11-01", "2023-01-01")
 
-valid_links4 <- tagesschau_go_thr_archive("2022-06-01", Sys.Date())
+valid_links4 <- tagesschau_go_thr_archive("2023-01-01", Sys.Date())
 
 valid_links <- rbind(valid_links1, valid_links2, valid_links3, valid_links4)
 

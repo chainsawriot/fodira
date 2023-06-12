@@ -25,7 +25,13 @@ achgut_getlink <- function(html){
     rvest::html_text(., trim = TRUE) %>% 
     stringr::str_extract(., "[0-9]+[.][0-9]+[.][0-9]+") %>%
     as.Date(., tryFormat = c("%d.%m.%Y")) -> item_pubdate
+  
+  item_pubdate <- item_pubdate[!is.na(item_pubdate)]
     
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//div[contains(@class, 'teaser_blog')]//div[contains(@class, 'teaser_text_meta')]") %>% 
+    rvest::html_text(., trim = TRUE)
+  
     df <- data.frame(item_title, item_link, item_pubdate)
     
     rvest::read_html(html) %>% 

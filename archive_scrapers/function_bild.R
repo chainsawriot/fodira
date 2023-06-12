@@ -18,17 +18,17 @@ bild_getlink <- function(html){
   #html <- remDr$getPageSource()[[1]]
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'txt')]//p/a[1]") %>% 
-    rvest::html_text(., trim = TRUE) -> item_title
+    rvest::html_elements(xpath = "//article[contains(@class, 'stage-feed-item')]//a//div[contains(@class, 'stage-feed-item__title')]") %>% 
+    rvest::html_text(., trim = TRUE) -> item_title 
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'txt')]//p/a[1]") %>% 
+    rvest::html_elements(xpath = "//article[contains(@class, 'stage-feed-item')]//a") %>% 
     rvest::html_attr("href")  %>% paste0("https://www.bild.de", .)-> item_link
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//span[contains(@class, 'headline')]") %>% 
-    rvest::html_text(., trim = TRUE) %>% stringr::str_extract("[0-9]+[.][0-9]+[.][0-9]+") %>%
-    as.Date(., tryFormat = c("%d.%m.%Y")) -> item_pubdate
+    rvest::html_elements(xpath = "//article[contains(@class, 'stage-feed-item')]//time") %>% 
+    rvest::html_attr(., "datetime") %>% as.Date() -> item_pubdate
+
   
   if (length(item_pubdate) == 0){
     df <- data.frame()
@@ -51,13 +51,10 @@ bild_getlink_url <- function(url){
 }
 
 bild_go_thr_archive <- function(startdate){
-  seq(as.Date(startdate), Sys.Date(), by="days") %>% 
-    as.character() %>% 
-    stringr::str_replace_all("-0", "-") %>%
-    stringr::str_replace_all("-", "/") -> V1
+  seq(as.Date(startdate), Sys.Date(), by="days") -> V1
   
   V1 %>%
-    paste0("https://www.bild.de/archive/", ., "/") %>%
+    paste0("https://www.bild.de/themen/uebersicht/archiv/archiv-82532020.bild.html?archiveDate=", .) %>%
     purrr::map_df(~bild_getlink_url(.)) -> valid_links
   
   return(valid_links)

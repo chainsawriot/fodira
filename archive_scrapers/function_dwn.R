@@ -46,8 +46,9 @@ dwm_go_thr_search <- function(url){
   valid_links <- data.frame()
   remDr$navigate(url)
   remDr$getPageSource()[[1]] %>% rvest::read_html() %>% 
-      rvest::html_elements(xpath = paste0("//p[last()]/a[contains(@class, 'pager')][last()]")) %>% 
+      rvest::html_elements(xpath = paste0("//a[contains(@class, 'pager')][last()]")) %>% 
       rvest::html_text(., trim = TRUE) %>% as.numeric() -> nr_
+  nr_ <- nr_[1]
   for (i in 1:nr_) {
     dwn_getlink_url(paste0(url, "&page=", i)) -> subset_links
     valid_links <- rbind(valid_links, subset_links)
@@ -56,7 +57,7 @@ dwm_go_thr_search <- function(url){
 }
 
 
-dwm_go_thr_search("https://deutsche-wirtschafts-nachrichten.de/search?lex=0&search=&match=0&author=&d1=1&m1=12&y1=2021&d2=15&m2=8&y2=2022&act=yes") -> valid_links
+dwm_go_thr_search("https://deutsche-wirtschafts-nachrichten.de/search?lex=0&search=&match=0&author=&d1=1&m1=12&y1=2021&d2=20&m2=3&y2=2023&act=yes") -> valid_links
 
 
 valid_links <- dplyr::distinct(valid_links)

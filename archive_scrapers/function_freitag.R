@@ -3,7 +3,7 @@ require(magrittr)
 
 .process_html <- function(src, slug) {
     psrc <- rvest::read_html(src)
-    titles <- rvest::html_elements(psrc, css = "a.js-article-card-url")
+    titles <- rvest::html_elements(psrc, css = "a.export-article-card-url")
     title <- titles %>% rvest::html_text() %>% stringr::str_trim()
     link <- titles %>% rvest::html_attr("href")
     return(tibble::tibble(title = title, link = link, slug = slug))
@@ -31,7 +31,7 @@ require(magrittr)
             message("Flip")
         }
         click_next <- tryCatch({
-            webElem <- remDr$findElement(using = "css", "a[title='Next Page']")
+            webElem <- remDr$findElement(using = "css", "a[title='Nächste Seite']")
             webElem$clickElement()
             TRUE
         }, error = function(e) {
@@ -55,11 +55,11 @@ require(magrittr)
 }
 
 
-valid_links_1 <- purrr::map_dfr("politik", .scrape, max_pages = 35)
-valid_links_2 <- purrr::map_dfr("wirtschaft", .scrape, max_pages = 35)
-valid_links_3 <- purrr::map_dfr("kultur", .scrape, max_pages = 35)
-valid_links_4 <- purrr::map_dfr("gruenes-wissen", .scrape, max_pages = 35)
-valid_links_5 <- purrr::map_dfr("debatte", .scrape, max_pages = 35)
+valid_links_1 <- purrr::map_dfr("politik", .scrape, max_pages = 40)
+valid_links_2 <- purrr::map_dfr("wirtschaft", .scrape, max_pages = 40)
+valid_links_3 <- purrr::map_dfr("kultur", .scrape, max_pages = 40)
+valid_links_4 <- purrr::map_dfr("gruenes-wissen", .scrape, max_pages = 40)
+valid_links_5 <- purrr::map_dfr("debatte", .scrape, max_pages = 40)
 
 dplyr::distinct(rbind(valid_links_1, valid_links_2, valid_links_3, 
                       valid_links_4, valid_links_5)) -> valid_links

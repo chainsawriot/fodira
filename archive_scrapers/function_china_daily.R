@@ -94,8 +94,9 @@ ch_d_go_thr_columns <- function(category, startdate){
 
 c("aufmacher", "aktuelles", "politik", "wirtschaft", "gesellschaft",
   "nachrichten_im_bild", "bildung_kultur_und_reisen",
-  "spezial", "videos", #"bilderserien", 
-  "leserfavoriten") %>%
+  "spezial", "videos"#, #"bilderserien", 
+  #"leserfavoriten"
+  ) %>%
   purrr::map_df(~ch_d_go_thr_columns(., "2021-12-01")) -> valid_links 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

@@ -104,7 +104,7 @@ trt_go_thr_columns <- function(category, startdate){
 c("news", "politik", "wirtschaft", "meinung",
   "exklusiv", "kultur",
   "gesellschaft", "sport", "wissenschaft") %>%
-  purrr::map_df(~trt_go_thr_columns(., "2021-12-31")) -> valid_links_1 
+  purrr::map_df(~trt_go_thr_columns(., "2022-08-01")) -> valid_links_1 
 
 #trt_go_thr_columns("news", "2021-12-31") -> test
 

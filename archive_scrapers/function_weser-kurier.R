@@ -132,7 +132,7 @@ weser_go_thr_page <- function(startdate){
 }
 
 
-weser_go_thr_page(startdate = "2021-12-01") -> valid_links1
+weser_go_thr_page(startdate = "2022-08-01") -> valid_links1
 
 valid_links <- dplyr::distinct(valid_links1)
 

@@ -6,14 +6,18 @@ require(magrittr)
 fprof <- makeFirefoxProfile(list(permissions.default.image = 21))
 rD <- RSelenium::rsDriver(browser = "firefox", 
                           #chromever = "103.0.5060.134", 
-                          port = sample(c(#5678L, 
-                                          #5679L, #5680L, #5681L, 
-                                          5682L), size = 1), 
+                          port = sample(c(5678L, 
+                                          5679L, 
+                            5680L, 
+                            5681L, 
+                                          5682L
+                                          ), size = 1), 
                           #phantomver = "2.1.1",
                           extraCapabilities = fprof,
-                          check = TRUE, verbose = FALSE)
+                          check = FALSE, verbose = FALSE)
 
 remDr <- rD[["client"]]
+
 
 #binman::list_versions("phantomjs")
 # 
@@ -335,33 +339,33 @@ zeit_go_thr_topics <- function(startdate, n){
 
 
 
-zeit_go_thr_topics("2021-12-01", 1)-> valid_links_1
-zeit_go_thr_topics("2021-12-01", 2)-> valid_links_2
-zeit_go_thr_topics("2021-12-01", 3)-> valid_links_3
-zeit_go_thr_topics("2021-12-01", 4)-> valid_links_4
-zeit_go_thr_topics("2021-12-01", 5)-> valid_links_5
-zeit_go_thr_topics("2021-12-01", 6)-> valid_links_6
-zeit_go_thr_topics("2021-12-01", 7)-> valid_links_7
-zeit_go_thr_topics("2021-12-01", 8)-> valid_links_8
-zeit_go_thr_topics("2021-12-01", 9)-> valid_links_9
-zeit_go_thr_topics("2021-12-01", 10)-> valid_links_10
-zeit_go_thr_topics("2021-12-01", 11)-> valid_links_11
-zeit_go_thr_topics("2021-12-01", 12)-> valid_links_12
-zeit_go_thr_topics("2021-12-01", 13)-> valid_links_13
-zeit_go_thr_topics("2021-12-01", 14)-> valid_links_14
-zeit_go_thr_topics("2021-12-01", 15)-> valid_links_15
-zeit_go_thr_topics("2021-12-01", 16)-> valid_links_16
-zeit_go_thr_topics("2021-12-01", 17)-> valid_links_17
-zeit_go_thr_topics("2021-12-01", 18)-> valid_links_18
-zeit_go_thr_topics("2021-12-01", 19)-> valid_links_19
-zeit_go_thr_topics("2021-12-01", 20)-> valid_links_20
-zeit_go_thr_topics("2021-12-01", 21)-> valid_links_21
-zeit_go_thr_topics("2021-12-01", 22)-> valid_links_22
-zeit_go_thr_topics("2021-12-01", 23)-> valid_links_23
-zeit_go_thr_topics("2021-12-01", 24)-> valid_links_24
-zeit_go_thr_topics("2021-12-01", 25)-> valid_links_25
-zeit_go_thr_topics("2021-12-01", 26)-> valid_links_26
-zeit_go_thr_topics("2021-12-01", 27)-> valid_links_27
+zeit_go_thr_topics("2022-08-01", 1)-> valid_links_1
+zeit_go_thr_topics("2022-08-01", 2)-> valid_links_2
+zeit_go_thr_topics("2022-08-01", 3)-> valid_links_3
+zeit_go_thr_topics("2022-08-01", 4)-> valid_links_4
+zeit_go_thr_topics("2022-08-01", 5)-> valid_links_5
+zeit_go_thr_topics("2022-08-01", 6)-> valid_links_6
+zeit_go_thr_topics("2022-08-01", 7)-> valid_links_7
+zeit_go_thr_topics("2022-08-01", 8)-> valid_links_8
+zeit_go_thr_topics("2022-08-01", 9)-> valid_links_9
+zeit_go_thr_topics("2022-08-01", 10)-> valid_links_10
+zeit_go_thr_topics("2022-08-01", 11)-> valid_links_11
+zeit_go_thr_topics("2022-08-01", 12)-> valid_links_12
+zeit_go_thr_topics("2022-08-01", 13)-> valid_links_13
+zeit_go_thr_topics("2022-08-01", 14)-> valid_links_14
+zeit_go_thr_topics("2022-08-01", 15)-> valid_links_15
+zeit_go_thr_topics("2022-08-01", 16)-> valid_links_16
+zeit_go_thr_topics("2022-08-01", 17)-> valid_links_17
+zeit_go_thr_topics("2022-08-01", 18)-> valid_links_18
+zeit_go_thr_topics("2022-08-01", 19)-> valid_links_19
+zeit_go_thr_topics("2022-08-01", 20)-> valid_links_20
+zeit_go_thr_topics("2022-08-01", 21)-> valid_links_21
+zeit_go_thr_topics("2022-08-01", 22)-> valid_links_22
+zeit_go_thr_topics("2022-08-01", 23)-> valid_links_23
+zeit_go_thr_topics("2022-08-01", 24)-> valid_links_24
+zeit_go_thr_topics("2022-08-01", 25)-> valid_links_25
+zeit_go_thr_topics("2022-08-01", 26)-> valid_links_26
+zeit_go_thr_topics("2022-08-01", 27)-> valid_links_27
 
 
 valid_links <- dplyr::distinct(rbind(valid_links_1, valid_links_10, 

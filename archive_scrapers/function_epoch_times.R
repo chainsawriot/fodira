@@ -68,7 +68,7 @@ epoch_go_thr_columns <- function(rubrik, endnr){
 
 c("politik", "wirtschaft", "gesundheit", 
   "meinung", "china", "feuilleton") %>% 
-  purrr::map_dfr(~epoch_go_thr_columns(., endnr = 400)) -> valid_links
+  purrr::map_dfr(~epoch_go_thr_columns(., endnr = 500)) -> valid_links
 
 valid_links <- dplyr::distinct(valid_links)
 

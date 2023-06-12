@@ -70,7 +70,7 @@ allg_z_go_thr_columns <- function(category, startdate){
   while (j) {
     #i <- 5
     #category <- "ratgeber/freizeittipps/unterwegs-mit-kindern"
-    paste0("https://www.allgemeine-zeitung.de/", category, "?page=", i) %>%
+    paste0(category, "?page=", i) %>%
       purrr::map_df(~allg_z_get_url(.)) -> df2
     nrow(df2) -> n
     print(n)
@@ -353,43 +353,47 @@ remDr <- rD[["client"]]
 
 remDr$navigate("https://www.allgemeine-zeitung.de/")
 
-e<- remDr$findElement(using = "xpath", "//div[contains(@class, 'js-vrm-navigation__menuButton vrm-navigation__menuIcon')]")
+
+e<- remDr$findElement(using = "xpath", "//div[contains(@class, 'iconLink')]")
 e$clickElement()
 
+e<- remDr$findElement(using = "xpath", "//a[contains(@href, '#')]")
+e$clickElement()
+
+
+
 rvest::read_html(remDr$getPageSource()[[1]]) %>% 
-  rvest::html_elements(xpath = "//div[contains(@class, 'row vrm-navigation__topics')]//a") %>%
+  rvest::html_elements(xpath = "//a[contains(@class, 'iconLink__text --clickable')]") %>%
   rvest::html_text(trim = TRUE) -> titel
 
 rvest::read_html(remDr$getPageSource()[[1]]) %>% 
-  rvest::html_elements(xpath = "//div[contains(@class, 'row vrm-navigation__topics')]//a") %>%
-  rvest::html_attr("href") %>% stringr::str_remove(., "^\\/") -> url
+  rvest::html_elements(xpath = "//a[contains(@class, 'iconLink__text --clickable')]") %>%
+  rvest::html_attr("href") %>% stringr::str_remove(., "^\\/") %>%
+  stringr::str_replace(., "vrm.cue.cloud", "de") -> url
 
 df <- data.frame(titel, url)
 
-df[!stringr::str_detect(df$titel,"Übersicht"),] -> df
 
 
-df[!df$url == '#',] -> df
+e<- remDr$findElements(using = "xpath", "//div[contains(@class, 'iconLink__textMain paragraph --regular')]")[[6]]
+e$clickElement()
 
-df[!df$url == 'lokales',] -> df
-
-df[!df$url == 'sport',] -> df
-
-df[!df$url == 'politik',] -> df
-
-df[!df$url == 'wirtschaft',] -> df
-
-df[!df$url == 'panorama',] -> df
-
-df[!df$url == 'kultur',] -> df
-
-df[!df$url == 'ratgeber',] -> df
-
-df[!df$url == 'dossiers/',] -> df
-
-df[!stringr::str_detect(df$url,"https"),] -> df
+rvest::read_html(remDr$getPageSource()[[1]]) %>% 
+  rvest::html_elements(xpath = "//a[contains(@class, 'iconLink__text --clickable')]") %>%
+  rvest::html_text(trim = TRUE) -> titel
 
 
+rvest::read_html(remDr$getPageSource()[[1]]) %>% 
+  rvest::html_elements(xpath = "//a[contains(@class, 'iconLink__text --clickable')]") %>%
+  rvest::html_attr("href") %>% stringr::str_remove(., "^\\/") %>%
+  stringr::str_replace(., "vrm.cue.cloud", "de") %>%
+  stringr::str_replace(., "schwerpunkte", "	https://www.allgemeine-zeitung.de/schwerpunkte") -> url
+
+
+df <- dplyr::distinct(rbind(df, data.frame(titel, url)))
+
+
+df <- df[c(6:21, 34:37),]
 
 allg_z_go_thr_doss<- function(){
   rvest::read_html(remDr$getPageSource()[[1]]) %>% 
@@ -417,10 +421,7 @@ rownames(df) <- 1:nrow(df)
 
 #save(valid_links3, file= "allg_z_3.RData")
 
-df$url[1:360] %>% purrr::map_df(~allg_z_go_thr_columns(., "2021-12-01")) -> valid_links2
-
-
-df$url[361:nrow(df)] %>% purrr::map_df(~allg_z_go_thr_columns(., "2021-12-01")) -> valid_links3
+df$url %>% purrr::map_df(~allg_z_go_thr_columns(., "2021-12-01")) -> valid_links2
 
 #nrow(dplyr::distinct(valid_links1))
 
@@ -435,5 +436,5 @@ valid_links %>% dplyr::rename(title = item_title, link = item_link) %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
 saveRDS(valid_links, "allg_z_1.RDS")
-#remDr$close()
-#z <- rD$server$stop()
+remDr$close()
+z <- rD$server$stop()

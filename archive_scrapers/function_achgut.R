@@ -57,7 +57,9 @@ achgut_getlink_url <- function(url){
   pjs_session$go(url)
   print(url)
   Sys.sleep(1)
-  return(achgut_getlink(pjs_session$getSource()))
+  df <- achgut_getlink(pjs_session$getSource())
+  print(nrow(df))
+  return(df)
 }
 
 achgut_go_thr_archive <-  function(startdate){

@@ -40,7 +40,7 @@ blaetter_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-valid_links <- blaetter_go_thr_archive("2021-12-01")
+valid_links <- blaetter_go_thr_archive("2021-12-31")
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
   dplyr::mutate(pub = "blaetter.de", description = NA, pubdate = NA) %>%

@@ -111,6 +111,10 @@ waz_go_thr_archive("2022-08-01", 7001, 7500) -> valid_links15
 waz_go_thr_archive("2022-08-01", 7501, 8000) -> valid_links16
 waz_go_thr_archive("2022-08-01", 8001, 8500) -> valid_links17
 waz_go_thr_archive("2022-08-01", 8501, 9000) -> valid_links18
+waz_go_thr_archive("2022-08-01", 9001, 9500) -> valid_links19
+waz_go_thr_archive("2022-08-01", 9501, 10000) -> valid_links20
+waz_go_thr_archive("2022-08-01", 10001, 15000) -> valid_links21
+waz_go_thr_archive("2022-08-01", 15001, 20000) -> valid_links22
 
 
 valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2, valid_links3,
@@ -118,7 +122,9 @@ valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2, valid_links3,
                      valid_links7, valid_links8, valid_links9,
                      valid_links10, valid_links11, valid_links12,
                      valid_links13, valid_links14, valid_links15, 
-                     valid_links16, valid_links17, valid_links18
+                     valid_links16, valid_links17, valid_links18,
+                     valid_links19, valid_links20, valid_links21,
+                     valid_links22
                      ))
 
 

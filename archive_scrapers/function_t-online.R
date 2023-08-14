@@ -121,7 +121,7 @@ c("nachrichten/panorama/menschen-schicksale", "nachrichten/panorama/katastrophen
   "gesundheit/schwangerschaft", "gesundheit/selbsttests") %>% 
   purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2022-08-31")) -> valid_links3
 
-c("leben/corona-krise", 
+c(#"leben/corona-krise", 
   "leben/essen-und-trinken", "leben/reisen", "leben/familie", "leben/alltagswissen",
   "leben/liebe", "leben/mode-beauty", "nachhaltigkeit/klima-und-umwelt", "nachhaltigkeit/mobilitaet-und-verkehr",
   "nachhaltigkeit/heim-garten-und-wohnen", "nachhaltigkeit/energie", "nachhaltigkeit/finanzen-und-beruf",
@@ -130,10 +130,13 @@ c("leben/corona-krise",
 
 
 c("auto/neuheiten-fahrberichte", "auto/recht-und-verkehr", "auto/elektromobilitaet",
-  "auto/technik", "digital/handy", "digital/computer", "digital/internet-sicherheit/sicherheit", 
-  "digital/internet-sicherheit/internet", "digital/netzpolitik", "heim-garten/garten", 
+  "auto/technik", #"digital/handy", 
+  #"digital/computer", "digital/internet-sicherheit/sicherheit", 
+  #"digital/internet-sicherheit/internet", "digital/netzpolitik", 
+  "heim-garten/garten", 
   "heim-garten/haushaltstipps", "heim-garten/bauen", "heim-garten/wohnen", "heim-garten/energie",
-  "ratgeber/deals", "ratgeber/technik", "ratgeber/haushalt-und-wohnen", "ratgeber/genuss",
+  #"ratgeber/deals", 
+  "ratgeber/technik", "ratgeber/haushalt-und-wohnen", "ratgeber/genuss",
   "ratgeber/leben-und-freizeit", "ratgeber/haus-und-garten", "ratgeber/gesundheit") %>% 
   purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2022-08-31")) -> valid_links5
 

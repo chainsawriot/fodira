@@ -128,7 +128,7 @@ c("https://www.freiewelt.net/blogs/", "https://www.freiewelt.net/interviews/",
   "https://www.freiewelt.net/politik/", "https://www.freiewelt.net/wirtschaft/",
   "https://www.freiewelt.net/familie/", "https://www.freiewelt.net/christliches/", "https://www.freiewelt.net/nachrichten/",
    "https://www.freiewelt.net/lebensart/") %>% 
-  purrr::map_df(~freiewelt_go_thr_archive(., startdate="2022-01-01"))  -> valid_links
+  purrr::map_df(~freiewelt_go_thr_archive(., startdate="2022-08-01"))  -> valid_links
 
 valid_links <- dplyr::distinct(valid_links)
 

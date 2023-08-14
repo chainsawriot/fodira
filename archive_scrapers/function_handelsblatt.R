@@ -61,7 +61,7 @@ handelsblatt_go_thr_archive <- function(startdate){
 }
 
 
-handelsblatt_go_thr_archive(startdate = "2021-12-01") -> valid_links
+handelsblatt_go_thr_archive(startdate = "2022-01-01") -> valid_links
 
 valid_links %>% dplyr::distinct() %>% 
   dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
@@ -70,3 +70,6 @@ valid_links %>% dplyr::distinct() %>%
 
 
 saveRDS(valid_links, "Handelsblatt.RDS")
+
+remDr$close()
+z <- rD$server$stop()

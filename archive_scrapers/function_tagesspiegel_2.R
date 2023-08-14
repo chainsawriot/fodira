@@ -22,7 +22,7 @@ pjs_session <- Session$new(port = pjs_instance$port)
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
 
-pjs_session$go("https://www.tagesspiegel.de/politik/archiv/2022/01/01/")
+pjs_session$go("https://www.tagesspiegel.de/politik/archiv/2023/07/08/")
 
 
 #function for geting links from page
@@ -40,16 +40,37 @@ tagesspiegel_get_links <- function(html){
     rvest::html_attr("href") %>% paste0("https://www.tagesspiegel.de",.)-> item_link
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//main//span[contains(@class, 'Gau')]") %>%
-    rvest::html_text(trim = TRUE) %>% stringr::str_extract("[0-9]+\\.[0-9]+\\.[0-9]+") %>%
+    rvest::html_elements(xpath = "//main") %>%
+    rvest::html_text(trim = TRUE) %>%
+    stringr::str_extract(pattern = "[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,4}")%>%
     lubridate::dmy()-> item_pubdate
+  
+  if(length(item_pubdate)==0){
+    print("wait")
+    url <- pjs_session$getUrl()
+    Sys.sleep(600)
+    pjs_session$go(url)
+
+    html <- pjs_session$getSource()
+    rvest::read_html(html) %>%
+      rvest::html_elements(xpath = "//time") %>%
+      rvest::html_attr("datetime") %>%
+      lubridate::ymd_hms()-> item_pubdate
+
+  }
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//main//p[contains(@class, 'Gaw')]") %>%
     rvest::html_text(trim = TRUE) -> item_empty
   
   if(length(item_empty) == 0){
-    df <- data.frame(item_title, item_link, item_pubdate)
+    if(length(item_title) == 0){
+      df <- data.frame()
+    } else {
+      df <- data.frame(item_title, item_link, item_pubdate)
+    }
+    
+    
   } else {
     df <- data.frame()
   }

@@ -50,7 +50,7 @@ valid_links <- jungle_world_go_thr_archive(c("2022/01", "2022/02", "2022/03",
                                              "2023/01", "2023/02", "2023/03",
                                              "2023/04", "2023/05", "2023/06",
                                              "2023/07", "2023/08", "2023/09",
-                                             paste0("2023/", c(10:15))))
+                                             paste0("2023/", c(10:26))))
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "Jungle World", description = NA) %>%

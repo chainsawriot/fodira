@@ -29,6 +29,13 @@ bad_z_getlink <- function(html){
     rvest::html_text(., trim = TRUE) %>% 
     stringr::str_extract("[0-9]+\\. [A-Za-zäöü]+ [0-9]+") %>% 
     stringr::str_replace(., "März", "March") %>%
+    stringr::str_replace(., "Dezember", "December") %>%
+    stringr::str_replace(., "Oktober", "October") %>%
+    stringr::str_replace(., "Januar", "January") %>%
+    stringr::str_replace(., "Februar", "February") %>%
+    stringr::str_replace(., "Mai", "May") %>%
+    stringr::str_replace(., "Juni", "June") %>%
+    stringr::str_replace(., "Juli", "July") %>%
     lubridate::dmy() -> item_pubdate
   
 
@@ -77,11 +84,11 @@ bad_z_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-bad_z_go_thr_archive(startdate = "2021-12-01") -> valid_links
+bad_z_go_thr_archive(startdate = "2022-08-31") -> valid_links
 
 unique(valid_links$item_pubdate)
-# remDr$close()
-# z <- rD$server$stop()
+ remDr$close()
+ z <- rD$server$stop()
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "Badische Zeitung", description = NA) %>%

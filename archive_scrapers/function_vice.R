@@ -6,7 +6,7 @@ pjs_session <- Session$new(port = pjs_instance$port)
 
 #function for geting links from page
 #Sys.setlocale("LC_TIME", "C")
-#Sys.setlocale("LC_TIME", "de_DE")
+Sys.setlocale("LC_TIME", "de_DE")
 
 
 vice_getlink <- function(html){
@@ -56,7 +56,7 @@ vice_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-vice_go_thr_archive(startdate = "2021-12-01") -> valid_links
+vice_go_thr_archive(startdate = "2022-01-01") -> valid_links
 
 valid_links <- dplyr::distinct(valid_links)
 

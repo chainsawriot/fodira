@@ -2,7 +2,7 @@ require(academictwitteR)
 require(dplyr)
 
 dir <- academictwitteR:::.gen_random_dir()
-x <- academictwitteR:::get_all_tweets("from:berlinerzeitung", start_tweets = "2022-08-01T00:00:00Z", end_tweets = "2023-04-24T00:00:00Z", n = Inf, bind_tweets = FALSE, data_path = dir, is_retweet = FALSE)
+x <- academictwitteR:::get_all_tweets("from:berlinerzeitung", start_tweets = "2023-04-24T00:00:00Z", end_tweets = "2023-07-02T00:00:00Z", n = Inf, bind_tweets = FALSE, data_path = dir, is_retweet = FALSE)
 
 res <- academictwitteR:::bind_tweets(dir, output_format = "tidy")
 all_urls <- stringr::str_extract_all(res$text, "https://t.co/[a-zA-Z0-9]+")

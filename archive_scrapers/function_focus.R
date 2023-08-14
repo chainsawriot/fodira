@@ -57,7 +57,7 @@ focus_go_thr_archive <- function(rubrik, startdate){
 
 c("familie", "immobilien", "reisen", "digital", "gesundheit", 
   "wissen", "kultur", "finanzen", "politik", "panorama", "sport", 
-  "auto") %>% purrr::map_df(~focus_go_thr_archive(., startdate = "2021-12-01")) -> valid_links
+  "auto") %>% purrr::map_df(~focus_go_thr_archive(., startdate = "2022-01-01")) -> valid_links
 
 valid_links %>% dplyr::distinct() %>% 
   dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

@@ -175,7 +175,7 @@ merkur_go_thr_archive <- function(startdate, enddate, rubrik){
 
 #merkur_go_thr_archive(startdate = "2021-12-31", enddate = "2022-01-31", "") -> valid_links
 
-merkur_go_thr_archive(startdate = "2021-12-01", enddate = "2022-02-01", "") -> valid_links1
+merkur_go_thr_archive(startdate = "2022-01-01", enddate = "2022-02-01", "") -> valid_links1
 
 merkur_go_thr_archive(startdate = "2022-02-01", enddate = "2022-04-01", "") -> valid_links2
 

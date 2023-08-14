@@ -59,7 +59,7 @@ rubikon_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-valid_links <- rubikon_go_thr_archive("2021-12-01")
+valid_links <- rubikon_go_thr_archive("2022-01-01")
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "Rubikon", description = NA) %>%

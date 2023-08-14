@@ -181,7 +181,7 @@ c("region/bayreuth") %>%
   purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links5
 
 c("region/erlangen") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-10-01")) -> valid_links6
+  purrr::map_df(~nordb_getlink(. , "2023-01-10")) -> valid_links6
 
 ###########################################
 c("region/forchheim") %>%
@@ -195,7 +195,7 @@ c("region/gunzenhausen") %>%
   purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links9
 
 c("region/herzogenaurach") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-10-01")) -> valid_links10
+  purrr::map_df(~nordb_getlink(. , "2023-01-10")) -> valid_links10
 
 c("region/hoechstadt") %>%
   purrr::map_df(~nordb_getlink(. , "2022-10-01")) -> valid_links11
@@ -254,13 +254,15 @@ c("tv") %>%
 c("sport") %>%
   purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links28
 
+#######remove nn
 
 save.image("nordb_.RData")
 
-valid_links <- dplyr::distinct(rbind(valid_links1, valid_links10, valid_links11, valid_links12,
+valid_links <- dplyr::distinct(rbind(valid_links1, valid_links10, #valid_links11, 
+                                     valid_links12,
                 valid_links13, valid_links14, valid_links15, valid_links16,
                 valid_links17, #valid_links18, 
-                valid_links19, valid_links2,
+                valid_links19, #valid_links2,
                 valid_links20, valid_links21, #valid_links22,
                 valid_links23, valid_links24, valid_links25, valid_links26,
                 valid_links27, valid_links28, valid_links3, 

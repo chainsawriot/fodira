@@ -126,7 +126,7 @@ cicero_go_thr_columns <- function(category, startdate){
 
 
 c("innenpolitik", "aussenpolitik", "wirtschaft",
-  "kultur", "cicero-plus") %>% purrr::map_df(~cicero_go_thr_columns(., "2021-12-01")) -> valid_links
+  "kultur", "cicero-plus") %>% purrr::map_df(~cicero_go_thr_columns(., "2022-08-01")) -> valid_links
 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 

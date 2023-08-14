@@ -50,7 +50,9 @@ opp_go_thr_archive <- function(year, lastpage){
   return(valid_links)
 }
 
-valid_links <- opp_go_thr_archive("2022", 97)
+valid_links1 <- opp_go_thr_archive("2022", 97)
+
+valid_links2 <- opp_go_thr_archive("2023", 97)
 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

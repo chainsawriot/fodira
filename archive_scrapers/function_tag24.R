@@ -6,11 +6,13 @@ require(magrittr)
 # fprof <- makeFirefoxProfile(list(permissions.default.image = 21))
 rD <- RSelenium::rsDriver(browser = "firefox",
                           #chromever = "103.0.5060.134",
-                          port = sample(c(5678L, 
+                          port = sample(c(#5678L, 
                                           #5679L, 
                                           5680L, 
-                                          5681L, 
-                                          5682L), size = 1),
+                                          #5681L, 
+                                          #5682L,
+                                          #5683L,
+                                          5684L), size = 1),
                           #phantomver = "2.1.1",
                           #extraCapabilities = fprof,
                           check = TRUE, verbose = FALSE)
@@ -110,11 +112,12 @@ tag24_getlink_url <- function(url, startdate){
     
     remDr$navigate(df2$item_link[nrow(df2)])
     # pjs_session$go(df2$item_link[nrow(df2)])
-    
+
     remDr$getPageSource()[[1]] %>% rvest::read_html() %>%
     # pjs_session$getSource() %>% rvest::read_html() %>%
       rvest::html_elements(xpath = "//div[contains(@class, 'article__info')]/time") %>%
       rvest::html_text(., trim = TRUE) %>% lubridate::dmy_hm()-> t
+    #print(t)
     if(t < as.Date(startdate)){
       n <- 0
     }

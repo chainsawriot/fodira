@@ -3,7 +3,7 @@
 require(RSelenium)
 require(magrittr)
 #eCap <- list(phantomjs.binary.path = "C:/phantomjs-2.1.1/bin.exe")
-fprof <- makeFirefoxProfile(list(permissions.default.image = 21))
+#fprof <- makeFirefoxProfile(list(permissions.default.image = 21))
 rD <- RSelenium::rsDriver(browser = "firefox", 
                           #chromever = "103.0.5060.134", 
                           port = sample(c(5678L, 
@@ -13,7 +13,7 @@ rD <- RSelenium::rsDriver(browser = "firefox",
                                           5682L
                                           ), size = 1), 
                           #phantomver = "2.1.1",
-                          extraCapabilities = fprof,
+                          #extraCapabilities = fprof,
                           check = FALSE, verbose = FALSE)
 
 remDr <- rD[["client"]]

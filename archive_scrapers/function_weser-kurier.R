@@ -1,8 +1,8 @@
 require(RSelenium)
 require(magrittr)
 rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(
-  #5678L, 
-  5679L, 5680L, #5681L, 
+  5678L, 
+  #5679L, 5680L, 5681L, 
   5682L), size = 1), check = FALSE, verbose = FALSE)
 remDr <- rD[["client"]]
 
@@ -117,8 +117,8 @@ weser_go_thr_page <- function(startdate){
     rvest::html_elements(xpath = "//ul[contains(@class, 'main-navi__list__item__sub-nav')]//li//a") %>% 
     rvest::html_attr("href") %>% stringr::str_remove("https://www.weser-kurier.de/") -> categories
   
-  categories[c(2:18, 20:21, 
-               23,
+  categories[c(2:6, 8:19, 21:22, 
+               
                25:50, 52:58)] %>% 
     purrr::map_dfr(~weser_go_thr_columns(., startdate)) -> df
   

@@ -61,7 +61,7 @@ bild_go_thr_archive <- function(startdate){
 }
 
 #pjs_session$go("https://www.bild.de/archive/")
-valid_links <- bild_go_thr_archive("2021-12-01")
+valid_links <- bild_go_thr_archive("2021-12-31")
 
 valid_links %>% dplyr::distinct() %>% 
   dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

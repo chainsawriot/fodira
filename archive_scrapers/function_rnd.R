@@ -23,6 +23,13 @@ rnd_getlink <- function(html){
     rvest::html_text(., trim = TRUE) %>% stringr::str_extract(., "[0-9]+[.][0-9]+[.][0-9]+") %>%
     as.Date(tryFormat = c("%d.%m.%Y")) -> item_pubdate
 
+  if(length(item_pubdate) != length(item_link)){
+    for (i in 1:(length(item_link) - length(item_pubdate))){
+      item_pubdate <- c(item_pubdate, item_pubdate[1])
+      print("add")
+    }
+  }
+  
     df <- data.frame(item_title, item_link, item_pubdate)
     
     return(df)
@@ -48,7 +55,7 @@ rnd_go_thr_archive <- function(startdate){
 }
 
 
-rnd_go_thr_archive(startdate = "2021-12-01") -> valid_links
+rnd_go_thr_archive(startdate = "2022-01-01") -> valid_links
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "RND", description = NA) %>%

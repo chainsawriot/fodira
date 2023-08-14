@@ -45,6 +45,13 @@ kiel_get_links <- function(html){
     rvest::html_attr("datetime") %>%
     lubridate::ymd_hms()-> item_pubdate
   
+  if(length(item_pubdate) != length(item_link)){
+    for (i in 1:(length(item_link) - length(item_pubdate))){
+      item_pubdate <- c(item_pubdate, item_pubdate[1])
+      print("add")
+    }
+  }
+  
   df <- data.frame(item_title, item_link, item_pubdate)
   return(df)
 }
@@ -87,7 +94,7 @@ kiel_go_thr_archive <- function(startdate, enddate){
 # df <- zeit_getlink_url("https://www.zeit.de/thema/krieg-in-ukraine", "2022-01-01")
   
   
-kiel_go_thr_archive("2021-12-01", "2022-05-01") -> valid_links1
+kiel_go_thr_archive("2022-01-01", "2022-05-01") -> valid_links1
 
 kiel_go_thr_archive("2022-05-02", Sys.Date()) -> valid_links2
 

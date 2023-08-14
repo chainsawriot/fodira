@@ -86,7 +86,7 @@ jf_go_thr_archive <- function(startdate){
 }
 
 
-jf_go_thr_archive("2021-12-01") -> valid_links3
+jf_go_thr_archive("2022-01-01") -> valid_links3
 
 valid_links <- dplyr::distinct(rbind(valid_links_1, valid_links_2, valid_links3))
 

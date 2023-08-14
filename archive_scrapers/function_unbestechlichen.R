@@ -32,11 +32,13 @@ unbest_go_thr_2022 <- function(startpage){
   remDr$navigate(startpage)
   print(startpage)
   Sys.sleep(10)
-  webElem <- remDr$findElement(using = "css", "a[class='_brlbs-btn _brlbs-btn-accept-all _brlbs-cursor']")
-  webElem$clickElement()
+  #webElem <- remDr$findElement(using = "css", "a[class='_brlbs-btn _brlbs-btn-accept-all _brlbs-cursor']")
+  #webElem$clickElement()
   rvest::read_html(remDr$getPageSource()[[1]]) %>% 
     rvest::html_elements(xpath = "//a[contains(@class, 'page-numbers')]") %>% 
-    rvest::html_text(., trim = TRUE) %>% stringr::str_extract(pattern = "[0-9]+")-> end
+    rvest::html_text(., trim = TRUE) %>% stringr::str_extract(pattern = "[0-9]+") %>%
+    as.numeric()  -> end
+
    
   valid_links <- data.frame()
   for (i in 1:sort(end , TRUE)[1]) {
@@ -47,8 +49,7 @@ unbest_go_thr_2022 <- function(startpage){
     
   }
   
-  remDr$close()
-  z <- rD$server$stop()
+
   return(valid_links)
 }
 
@@ -64,3 +65,6 @@ valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = it
 
 
 saveRDS(valid_links, "DieUnbestechlichen.RDS")
+
+remDr$close()
+z <- rD$server$stop()

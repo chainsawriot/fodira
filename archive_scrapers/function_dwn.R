@@ -57,13 +57,13 @@ dwm_go_thr_search <- function(url){
 }
 
 
-dwm_go_thr_search("https://deutsche-wirtschafts-nachrichten.de/search?lex=0&search=&match=0&author=&d1=1&m1=12&y1=2021&d2=20&m2=3&y2=2023&act=yes") -> valid_links
+dwm_go_thr_search("https://deutsche-wirtschafts-nachrichten.de/search?lex=0&search=&match=0&author=&d1=1&m1=1&y1=2022&d2=2&m2=7&y2=2023&act=yes") -> valid_links
 
 
 valid_links <- dplyr::distinct(valid_links)
 
 
-valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate.1.) %>% 
+valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "DWN", description = NA) %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links
 

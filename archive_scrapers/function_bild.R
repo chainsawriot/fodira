@@ -71,4 +71,6 @@ valid_links %>% dplyr::distinct() %>%
 
 saveRDS(valid_links, "Bild.RDS")
 
+remDr$close()
+z <- rD$server$stop()
 

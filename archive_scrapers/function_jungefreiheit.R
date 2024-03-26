@@ -55,6 +55,9 @@ jf_go_thr_2022("https://jungefreiheit.de/2022/") -> valid_links_1
 
 jf_go_thr_2022("https://jungefreiheit.de/2023/") -> valid_links_2
 
+
+jf_go_thr_2022("https://jungefreiheit.de/2024/") -> valid_links_3
+
 jf_getlink_url <- function(url){
   remDr$navigate(url)
   print(url)

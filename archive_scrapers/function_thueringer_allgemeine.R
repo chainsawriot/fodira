@@ -91,7 +91,7 @@ th_allg_go_thr_archive <- function(startdate){
 # df <- zeit_getlink_url("https://www.zeit.de/thema/krieg-in-ukraine", "2022-01-01")
   
   
-th_allg_go_thr_archive("2022-08-01") -> valid_links
+th_allg_go_thr_archive("2023-01-01") -> valid_links
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "TA", description = NA) %>%

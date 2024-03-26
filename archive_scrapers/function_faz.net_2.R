@@ -82,7 +82,7 @@ valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = it
 
 saveRDS(valid_links, "FAZ.RDS")
 
- remDr$close()
- z <- rD$server$stop()
+remDr$close()
+z <- rD$server$stop()
 
 # 

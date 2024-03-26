@@ -32,6 +32,10 @@ haz_get_links <- function(html){
   html <- pjs_session$getSource()
   
   rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//h2[contains(@class, 'c-teaser__title')]") %>% 
+    rvest::html_text(trim = TRUE) -> item_titles_2  
+  
+  rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//h2//a") %>% 
     rvest::html_text(trim = TRUE) -> item_title
   
@@ -43,6 +47,15 @@ haz_get_links <- function(html){
     rvest::html_elements(xpath = "//span[contains(@class, 'c-meta__label')]") %>%
     rvest::html_text(trim = TRUE) %>% stringr::str_extract("[0-9]+\\.[0-9]+\\.[0-9]+") %>%
     lubridate::dmy()-> item_pubdate
+  
+  if(length(item_titles_2)!=length(item_title)){
+    item_pubdate <- item_pubdate[-which(item_titles_2 == setdiff(item_titles_2, item_title))]
+    
+  }
+
+  print(length(item_title))
+  print(length(item_link))
+  print(length(item_pubdate))
   
   df <- data.frame(item_title, item_link, item_pubdate)
   return(df)
@@ -70,6 +83,7 @@ haz_go_thr_archive <- function(startdate){
     haz_get_url(paste0("https://www.hildesheimer-allgemeine.de/suche.html?tx_kesearch_pi1%5Bpage%5D=", i)) %>%
       subset(., item_pubdate >= as.Date(startdate)) -> df2
     n <- nrow(df2)
+    print(df2$item_pubdate[1])
     print(n)
     i <- i+1
     df <- rbind(df, df2)
@@ -81,7 +95,7 @@ haz_go_thr_archive <- function(startdate){
 # df <- zeit_getlink_url("https://www.zeit.de/thema/krieg-in-ukraine", "2022-01-01")
   
   
-haz_go_thr_archive("2022-10-01") -> valid_links
+haz_go_thr_archive("2022-01-01") -> valid_links
 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

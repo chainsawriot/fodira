@@ -30,7 +30,7 @@ blaetter_getlink_url <- function(url){
 }
 
 blaetter_go_thr_archive <- function(startdate){
-  format(seq(as.Date(startdate), Sys.Date()+10, by="months"), "%Y/%B") %>%
+  format(seq(as.Date(startdate), Sys.Date(), by="months"), "%Y/%B") %>%
     stringr::str_replace(., "M.+rz", "Maerz") -> V1
   
   V1 %>% as.character() %>%
@@ -40,7 +40,7 @@ blaetter_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-valid_links <- blaetter_go_thr_archive("2021-12-31")
+valid_links <- blaetter_go_thr_archive("2021-12-01")
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link) %>% 
   dplyr::mutate(pub = "blaetter.de", description = NA, pubdate = NA) %>%

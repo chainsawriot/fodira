@@ -97,7 +97,7 @@ c("aufmacher", "aktuelles", "politik", "wirtschaft", "gesellschaft",
   "spezial", "videos"#, #"bilderserien", 
   #"leserfavoriten"
   ) %>%
-  purrr::map_df(~ch_d_go_thr_columns(., "2022-12-31")) -> valid_links 
+  purrr::map_df(~ch_d_go_thr_columns(., "2023-07-30")) -> valid_links 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "China heute", description = NA) %>%

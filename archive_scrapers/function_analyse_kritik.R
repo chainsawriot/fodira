@@ -46,7 +46,7 @@ ak_go_thr_archive <- function(start_issue, end_issue){
   return(valid_links)
 }
 
-valid_links <- ak_go_thr_archive("677", "694")
+valid_links <- ak_go_thr_archive("677", "700")
 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

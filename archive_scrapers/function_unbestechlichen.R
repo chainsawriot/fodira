@@ -57,7 +57,10 @@ unbest_go_thr_2022("https://dieunbestechlichen.com/2023/") -> valid_links_1
 
 unbest_go_thr_2022("https://dieunbestechlichen.com/2022/") -> valid_links_2
 
-valid_links <- dplyr::distinct(rbind(valid_links_1, valid_links_2))
+unbest_go_thr_2022("https://dieunbestechlichen.com/2024/") -> valid_links_3
+
+
+valid_links <- dplyr::distinct(rbind(valid_links_1, valid_links_2, valid_links_3))
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "DieUnbestechlichen", description = NA) %>%

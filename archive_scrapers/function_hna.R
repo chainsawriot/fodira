@@ -142,7 +142,11 @@ hna_go_thr_archive <- function(startdate, enddate){
 
 hna_go_thr_archive("2022-01-01", "2022-03-01")-> valid_links1
 
-hna_go_thr_archive("2022-03-02", "2022-06-01")-> valid_links2
+hna_go_thr_archive("2022-03-02", "2022-04-01")-> valid_links2
+
+hna_go_thr_archive("2022-04-02", "2022-05-01")-> valid_links2_1
+
+hna_go_thr_archive("2022-05-02", "2022-06-01")-> valid_links2_2
 
 hna_go_thr_archive("2022-06-02", "2022-07-01")-> valid_links3
 
@@ -170,7 +174,7 @@ hna_go_thr_archive("2023-05-02", "2023-06-01")-> valid_links14
 
 hna_go_thr_archive("2023-06-02", Sys.Date())-> valid_links15
 
-dplyr::distinct(rbind(valid_links1, valid_links2, valid_links3,
+dplyr::distinct(rbind(valid_links1, valid_links2, valid_links2_1, valid_links2_2, valid_links3,
                       valid_links4, valid_links5, valid_links6,
                       valid_links7, valid_links8, valid_links9,
                       valid_links10, valid_links11, valid_links12,

@@ -14,8 +14,8 @@ require(magrittr)
 ## remDr$navigate(url)
 
 .scrape <- function(slug, max_pages = 30, debug = FALSE) {
-    rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(#5678L, #5679L, 
-                                                                   5680L, #5681L, 
+    rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 
+                                                                   5680L, 5681L, 
                                                                    5682L), size = 1), check = FALSE, verbose = FALSE)
     remDr <- rD[["client"]]
 
@@ -58,8 +58,8 @@ require(magrittr)
 valid_links_1 <- purrr::map_dfr("politik", .scrape, max_pages = 40)
 valid_links_2 <- purrr::map_dfr("wirtschaft", .scrape, max_pages = 40)
 valid_links_3 <- purrr::map_dfr("kultur", .scrape, max_pages = 40)
-valid_links_4 <- purrr::map_dfr("gruenes-wissen", .scrape, max_pages = 40)
-valid_links_5 <- purrr::map_dfr("debatte", .scrape, max_pages = 40)
+valid_links_4 <- purrr::map_dfr("gruenes-wissen", .scrape, max_pages = 5)
+valid_links_5 <- purrr::map_dfr("debatte", .scrape, max_pages = 28)
 
 dplyr::distinct(rbind(valid_links_1, valid_links_2, valid_links_3, 
                       valid_links_4, valid_links_5)) -> valid_links

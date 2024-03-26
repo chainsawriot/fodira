@@ -5,8 +5,8 @@ require(magrittr)
 
 rD <- RSelenium::rsDriver(browser = "firefox",
                           #chromever = "103.0.5060.134",
-                          port = sample(c(#5678L, 
-                            5679L, #5680L, 
+                          port = sample(c(5678L, 
+                            5679L, 5680L, 
                             5681L, 5682L), size = 1),
                           #phantomver = "2.1.1",
                           check = FALSE, verbose = FALSE)

@@ -54,7 +54,7 @@ handelsblatt_go_thr_archive <- function(startdate){
     format.Date(format="%Y/%m/%d") -> V1
   
   V1 %>%
-    paste0("https://www.handelsblatt.com/archiv/", ., "/") %>%
+    paste0("https://www.handelsblatt.com/archiv/?date=", ., "/") %>%
     purrr::map_df(~handelsblatt_getlink_url(.)) -> valid_links
   
   return(valid_links)

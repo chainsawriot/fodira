@@ -53,7 +53,7 @@ tichy_go_thr_columns <- function(rubrik, startdate){
 
 c("tichys-einblick", "kolumnen", "gastbeitrag", "daili-es-sentials", 
   "meinungen", "feuilleton", "wirtschaft") %>% 
-  purrr::map_dfr(~tichy_go_thr_columns(., startdate = "2022-08-01")) -> valid_links
+  purrr::map_dfr(~tichy_go_thr_columns(., startdate = "2023-08-01")) -> valid_links
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "Tichys Einblick", description = NA) %>%

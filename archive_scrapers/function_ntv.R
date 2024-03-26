@@ -157,9 +157,9 @@ ntv_go_thr_topics <- function(startdate, n){
 }
 
 
-ntv_go_thr_topics("2022-01-01", 20:27)-> valid_links1
+ntv_go_thr_topics("2023-01-01", 20:27)-> valid_links1
 
-ntv_go_thr_topics("2022-01-01", 1:19)-> valid_links2
+ntv_go_thr_topics("2023-01-01", 1:19)-> valid_links2
 
 valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2))
 # 

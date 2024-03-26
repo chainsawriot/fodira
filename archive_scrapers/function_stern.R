@@ -68,7 +68,7 @@ stern_go_thr_archive <- function(rubrik, startdate){
 
 c("politik", "gesellschaft", "panorama", "kultur", "lifestyle", "digital",
   "wirtschaft", "sport", "gesundheit", "genuss", "reise", "familie", 
-  "auto") %>% purrr::map_df(~stern_go_thr_archive(., startdate = "2022-08-01")) -> valid_links
+  "auto") %>% purrr::map_df(~stern_go_thr_archive(., startdate = "2023-01-01")) -> valid_links
 
 valid_links %>% dplyr::distinct()  %>%
   dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

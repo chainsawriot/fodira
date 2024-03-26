@@ -10,19 +10,20 @@ Sys.setlocale("LC_TIME", "de_DE")
 #function for geting links from page
 rnd_getlink <- function(html){
 
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//a[contains(@data-is-element-rendered, 'true')]//h2") %>% 
-    rvest::html_text(., trim = TRUE) -> item_title
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//a[contains(@data-is-element-rendered, 'true')]") %>% 
-    rvest::html_attr("href") %>% paste0("https://www.rnd.de", .) -> item_link
+    rvest::html_elements(xpath = "//div[contains(@class, 'ArchiveContentstyled__ArchiveContentWrapper')]//a[contains(@class, 'Linkstyled__Link')]//h2") %>% 
+    rvest::html_text(trim = TRUE) -> item_title
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//a[contains(@data-is-element-rendered, 'true')]//time") %>%
-    rvest::html_text(., trim = TRUE) %>% stringr::str_extract(., "[0-9]+[.][0-9]+[.][0-9]+") %>%
-    as.Date(tryFormat = c("%d.%m.%Y")) -> item_pubdate
-
+    rvest::html_elements(xpath = "//div[contains(@class, 'ArchiveContentstyled__ArchiveContentWrapper')]//a[contains(@class, 'Linkstyled__Link')]") %>% 
+    rvest::html_attr("href") %>% paste0("https://www.lvz.de",.)-> item_link
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//div[contains(@class, 'ArchiveContentstyled__ArchiveContentWrapper')]//time") %>%
+    rvest::html_attr("datetime") %>%
+    lubridate::ymd_hms()-> item_pubdate
+  
   if(length(item_pubdate) != length(item_link)){
     for (i in 1:(length(item_link) - length(item_pubdate))){
       item_pubdate <- c(item_pubdate, item_pubdate[1])
@@ -30,9 +31,9 @@ rnd_getlink <- function(html){
     }
   }
   
-    df <- data.frame(item_title, item_link, item_pubdate)
-    
-    return(df)
+  
+  df <- data.frame(item_title, item_link, item_pubdate)
+  return(df)
 }
 
 rnd_getlink_url <- function(url){

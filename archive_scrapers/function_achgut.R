@@ -75,14 +75,24 @@ achgut_go_thr_archive <-  function(startdate){
     j <- j + 13
     valid_links <- rbind(valid_links, subset_links)
     k <- k +1 
-    if (k > 79){
+    if (k > 59){
       print("wait")
       Sys.sleep(30)
+      k <- 0
+    }
+    if (j == 197){
+      print("wait")
+      Sys.sleep(500)
       k <- 0
     }
     if (j == 1924){
       print("wait")
       Sys.sleep(45)
+      k <- 0
+    }
+    if (j == 118){
+      print("wait")
+      Sys.sleep(500)
       k <- 0
     }
   }

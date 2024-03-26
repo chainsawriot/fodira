@@ -104,7 +104,7 @@ taz_go_thr_archive <- function(startdate){
 }
 
 
-taz_go_thr_archive(startdate = "2022-08-01") -> valid_links
+taz_go_thr_archive(startdate = "2023-12-31") -> valid_links
 
 valid_links <- dplyr::distinct(valid_links)
 

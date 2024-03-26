@@ -50,7 +50,7 @@ ppq_getlink <- function(html){
 
 ppq_go_thr_archive <- function(startdate){
   valid_links <- data.frame()
-  remDr$navigate("https://www.politplatschquatsch.com/2023")
+  remDr$navigate("https://www.politplatschquatsch.com/2024")
   ppq_getlink(remDr$getPageSource()[[1]]) %>% subset(., item_pubdate >= as.Date(startdate)) -> subset_links
   i <- nrow(subset_links)
   valid_links <- rbind(valid_links, subset_links)

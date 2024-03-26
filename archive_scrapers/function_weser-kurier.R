@@ -119,10 +119,10 @@ weser_go_thr_page <- function(startdate){
   
   categories[c(2:6, 8:19, 21:22, 
                
-               25:50, 52:58)] %>% 
+               25:31, 33:34, 36:49)] %>% 
     purrr::map_dfr(~weser_go_thr_columns(., startdate)) -> df
   
-  c("thema/corona-q278567", "deutschland-welt", "sport/sport-in-der-region/landkreis-osterholz",
+  c("deutschland-welt", "sport/sport-in-der-region/landkreis-osterholz",
     "sport/sport-in-der-region/landkreis-verden", "sport/sport-in-der-region/landkreis-diepholz",
     "sport/sport-in-der-region/stadt-delmenhorst", "sport/sport-in-der-region/landkreis-wesermarsch",
     "sport/sport-in-der-region/landkreis-oldenburg", "sport/sport-in-der-region/landkreis-rotenburg",
@@ -132,7 +132,7 @@ weser_go_thr_page <- function(startdate){
 }
 
 
-weser_go_thr_page(startdate = "2022-08-01") -> valid_links1
+weser_go_thr_page(startdate = "2023-08-01") -> valid_links1
 
 valid_links <- dplyr::distinct(valid_links1)
 

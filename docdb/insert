@@ -16,7 +16,7 @@ Options:
 
 ' -> doc
 
-args <- docopt::docopt(doc, version = 'insert 0.0.2')
+args <- docopt::docopt(doc, version = 'insert 0.0.3\n')
 
 ## args <- commandArgs(trailingOnly = TRUE)
 ## if ("debug" %in% args) {
@@ -33,7 +33,7 @@ args <- docopt::docopt(doc, version = 'insert 0.0.2')
 ## }
 
 .insert <- function(link_file, debug, newlinks_fname = "newlinks.RDS") {
-    links <- readRDS(link_file)
+    links <- fodira::harmonize_output(readRDS(link_file))
     newlinks <- fodira::insert_doc_link(links, debug = debug, db = "main", collection = "articles")
     if (!is.null(newlinks_fname)) {
         saveRDS(newlinks, newlinks_fname)

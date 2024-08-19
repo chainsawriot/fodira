@@ -6,8 +6,8 @@
 .paywall_xpath[["Spiegel"]] <- "//div[contains(@data-target-id, 'paywall')]"
 .paywall_xpath[["Stern"]] <- "//section[contains(@class, 'paid-barrier--context-article')]"
 .paywall_xpath[["FAZ"]] <- "//section[contains(@class, 'atc-ContainerPaywall')]"
-.paywall_xpath[["SZ"]] <- "//offer-page"
-.paywall_xpath[["Handelsblatt"]] <- "//div[contains(@class, 'o-paywall__content')]"
+#.paywall_xpath[["SZ"]] <- "//offer-page"
+#.paywall_xpath[["Handelsblatt"]] <- "//div[contains(@class, 'o-paywall__content')]"
 .paywall_xpath[["Welt"]] <- "//div[contains(@class, 'contains_walled_content')]"
 .paywall_xpath[["Berliner Zeitung"]] <- "//div[contains(@class, 'paywall_overlay__CR1uO')]"
 .paywall_xpath[["Hildesheimer Allgemeine Zeitung"]] <- "//div[contains(@class, 'o-paywall')]"
@@ -29,7 +29,7 @@
 .paywall_xpath[["Compact"]] <- "//div[contains(@id, 'wpmem_restricted_msg')]"
 .paywall_xpath[["Junge Freiheit"]] <- "//div[contains(@class, 'paywall-content-block')]"
 .paywall_xpath[["Jungle World"]] <- "//div[contains(@class, 'subscription-only-block')]"
-.paywall_xpath[["Junge Welt"]] <- "//a[contains(@title, 'Onlineabo abschließen')]"
+#.paywall_xpath[["Junge Welt"]] <- "//a[contains(@title, 'Onlineabo abschließen')]"
 .paywall_xpath[["blaetter.de"]] <- "//a[contains(@class, 'button--buy')]"
 
 .check_element <- function(parsed_html, xpath) {
@@ -48,10 +48,31 @@
 }
 
 .check_other_funs[["DWN"]] <- function(parsed_html) {
-    xpaths <- c("//div[contains(@class, 'message notice')]",
-                "//div[contains(@class, 'gustly')]",
-                "//div[contains(@id, 'article-teaser-blocks')]")
-    any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
+  xpaths <- c("//div[contains(@class, 'message notice')]",
+              "//div[contains(@class, 'gustly')]",
+              "//div[contains(@class, 'noaccess_message')]",
+              "//div[contains(@id, 'article-teaser-blocks')]")
+  any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
+}
+
+
+
+.check_other_funs[["Junge Welt"]] <- function(parsed_html) {
+  xpaths <- c("//a[contains(@title, 'Onlineabo abschließen')]",
+              "//a[contains(@title, 'Onlineaktionsbo abschließen')]")
+  any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
+}
+
+.check_other_funs[["SZ"]] <- function(parsed_html) {
+  xpaths <- c("//offer-page",
+              "//div[contains(@class, 'offer-page')]")
+  any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
+}
+
+.check_other_funs[["Handelsblatt"]] <- function(parsed_html) {
+  xpaths <- c("//div[contains(@class, 'o-paywall__content')]",
+              "//app-paywall")
+  any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
 }
 
 .check_other_funs[["RP Online"]] <- function(parsed_html) {

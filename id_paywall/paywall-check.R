@@ -5,29 +5,29 @@
 .paywall_xpath[["Cicero"]] <- "//div[contains(@class, 'paywall-header')]"
 .paywall_xpath[["Spiegel"]] <- "//div[contains(@data-target-id, 'paywall')]"
 .paywall_xpath[["Stern"]] <- "//section[contains(@class, 'paid-barrier--context-article')]"
-.paywall_xpath[["FAZ"]] <- "//section[contains(@class, 'atc-ContainerPaywall')]"
+#.paywall_xpath[["FAZ"]] <- "//section[contains(@class, 'atc-ContainerPaywall')]"
 #.paywall_xpath[["SZ"]] <- "//offer-page"
 #.paywall_xpath[["Handelsblatt"]] <- "//div[contains(@class, 'o-paywall__content')]"
 .paywall_xpath[["Welt"]] <- "//div[contains(@class, 'contains_walled_content')]"
 .paywall_xpath[["Berliner Zeitung"]] <- "//div[contains(@class, 'paywall_overlay__CR1uO')]"
-.paywall_xpath[["Hildesheimer Allgemeine Zeitung"]] <- "//div[contains(@class, 'o-paywall')]"
-.paywall_xpath[["TA"]] <- "//p[contains(@class, 'obfuscated')]"
+#.paywall_xpath[["Hildesheimer Allgemeine Zeitung"]] <- "//div[contains(@class, 'o-paywall')]"
+#.paywall_xpath[["TA"]] <- "//p[contains(@class, 'obfuscated')]"
 .paywall_xpath[["nordbayern.de"]] <- "//div[contains(@class, 'paywall')]"
 .paywall_xpath[["Stuttgarter Zeitung"]] <- "//div[contains(@id, 'taboola-below-paid-article-thumbnails')]"
-.paywall_xpath[["Tagesspiegel"]] <- "//div[contains(@class, 'article--paid')]"
+#.paywall_xpath[["Tagesspiegel"]] <- "//div[contains(@class, 'article--paid')]"
 .paywall_xpath[["Berliner Morgenpost"]] <- "//div[contains(@id, 'paywall-container')]"
 .paywall_xpath[["WAZ"]] <- "//div[contains(@id, 'paywall-container')]"
-.paywall_xpath[["Weser Kurier"]] <- "//div[contains(@class, 'paywall__overlay')]"
+#.paywall_xpath[["Weser Kurier"]] <- "//div[contains(@class, 'paywall__overlay')]"
 .paywall_xpath[["Hamburger MoPo"]] <- "//div[contains(@id, 'paywall')]"
 .paywall_xpath[["RND"]] <- "//div[contains(@class, 'paywalledContent')]"
 .paywall_xpath[["Ostsee-Zeitung"]] <- .paywall_xpath[["RND"]]
 .paywall_xpath[["LVZ"]] <- .paywall_xpath[["RND"]]
 .paywall_xpath[["KN"]] <- .paywall_xpath[["RND"]]
 .paywall_xpath[["akweb"]] <- "//section[contains(@class, 'wp-block-ak-subscription')]"
-.paywall_xpath[["Epoch Times"]] <- "//div[contains(@id, 'premium-content')]"
+#.paywall_xpath[["Epoch Times"]] <- "//div[contains(@id, 'premium-content')]"
 .paywall_xpath[["Freitag"]] <- "//div[contains(@class, 'c-paywall-banner')]"
 .paywall_xpath[["Compact"]] <- "//div[contains(@id, 'wpmem_restricted_msg')]"
-.paywall_xpath[["Junge Freiheit"]] <- "//div[contains(@class, 'paywall-content-block')]"
+#.paywall_xpath[["Junge Freiheit"]] <- "//div[contains(@class, 'paywall-content-block')]"
 .paywall_xpath[["Jungle World"]] <- "//div[contains(@class, 'subscription-only-block')]"
 #.paywall_xpath[["Junge Welt"]] <- "//a[contains(@title, 'Onlineabo abschließen')]"
 .paywall_xpath[["blaetter.de"]] <- "//a[contains(@class, 'button--buy')]"
@@ -52,6 +52,55 @@
               "//div[contains(@class, 'gustly')]",
               "//div[contains(@class, 'noaccess_message')]",
               "//div[contains(@id, 'article-teaser-blocks')]")
+  any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
+}
+
+.check_other_funs[["Badische Zeitung"]] <- function(parsed_html) {
+  xpaths <- c("//article[contains(@id, 'articleWall')]",
+              "//section[contains(@id, 'regWalli')]")
+  any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
+}
+
+.check_other_funs[["Epoch Times"]] <- function(parsed_html) {
+  xpaths <- c("//div[contains(@id, 'premium-content')]",
+              "//div[contains(@class, 'modal__container')]")
+  any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
+}
+
+
+.check_other_funs[["FAZ"]] <- function(parsed_html) {
+  xpaths <- c("//section[contains(@class, 'atc-ContainerPaywall')]",
+              "//div[contains(@class, 'wall paywall')]")
+  any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
+}
+
+.check_other_funs[["Hildesheimer Allgemeine Zeitung"]] <- function(parsed_html) {
+  xpaths <- c("//div[contains(@class, 'o-paywall')]",
+              "//div[contains(@class, 'paywall-box-header')]")
+  any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
+}
+
+.check_other_funs[["Junge Freiheit"]] <- function(parsed_html) {
+  xpaths <- c("//div[contains(@class, 'paywall-content-block')]",
+              "//div[contains(@class, 'paywall-teaser-box')]")
+  any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
+}
+
+.check_other_funs[["TA"]] <- function(parsed_html) {
+  xpaths <- c("//p[contains(@class, 'obfuscated')]",
+              "//div[contains(@class, 'paywall-ld-ident')]")
+  any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
+}
+
+.check_other_funs[["Tagesspiegel"]] <- function(parsed_html) {
+  xpaths <- c("//div[contains(@class, 'article--paid')]",
+              "//div[contains(@id, 'paywall')]")
+  any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
+}
+
+.check_other_funs[["Weser Kurier"]] <- function(parsed_html) {
+  xpaths <- c("//div[contains(@class, 'paywall__overlay')]",
+              "//div[contains(@class, 'tp-container-inner')]")
   any(purrr::map_lgl(xpaths, ~.check_element(parsed_html, .)))
 }
 

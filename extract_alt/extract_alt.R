@@ -39,7 +39,7 @@ require(magrittr)
     } 
     return(NA)
     
-  # } if(pub == "Jouwatch"){
+  # } elseif(pub == "Jouwatch"){
   #   html %>% 
   #     rvest::html_elements(xpath = "//div[contains(@data-widget_type, 'theme-post-content.default')]") %>% 
   #     rvest::html_text(., trim = TRUE) -> text
@@ -52,4 +52,4 @@ require(magrittr)
     stop("Wrong pub for this function.")
   }
 }
-
+ 

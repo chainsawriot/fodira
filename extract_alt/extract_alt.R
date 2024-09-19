@@ -39,17 +39,17 @@ require(magrittr)
     } 
     return(NA)
     
-  # } elseif(pub == "Jouwatch"){
-  #   html %>% 
-  #     rvest::html_elements(xpath = "//div[contains(@data-widget_type, 'theme-post-content.default')]") %>% 
-  #     rvest::html_text(., trim = TRUE) -> text
-  #   
-  #   if(length(text) != 0 && nchar(text) > 0){
-  #     return(text)
-  #   } 
-  #   return(NA)
+  } else if(pub == "Jouwatch"){
+    html %>% 
+      rvest::html_elements(xpath = "//div[contains(@data-widget_type, 'theme-post-content.default')]") %>% 
+      rvest::html_text(., trim = TRUE) -> text
+    
+    if(length(text) != 0 && nchar(text) > 0){
+      return(text)
+    } 
+    return(NA)
   } else {
     stop("Wrong pub for this function.")
   }
 }
- 
+

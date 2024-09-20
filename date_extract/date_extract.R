@@ -11,7 +11,7 @@ require(magrittr)
   date <- date[!is.na(date)][1]
   
   if(!is.na(date)){
-    return(date)
+    return(as.character(date))
   }
   
   html %>% 
@@ -25,7 +25,7 @@ require(magrittr)
   date <- date[!is.na(date)][1]
   
   if(!is.na(date)){
-    return(date)
+    return(as.character(date))
   }
   
   html %>% 
@@ -38,7 +38,7 @@ require(magrittr)
   date <- date[!is.na(date)][1]
   
   if(!is.na(date)){
-    return(date)
+    return(as.character(date))
   }
   
   html %>% 
@@ -51,7 +51,7 @@ require(magrittr)
   date <- date[!is.na(date)][1]
   
   if(!is.na(date)){
-    return(date)
+    return(as.character(date))
   }
   
   html %>% 
@@ -62,7 +62,7 @@ require(magrittr)
   date <- date[!is.na(date)][1]
   
   if(!is.na(date)){
-    return(date)
+    return(as.character(date))
   }
   
   html %>% 
@@ -74,7 +74,7 @@ require(magrittr)
   date <- date[!is.na(date)][1]
   
   if(!is.na(date)){
-    return(date)
+    return(as.character(date))
   }
   
   html %>% 
@@ -86,7 +86,7 @@ require(magrittr)
   date <- date[!is.na(date)][1]
   
   if(!is.na(date)){
-    return(date)
+    return(as.character(date))
   }
   
   

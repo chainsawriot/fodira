@@ -17,7 +17,7 @@ rubikon_getlink <- function(html){
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'article-content')]//h2/a") %>% 
-    rvest::html_attr("href") %>% paste0("https://www.rubikon.news", .)-> item_link
+    rvest::html_attr("href") %>% paste0("https://www.manova.news", .)-> item_link
 
   ## Date is in 2 different formats - didn't find better way to get dates
   
@@ -25,7 +25,7 @@ rubikon_getlink <- function(html){
     rvest::html_elements(xpath = "//article[contains(@class, 'article-horizontal article-big')]//div[contains(@class, 'article-meta')]") %>% 
     rvest::html_text(., trim = TRUE) %>% 
     stringr::str_extract(., pattern = "[0-9]+[. ]+[0-9a-zA-Z]+[. ][0-9]+") %>%
-    stringr::str_replace(., "März", "March") %>%
+    stringr::str_replace(., "März", "March") %>% stringr::str_replace(., "Dezember", "December") %>%
     lubridate::dmy() -> item_pubdate
   
   rvest::read_html(html) %>% 
@@ -50,7 +50,7 @@ rubikon_go_thr_archive <- function(startdate){
   j <- 1
   valid_links <- data.frame()
   while (i > 0) {
-    rubikon_getlink_url(paste0("https://www.rubikon.news/artikel/page/", j)) %>% 
+    rubikon_getlink_url(paste0("https://www.manova.news/artikel/page/", j)) %>% 
       subset(item_pubdate>=as.Date(startdate)) -> subset_links
     i <- nrow(subset_links)
     j <- j + 1

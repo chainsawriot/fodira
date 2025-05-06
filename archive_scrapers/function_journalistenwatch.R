@@ -71,10 +71,16 @@ jouw_go_thr_akt <- function(startpage, startdate){
   print(startpage)
   Sys.sleep(10)
   stop_ <- FALSE
+  valid_links <- jouw_getlink(remDr$getPageSource()[[1]])
+  i <- 1
   while (!stop_) {
-    webElem <- remDr$findElement(using = "xpath", "//a[contains(@class, 'elementor-button-link elementor-button')]")
-    webElem$clickElement()
-    Sys.sleep(5)
+    i <- i + 1
+    remDr$navigate(paste0(startpage, "page/", i, "/"))
+    print(paste0(startpage, "page/", i, "/"))
+    
+    
+    
+    Sys.sleep(10)
     rvest::read_html(remDr$getPageSource()[[1]]) %>% 
       rvest::html_elements(xpath = "//div[contains(@class, 'elementor-post__meta-data')]//span[contains(@class, 'elementor-post-date')]") %>% 
       rvest::html_text(., trim = TRUE) %>% 
@@ -88,21 +94,25 @@ jouw_go_thr_akt <- function(startpage, startdate){
       stringr::str_replace(., "Juni", "June") %>%
       stringr::str_replace(., "Juli", "July") %>%
       lubridate::dmy() -> item_pubdate
+    
+    valid_links <- rbind(valid_links,
+                         jouw_getlink(remDr$getPageSource()[[1]]))
+    
     if(item_pubdate[length(item_pubdate)] < as.Date(startdate)){
       stop_ <- TRUE
     }
   }
-  valid_links <- jouw_getlink(remDr$getPageSource()[[1]])
+  #valid_links <- jouw_getlink(remDr$getPageSource()[[1]])
   return(valid_links)
 }
 
-valid_links <- jouw_go_thr_akt("https://journalistenwatch.com/meldungen/", startdate = "2022-08-01")
+valid_links <- jouw_go_thr_akt("https://journalistenwatch.com/meldungen/", startdate = "2022-01-01")
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "Jouwatch", description = NA) %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links
 
-saveRDS(valid_links, "Jouwatch.RDS")
+saveRDS(valid_links, "Jouwatch2.RDS")
 
 remDr$close()
 z <- rD$server$stop()

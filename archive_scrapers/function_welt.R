@@ -48,7 +48,7 @@ welt_go_thr_archive <- function(startdate){
 }
 
 
-welt_go_thr_archive(startdate = "2022-01-01") -> valid_links
+welt_go_thr_archive(startdate = "2023-01-01") -> valid_links
 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate.1.) %>% 

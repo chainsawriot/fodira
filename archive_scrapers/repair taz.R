@@ -5,7 +5,7 @@ pjs_session <- Session$new(port = pjs_instance$port)
 
 TAZ <- readRDS("TAZ_auflösen.RDS")
 
-TAZ$false_link <- TAZ$link
+TAZ$false_link <- paste0("https://taz.de", TAZ$link)
 
 function_resolve <- function(url){
   print(url)
@@ -20,7 +20,7 @@ for (i in 1:nrow(TAZ)) {
 }
 
 
-saveRDS(TAZ, "TAZ_02_2024.RDS")
+saveRDS(TAZ, "TAZ_01_2025.RDS")
 
 TAZ_8 <- readRDS("C:/fodira/TAZ_8.RDS")
 

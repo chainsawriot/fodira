@@ -1,11 +1,19 @@
-require(RSelenium)
-require(magrittr)
-rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
-remDr <- rD[["client"]]
+# require(RSelenium)
+# require(magrittr)
+# rD <- RSelenium::rsDriver(browser = "firefox", port = sample(c(5678L, 5679L, 5680L, 5681L, 5682L), size = 1), check = FALSE, verbose = FALSE)
+# remDr <- rD[["client"]]
 
-remDr$setTimeout(type = "page load", milliseconds = 10000000)
-remDr$setTimeout(type = "script", milliseconds = 10000000)
-remDr$setTimeout(type = "implicit", milliseconds = 10000000)
+
+require(webdriver)
+require(magrittr)
+pjs_instance <- run_phantomjs()
+pjs_session <- Session$new(port = pjs_instance$port)
+
+
+# 
+# remDr$setTimeout(type = "page load", milliseconds = 10000000)
+# remDr$setTimeout(type = "script", milliseconds = 10000000)
+# remDr$setTimeout(type = "implicit", milliseconds = 10000000)
 
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
@@ -13,6 +21,24 @@ Sys.setlocale("LC_TIME", "de_DE")
 #function for geting links from page
 mmn_getlink <- function(html){
 
+  #html <- pjs_session$getSource()
+  
+  
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//article//h2/a") %>% 
+    rvest::html_text(trim = TRUE) -> item_title
+  
+  while (length(item_title) == 0 ) {
+    pjs_session$go(pjs_session$getUrl())
+    
+    html <- pjs_session$getSource()
+    
+    rvest::read_html(html) %>% 
+      rvest::html_elements(xpath = "//article//h2/a") %>% 
+      rvest::html_text(trim = TRUE) -> item_title
+  }
+  
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//article//h2/a") %>% 
     rvest::html_text(trim = TRUE) -> item_title
@@ -29,9 +55,9 @@ mmn_getlink <- function(html){
 
 
 mmn_getlink_url <- function(url){
-  remDr$navigate(url)
+  pjs_session$go(url)
   print(url)
-  df <- mmn_getlink(remDr$getPageSource()[[1]])
+  df <- mmn_getlink(pjs_session$getSource())
   return(df)
 }
 

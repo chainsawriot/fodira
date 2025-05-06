@@ -1,8 +1,28 @@
+# 
+# require(webdriver)
+# require(magrittr)
+# pjs_instance <- run_phantomjs()
+# pjs_session <- Session$new(port = pjs_instance$port)
+# 
 
-require(webdriver)
+require(RSelenium)
 require(magrittr)
-pjs_instance <- run_phantomjs()
-pjs_session <- Session$new(port = pjs_instance$port)
+#eCap <- list(phantomjs.binary.path = "C:/phantomjs-2.1.1/bin.exe")
+#fprof <- makeFirefoxProfile(list(permissions.default.image = 21))
+rD <- RSelenium::rsDriver(browser = "firefox", 
+                          #chromever = "103.0.5060.134", 
+                          port = sample(c(5678L, 
+                                          5679L, 
+                                          5680L, 
+                                          5681L, 
+                                          5682L
+                          ), size = 1), 
+                          #phantomver = "2.1.1",
+                          #extraCapabilities = fprof,
+                          check = FALSE, verbose = FALSE)
+
+remDr <- rD[["client"]]
+
 
 
 #Sys.setlocale("LC_TIME", "C")
@@ -11,7 +31,7 @@ Sys.setlocale("LC_TIME", "de_DE")
 #function for geting links from page
 tichy_getlink <- function(html){
 
-  html <- pjs_session$getSource()
+  html <- remDr$getPageSource()[[1]]
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'entry-content')]//div[contains(@class, 'category-content-title')]/a") %>% 
     rvest::html_text(., trim = TRUE) -> item_title
@@ -31,9 +51,9 @@ tichy_getlink <- function(html){
 }
 
 tichy_getlink_url <- function(url){
-  pjs_session$go(url)
+  remDr$navigate(url)
   print(url)
-  return(tichy_getlink(pjs_session$getSource()))
+  return(tichy_getlink(remDr$getPageSource()[[1]]))
 }
 
 tichy_go_thr_columns <- function(rubrik, startdate){
@@ -46,6 +66,7 @@ tichy_go_thr_columns <- function(rubrik, startdate){
     i <- nrow(subset_links)
     j <- j + 1
     valid_links <- rbind(valid_links, subset_links)
+    Sys.sleep(sample(150:500/100, 1))
   }
   return(valid_links)
 }
@@ -53,7 +74,7 @@ tichy_go_thr_columns <- function(rubrik, startdate){
 
 c("tichys-einblick", "kolumnen", "gastbeitrag", "daili-es-sentials", 
   "meinungen", "feuilleton", "wirtschaft") %>% 
-  purrr::map_dfr(~tichy_go_thr_columns(., startdate = "2023-08-01")) -> valid_links
+  purrr::map_dfr(~tichy_go_thr_columns(., startdate = "2023-01-01")) -> valid_links
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "Tichys Einblick", description = NA) %>%
@@ -63,4 +84,7 @@ valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = it
 saveRDS(valid_links, "TichysEinblick.RDS")
 
 
+
+remDr$close()
+z <- rD$server$stop()
 

@@ -10,21 +10,27 @@ Sys.setlocale("LC_TIME", "de_DE")
 
 
 redglobe_getlink <- function(html){
+    
 
+  
     rvest::read_html(html) %>% 
-      rvest::html_elements(xpath = "//article//h4[contains(@class, 'entry-title')]/a") %>% 
+      rvest::html_elements(xpath = "//article//h2[contains(@class, 'entry-title')]/a") %>% 
       rvest::html_text(., trim = TRUE) -> item_title
     
     rvest::read_html(html) %>% 
-      rvest::html_elements(xpath = "//article//h4[contains(@class, 'entry-title')]/a") %>% 
+      rvest::html_elements(xpath = "//article//h2[contains(@class, 'entry-title')]/a") %>% 
       rvest::html_attr("href")  -> item_link
     
     rvest::read_html(html) %>% 
-      rvest::html_elements(xpath = "//article//div[contains(@class, 'entry-date')]/a") %>% 
+      rvest::html_elements(xpath = "//article//time[contains(@class, 'entry-date')]") %>% 
       rvest::html_text() %>% 
       #as.Date(tryFormats = c("%d. %B %Y")) 
       stringr::str_replace(., "März", "March") %>%
       lubridate::dmy()-> item_pubdate
+    
+    while (length(item_title) > length(item_pubdate)) {
+      item_pubdate <- c(item_pubdate, item_pubdate[1])
+    }
     
     df <- data.frame(item_title, item_link, item_pubdate)
     return(df)
@@ -52,7 +58,7 @@ redglobe_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-valid_links <- redglobe_go_thr_archive("2022-01-01")
+valid_links <- redglobe_go_thr_archive("2023-01-01")
 
 valid_links <- dplyr::distinct(valid_links)
 

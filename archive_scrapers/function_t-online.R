@@ -57,7 +57,7 @@ tonline_go_thr_columns <- function(rubrik, startdate){
   j <- 1
   valid_links <- data.frame()
   while (i > 0) {
-    paste0("https://www.t-online.de/", rubrik, "/page_", j, "/") %>%
+    paste0("https://www.t-online.de", rubrik, "page_", j) %>%
       purrr::map_df(~tonline_getlink_url(.)) -> subset_links
     
     valid_links <- rbind(valid_links, subset_links)  
@@ -80,13 +80,35 @@ tonline_go_thr_columns <- function(rubrik, startdate){
         remDr$navigate(subset_links$item_link[1])
         rvest::read_html(remDr$getPageSource()[[1]]) %>% 
           rvest::html_elements(xpath = "//div[contains(@data-testid, 'StreamLayout.Stream')]//header") %>%
-          rvest::html_text(trim = TRUE) %>% 
+          rvest::html_text(trim = TRUE) %>%
 #          stringr::str_extract(., "Aktualisiert am [0-9]+[.][0-9]+[.][0-9]+") %>% 
           stringr::str_extract(., "[0-9]+[.][0-9]+[.][0-9]+")-> date
-        date[!is.na(date)] %>% as.Date(., format = "%d.%m.%Y") -> date        
-        if(date < as.Date(startdate)){
+        
+        if(length(date) > 1){
+          date <- date[1]
+        }
+        
+        date <- date[!is.na(date)] 
+        
+        if(length(date) == 0){
+          rvest::read_html(remDr$getPageSource()[[1]]) %>% 
+            rvest::html_elements(xpath = "//span[contains(@class, 'text-manatee')]") %>%
+            rvest::html_text(trim = TRUE)  %>%
+            stringr::str_extract(., "[0-9]+[.][0-9]+[.][0-9]+")-> date
+        }
+          
+        date <- date[!is.na(date)]     
+        
+        if(stringr::str_detect(remDr$getCurrentUrl(), "[.]html")){
+          date[!is.na(date)] %>% as.Date(., format = "%d.%m.%Y") -> date        
+          if(date < as.Date(startdate)){
+            i <-  nrow(subset_links2)
+          }
+        } else {
           i <-  nrow(subset_links2)
         }
+        
+
       }
     }
 
@@ -107,50 +129,62 @@ tonline_go_thr_columns <- function(rubrik, startdate){
   return(valid_links)
 }
 
+remDr$navigate("https://t-online.de")
 
-c("finanzen/geld-vorsorge", "finanzen/unternehmen-verbraucher", "finanzen/versicherungen",
-  "finanzen/immobilien-wohnen", "finanzen/beruf-karriere", "unterhaltung/stars", 
-  "unterhaltung/stars/royals", "unterhaltung/kino", "unterhaltung/tv", "unterhaltung/musik") %>% 
-  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2022-08-31")) -> valid_links1
+html <- remDr$getPageSource()[[1]]
 
-c("nachrichten/panorama/menschen-schicksale", "nachrichten/panorama/katastrophen",
-  "nachrichten/panorama/kriminalitaet", "nachrichten/panorama/justiz",
-  "nachrichten/panorama/buntes-kurioses", "nachrichten/panorama/wissen/geschichte", 
-  "nachrichten/panorama/quiz", "gesundheit/krankheiten-symptome", "gesundheit/krankheiten-symptome/coronavirus",
-  "gesundheit/ernaehrung", "gesundheit/fitness", "gesundheit/gesund-leben", "gesundheit/heilmittel-medikamente",
-  "gesundheit/schwangerschaft", "gesundheit/selbsttests") %>% 
-  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2022-08-31")) -> valid_links3
+rvest::read_html(html) %>% 
+  rvest::html_elements(xpath = "//div[contains(@class, 'group')]//a") %>% 
+  rvest::html_attr("href")  -> categories
 
-c(#"leben/corona-krise", 
-  "leben/essen-und-trinken", "leben/reisen", "leben/familie", "leben/alltagswissen",
-  "leben/liebe", "leben/mode-beauty", "nachhaltigkeit/klima-und-umwelt", "nachhaltigkeit/mobilitaet-und-verkehr",
-  "nachhaltigkeit/heim-garten-und-wohnen", "nachhaltigkeit/energie", "nachhaltigkeit/finanzen-und-beruf",
-  "nachhaltigkeit/ernaehrung", "nachhaltigkeit/konsum", "nachhaltigkeit/klima-lexikon") %>% 
-  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2022-08-31")) -> valid_links4
+categories[stringr::str_which(categories, "^/.*/.*/$")] -> categories
+
+categories[1:10] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links1
+
+categories[11:20] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links2
+
+categories[21:30] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links3
+
+categories[31:40] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links4
+
+categories[41:50] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links5
+
+categories[51:60] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links6
+
+categories[61:70] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links7
+
+categories[71:80] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links8
+
+categories[81:90] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links9
+
+categories[91:100] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links10
+
+categories[101:110] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links11
+
+categories[111:120] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links12
+
+categories[121:132] %>% 
+  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2023-01-01")) -> valid_links13
 
 
-c("auto/neuheiten-fahrberichte", "auto/recht-und-verkehr", "auto/elektromobilitaet",
-  "auto/technik", #"digital/handy", 
-  #"digital/computer", "digital/internet-sicherheit/sicherheit", 
-  #"digital/internet-sicherheit/internet", "digital/netzpolitik", 
-  "heim-garten/garten", 
-  "heim-garten/haushaltstipps", "heim-garten/bauen", "heim-garten/wohnen", "heim-garten/energie",
-  #"ratgeber/deals", 
-  "ratgeber/technik", "ratgeber/haushalt-und-wohnen", "ratgeber/genuss",
-  "ratgeber/leben-und-freizeit", "ratgeber/haus-und-garten", "ratgeber/gesundheit") %>% 
-  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2022-08-31")) -> valid_links5
 
-c("nachrichten/deutschland", "nachrichten/ausland", "nachrichten/corona-krise", 
-  "nachrichten/tagesanbruch", "nachrichten/ukraine", "region/berlin", "region/hamburg",
-  "region/muenchen", "region/koeln", "region/frankfurt-am-main", "sport/fussball/bundesliga",
-  #"sport/fussball/2-bundesliga", 
-  "sport/fussball", "sport/fussball/frauenfussball/em-2022", 
-  "sport/mehr-sport/radsport/tour-de-france", "sport/formel-1", "sport/mehr-sport") %>% 
-  purrr::map_dfr(~tonline_go_thr_columns(., startdate = "2022-08-31")) -> valid_links2
-
-valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2,
-                                     valid_links3, valid_links4,
-                                     valid_links5))
+valid_links <- rbind(valid_links1, valid_links2, valid_links3,
+                     valid_links4, valid_links5, valid_links6,
+                     valid_links7, valid_links8, valid_links9,
+                     valid_links10, valid_links11, valid_links12,
+                     valid_links13)
 
 remDr$close()
 z <- rD$server$stop()
@@ -163,3 +197,7 @@ valid_links %>% dplyr::distinct() %>%
 valid_links <- dplyr::distinct(valid_links)
 
 saveRDS(valid_links, "T-Online.RDS") 
+
+
+
+

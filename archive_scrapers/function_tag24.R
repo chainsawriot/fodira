@@ -6,12 +6,12 @@ require(magrittr)
 # fprof <- makeFirefoxProfile(list(permissions.default.image = 21))
 rD <- RSelenium::rsDriver(browser = "firefox",
                           #chromever = "103.0.5060.134",
-                          port = sample(c(#5678L, 
-                                          #5679L, 
+                          port = sample(c(5678L, 
+                                          5679L, 
                                           5680L, 
-                                          #5681L, 
-                                          #5682L,
-                                          #5683L,
+                                          5681L, 
+                                          5682L,
+                                          5683L,
                                           5684L), size = 1),
                           #phantomver = "2.1.1",
                           #extraCapabilities = fprof,
@@ -52,19 +52,20 @@ tag24_getlink <- function(html){
   # 
   rvest::read_html(html) %>%  
   #html %>%
-    rvest::html_elements(xpath = "//span[contains(@class, 'article-tile__inner')]/a[contains(@data-atype, 'news')]//span[contains(@class, 'article-tile__headline')]") %>% 
+    rvest::html_elements(xpath = "//div[contains(@class, 'article-tile__inner')]//a[contains(@data-atype, 'news')]") %>% 
     rvest::html_text(trim = TRUE) -> item_title
 
-  rvest::read_html(html) %>%  
-    #html %>%
-    rvest::html_elements(xpath = "//span[contains(@class, 'article-tile__inner')]/a[contains(@data-atype, 'news')]//h3[contains(@class, 'article-tile__headline')]") %>% 
-    rvest::html_text(trim = TRUE) -> item_title2
+  # rvest::read_html(html) %>%
+  #   #html %>%
+  #   rvest::html_elements(xpath = "//div[contains(@class, 'article-tile__inner')]//a[contains(@data-atype, 'news')]//h3[contains(@class, 'article-tile__headline')]") %>%
+  #   rvest::html_text(trim = TRUE) -> item_title2
+  # 
+  # item_title <- c(item_title2, item_title)
+
   
-  item_title <- c(item_title2, item_title)
-    
   rvest::read_html(html) %>% 
   #html %>%
-    rvest::html_elements(xpath = "//span[contains(@class, 'article-tile__inner')]/a[contains(@data-atype, 'news')]") %>% 
+    rvest::html_elements(xpath = "//div[contains(@class, 'article-tile__inner')]//a[contains(@data-atype, 'news')]") %>% 
     rvest::html_attr("href")  -> item_link
   
  df <- data.frame(item_title, item_link)
@@ -168,12 +169,12 @@ tag24_go_thr_topics <- function(startdate, n){
 
 
 
-tag24_go_thr_topics("2022-09-01", 1:5)-> valid_links_1
-tag24_go_thr_topics("2022-09-01", 6:10)-> valid_links_2
-tag24_go_thr_topics("2022-09-01", 11:15)-> valid_links_3
-tag24_go_thr_topics("2022-09-01", 16:20)-> valid_links_4
-tag24_go_thr_topics("2022-09-01", 21:25)-> valid_links_5
-tag24_go_thr_topics("2022-09-01", 26:29)-> valid_links_6
+tag24_go_thr_topics("2023-01-01", 1:5)-> valid_links_1
+tag24_go_thr_topics("2023-01-01", 6:10)-> valid_links_2
+tag24_go_thr_topics("2023-01-01", 11:15)-> valid_links_3
+tag24_go_thr_topics("2023-01-01", 16:20)-> valid_links_4
+tag24_go_thr_topics("2023-01-01", 21:25)-> valid_links_5
+tag24_go_thr_topics("2023-01-01", 26:29)-> valid_links_6
 
 valid_links <- dplyr::distinct(rbind(valid_links_1, valid_links_2, valid_links_3,
                                      valid_links_4, valid_links_5, valid_links_6))

@@ -54,6 +54,11 @@ valid_links1 <- opp_go_thr_archive("2022", 97)
 
 valid_links2 <- opp_go_thr_archive("2023", 97)
 
+valid_links3 <- opp_go_thr_archive("2024", 97)
+
+valid_links <- rbind(valid_links1,
+                     valid_links2,
+                     valid_links3)
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "Opposition24", description = NA) %>%

@@ -7,83 +7,72 @@ remDr <- rD[["client"]]
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
 
+
+
 #function for geting links from page
 sch_li_getlink <- function(html){
+  #html <- remDr$getPageSource()[[1]]
+  
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//tbody//table[contains(@width, 600)]//tbody/tr[1]/td/a") %>% 
+    rvest::html_elements(xpath = "//div[contains(@class, article)]//h3//a[contains(@itemprop, url)]//span[contains(@itemprop, headline)]") %>% 
     rvest::html_text(trim = TRUE) -> item_title
-  item_title <- item_title[!stringr::str_detect(item_title, "Weiter lesen>>")]
+  #item_title <- item_title[!stringr::str_detect(item_title, "Weiter lesen>>")]
   
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//tbody//table[contains(@width, 600)]//tbody/tr[1]/td/a") %>% 
-    rvest::html_attr("href") %>% paste0("http://www.scharf-links.de/", .) -> item_link
-  item_link <- unique(item_link)
+    rvest::html_elements(xpath = "//div[contains(@class, article)]//h3//a[contains(@itemprop, url)]") %>% 
+    rvest::html_attr("href") %>% paste0("http://www.scharf-links.de", .) -> item_link
+  #item_link <- unique(item_link)
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//tbody//table[contains(@width, 600)]//tbody/tr[1]/td/font") %>% 
+    rvest::html_elements(xpath = "//div[contains(@class, article)]//time[contains(@itemprob, datePublished)]") %>% 
     rvest::html_text(trim = TRUE) %>% 
-    #as.Date(., tryFormat = c("%A %d. %B %Y")) 
-    stringr::str_replace(., "März", "March") %>%
-    lubridate::dmy() -> item_pubdate
+    lubridate::mdy() -> item_pubdate
   
   df <- data.frame(item_title, item_link, item_pubdate)
     return(df)
 }
 
-
-sch_li_getlink_url <- function(url){
-  remDr$navigate(url)
-  print(url)
-  i <- 1
-  j <- 2
-  html <- remDr$getPageSource()[[1]]
-  rvest::read_html(html) %>% rvest::html_elements(xpath = "//div[contains(@class, 'tx-ttnews-browsebox')]//td[last()]/p/a") %>%
-    rvest::html_text(trim = TRUE) -> nexturl_txt
-  rvest::read_html(html) %>% rvest::html_elements(xpath = "//div[contains(@class, 'tx-ttnews-browsebox')]//td[last()]/p/a") %>%
-    rvest::html_attr("href") -> nexturl
-  df <- sch_li_getlink(remDr$getPageSource()[[1]])
-  while(stringr::str_detect(nexturl_txt, "nächste")){
-    remDr$navigate(paste0("http://www.scharf-links.de/", nexturl))
-    print(paste0("http://www.scharf-links.de/", nexturl))
-    df <- rbind(df, sch_li_getlink(remDr$getPageSource()[[1]]))
-    html <- remDr$getPageSource()[[1]]
-    rvest::read_html(html) %>% rvest::html_elements(xpath = "//div[contains(@class, 'tx-ttnews-browsebox')]//td[last()]/p/a") %>%
-      rvest::html_text(trim = TRUE) -> nexturl_txt
-    rvest::read_html(html) %>% rvest::html_elements(xpath = "//div[contains(@class, 'tx-ttnews-browsebox')]//td[last()]/p/a") %>%
-      rvest::html_attr("href") -> nexturl
-  }
-  print(nrow(df))
-  return(df)
+sch_li_goget <- function(url){
+  remDr$navigate(paste0("http://www.scharf-links.de", url))
+  return(sch_li_getlink(remDr$getPageSource()[[1]]))
 }
 
 
-
-
-sch_li_go_thr_columns <- function(){
+sch_li_go_thr_columns <- function(years = c(2022, 2023, 2024, 2025)){
   
-  remDr$navigate("http://www.scharf-links.de/78.0.html")
+  remDr$navigate("https://www.scharf-links.de/archiv")
   html <- remDr$getPageSource()[[1]]
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//table[contains(@align, 'left')]//font/a") %>% 
-    rvest::html_text(trim = TRUE) -> item_title
+    rvest::html_elements(xpath = "//ul/li/ul/li/a") %>% 
+    rvest::html_attr("href") %>% 
+    stringr::str_extract(pattern = paste0(paste0("^.*archiv.*", years, ".*$"),
+                                          collapse = "|")) ->links
   
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//table[contains(@align, 'left')]//font/a") %>% 
-    rvest::html_attr("href") %>% paste0("http://www.scharf-links.de/", .) -> item_link
+  links <- links[!is.na(links)]
   
-  df <- data.frame(item_title, item_link)
-  df <- df[stringr::str_detect(df$item_title, "202[234]"),]
+  links2 <- lapply(links, function(first_url) {
+    sapply(2:40, function(page_num) {
+      # Replace "seite-1" with the appropriate page number using str_replace
+      stringr::str_replace(first_url, "seite", paste0("seite-", page_num))
+    })
+  })
   
-  df$item_link -> x
-  x %>%
-      purrr::map_df(~sch_li_getlink_url(.)) -> valid_links
+  links2 <- unlist(links2)
+  
+  # links3 <- c("/news",
+  #             paste0("/news/seite-", 2:100))
+  
+  links3 <- c(links, links2)
+  
+  links3 %>%
+    purrr::map_df(~sch_li_goget(.)) %>%
+    dplyr::distinct() -> valid_links
 
   return(valid_links)
 }
 
-
-sch_li_go_thr_columns() -> valid_links
+sch_li_go_thr_columns(years = c(2022, 2023, 2024, 2025)) -> valid_links
 
 valid_links <- dplyr::distinct(valid_links)
 

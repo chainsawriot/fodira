@@ -10,23 +10,24 @@ Sys.setlocale("LC_TIME", "de_DE")
 
 #function for geting links from page
 stern_getlink <- function(html){
-
+  
+  html <- pjs_session$getSource()
+  
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'group__items')]//article//a") %>% 
+    rvest::html_elements(xpath = "//div[contains(@class, 'group-teaserlist__items')]//article//a") %>% 
     rvest::html_text(., trim = TRUE) -> item_title
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'group__items')]//article//a") %>% 
+    rvest::html_elements(xpath = "//div[contains(@class, 'group-teaserlist__items')]//article//a") %>% 
     rvest::html_attr("href")  -> item_link
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'group__items')]//time") %>% 
-    rvest::html_text(., trim = TRUE) %>% stringr::str_extract("[0-9]+[.][0-9]+[.][0-9]+") %>%
-    as.Date(., tryFormat = c("%d.%m.%Y")) -> item_pubdate
+    rvest::html_elements(xpath = "//div[contains(@class, 'teaserlist__items')]//time") %>% 
+    rvest::html_attr("datetime") %>% lubridate::ymd_hms() -> item_pubdate
   
-  if(length(item_pubdate)< length(item_link)){
-    item_pubdate <- c(item_pubdate, item_pubdate[1:(length(item_link)-length(item_pubdate))])
-  }
+  # if(length(item_pubdate)< length(item_link)){
+  #   item_pubdate <- c(item_pubdate, item_pubdate[1:(length(item_link)-length(item_pubdate))])
+  # }
   
     df <- data.frame(item_title, item_link, item_pubdate)
     return(df)
@@ -46,16 +47,24 @@ stern_go_thr_archive <- function(rubrik, startdate){
     as.character() %>% 
     stringr::str_replace_all("=0", "=") -> V1
   print(V1)
-  valid_links <- data.frame()
+  valid_links <- data.frame(item_title = c(),
+                            item_link = c(),
+                            item_pubdate = c())
   
   for (k in (1:length(V1))) {
     j <- 0
     i <- 1
     while (i > 0) {
-      
+      print(paste0(j, "  "))
       paste0("https://www.stern.de/", rubrik, "/archiv/", V1[k], "&pageNum=", j) %>%
         purrr::map_df(~stern_getlink_url(.)) -> subset_links
-      i <- nrow(subset_links)
+      print(paste0(j, "  ", nrow(subset_links)))
+      if(j == 0){
+        i <- nrow(subset_links)
+      } else {
+        i <- nrow(dplyr::setdiff(subset_links, valid_links))
+      }
+      Sys.sleep(sample(1:100/100, 1))
       j <- j + 1
       valid_links <- rbind(valid_links, subset_links)
     }
@@ -67,7 +76,7 @@ stern_go_thr_archive <- function(rubrik, startdate){
 
 
 c("politik", "gesellschaft", "panorama", "kultur", "lifestyle", "digital",
-  "wirtschaft", "sport", "gesundheit", "genuss", "reise", "familie", 
+  "wirtschaft", "sport", "gesundheit", "genuss", "reise", #"familie", 
   "auto") %>% purrr::map_df(~stern_go_thr_archive(., startdate = "2023-01-01")) -> valid_links
 
 valid_links %>% dplyr::distinct()  %>%
@@ -76,4 +85,4 @@ valid_links %>% dplyr::distinct()  %>%
   dplyr::select(pub, link, pubdate, title, description) -> valid_links1
 
 saveRDS(valid_links1, "Stern.RDS")
-
+  

@@ -140,45 +140,88 @@ hna_go_thr_archive <- function(startdate, enddate){
   
   
 
-hna_go_thr_archive("2022-01-01", "2022-03-01")-> valid_links1
+# hna_go_thr_archive("2022-01-01", "2022-03-01")-> valid_links1
+# 
+# hna_go_thr_archive("2022-03-02", "2022-04-01")-> valid_links2
+# 
+# hna_go_thr_archive("2022-04-02", "2022-05-01")-> valid_links2_1
+# 
+# hna_go_thr_archive("2022-05-02", "2022-06-01")-> valid_links2_2
+# 
+# hna_go_thr_archive("2022-06-02", "2022-07-01")-> valid_links3
+# 
+# hna_go_thr_archive("2022-07-02", "2022-08-01")-> valid_links4
+# 
+# hna_go_thr_archive("2022-08-02", "2022-09-01")-> valid_links5
+# 
+# hna_go_thr_archive("2022-09-02", "2022-10-01")-> valid_links6
+# 
+# hna_go_thr_archive("2022-10-02", "2022-11-01")-> valid_links7
+# 
+# hna_go_thr_archive("2022-11-02", "2022-12-01")-> valid_links8
+# 
+# hna_go_thr_archive("2022-12-02", "2023-01-01")-> valid_links9
 
-hna_go_thr_archive("2022-03-02", "2022-04-01")-> valid_links2
+hna_go_thr_archive("2023-01-02", "2023-02-01")-> valid_links1
 
-hna_go_thr_archive("2022-04-02", "2022-05-01")-> valid_links2_1
+hna_go_thr_archive("2023-02-02", "2023-03-01")-> valid_links2
 
-hna_go_thr_archive("2022-05-02", "2022-06-01")-> valid_links2_2
+hna_go_thr_archive("2023-03-02", "2023-04-01")-> valid_links3
 
-hna_go_thr_archive("2022-06-02", "2022-07-01")-> valid_links3
+hna_go_thr_archive("2023-04-02", "2023-05-01")-> valid_links4
 
-hna_go_thr_archive("2022-07-02", "2022-08-01")-> valid_links4
+hna_go_thr_archive("2023-05-02", "2023-06-01")-> valid_links5
 
-hna_go_thr_archive("2022-08-02", "2022-09-01")-> valid_links5
+hna_go_thr_archive("2023-06-02", "2023-07-01")-> valid_links6
 
-hna_go_thr_archive("2022-09-02", "2022-10-01")-> valid_links6
+hna_go_thr_archive("2023-07-02", "2023-08-01")-> valid_links7
 
-hna_go_thr_archive("2022-10-02", "2022-11-01")-> valid_links7
+hna_go_thr_archive("2023-08-02", "2023-09-01")-> valid_links8
 
-hna_go_thr_archive("2022-11-02", "2022-12-01")-> valid_links8
+hna_go_thr_archive("2023-09-02", "2023-10-01")-> valid_links9
 
-hna_go_thr_archive("2022-12-02", "2023-01-01")-> valid_links9
+hna_go_thr_archive("2023-10-02", "2023-11-01")-> valid_links10
 
-hna_go_thr_archive("2023-01-02", "2023-02-01")-> valid_links10
+hna_go_thr_archive("2023-11-02", "2023-12-01")-> valid_links11
 
-hna_go_thr_archive("2023-02-02", "2023-03-01")-> valid_links11
+hna_go_thr_archive("2023-12-02", "2024-01-01")-> valid_links12
 
-hna_go_thr_archive("2023-03-02", "2023-04-01")-> valid_links12
+hna_go_thr_archive("2024-01-02", "2024-02-01")-> valid_links13
 
-hna_go_thr_archive("2023-04-02", "2023-05-01")-> valid_links13
+hna_go_thr_archive("2024-02-02", "2024-03-01")-> valid_links14
 
-hna_go_thr_archive("2023-05-02", "2023-06-01")-> valid_links14
+hna_go_thr_archive("2024-03-02", "2024-04-01")-> valid_links15
 
-hna_go_thr_archive("2023-06-02", Sys.Date())-> valid_links15
+hna_go_thr_archive("2024-04-02", "2024-05-01")-> valid_links16
 
-dplyr::distinct(rbind(valid_links1, valid_links2, valid_links2_1, valid_links2_2, valid_links3,
+hna_go_thr_archive("2024-05-02", "2024-06-01")-> valid_links17
+
+hna_go_thr_archive("2024-06-02", "2024-07-01")-> valid_links18
+
+hna_go_thr_archive("2024-07-02", "2024-08-01")-> valid_links19
+
+hna_go_thr_archive("2024-08-02", "2024-09-01")-> valid_links20
+
+hna_go_thr_archive("2024-09-02", "2024-10-01")-> valid_links21
+
+hna_go_thr_archive("2024-10-02", "2024-11-01")-> valid_links22
+
+hna_go_thr_archive("2024-11-02", "2024-12-01")-> valid_links23
+
+hna_go_thr_archive("2024-12-02", "2025-01-01")-> valid_links24
+
+hna_go_thr_archive("2025-01-02", Sys.Date())-> valid_links25
+
+dplyr::distinct(rbind(valid_links1, valid_links2, #valid_links2_1, valid_links2_2, 
+                      valid_links3,
                       valid_links4, valid_links5, valid_links6,
                       valid_links7, valid_links8, valid_links9,
                       valid_links10, valid_links11, valid_links12,
-                      valid_links13, valid_links14, valid_links15)) -> valid_links
+                      valid_links13, valid_links14, valid_links15,
+                      valid_links16, valid_links17, valid_links18,
+                      valid_links19, valid_links20, valid_links21,
+                      valid_links22, valid_links23, valid_links24,
+                      valid_links25)) -> valid_links
 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

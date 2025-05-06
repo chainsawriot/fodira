@@ -26,106 +26,112 @@ pjs_session$go("https://www.tagesspiegel.de/politik/archiv/2023/07/08/")
 
 
 #function for geting links from page
-tagesspiegel_get_links <- function(html){
+tagesspiegel_get_links <- function(html, datethru){
   
   #html <- remDr$getPageSource()[[1]]
   html <- pjs_session$getSource()
   
+  pjs_session$getUrl()
+  
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//article//h3") %>% 
+    rvest::html_elements(xpath = "//article//h2") %>% 
     rvest::html_text(trim = TRUE) -> item_title
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//article//a") %>% 
+    rvest::html_elements(xpath = "//article//a[contains(@class, 'tspBDh2')]") %>% 
     rvest::html_attr("href") %>% paste0("https://www.tagesspiegel.de",.)-> item_link
   
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//main") %>%
-    rvest::html_text(trim = TRUE) %>%
-    stringr::str_extract(pattern = "[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,4}")%>%
-    lubridate::dmy()-> item_pubdate
+  datethru -> item_pubdate
+  # rvest::read_html(html) %>% 
+  #   rvest::html_elements(xpath = "//main//h1") %>%
+  #   rvest::html_text(trim = TRUE)
+  #   stringr::str_extract(pattern = "[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,4}")%>%
+  #   lubridate::dmy()-> item_pubdate
+  # 
+  # if(length(item_pubdate) == 0){
+  #   pjs_session$go(pjs_session$getUrl())
+  # }
+  # 
+  # if(length(item_pubdate)==0){
+  #   print("wait")
+  #   url <- pjs_session$getUrl()
+  #   Sys.sleep(600)
+  #   pjs_session$go(url)
+  # 
+  #   html <- pjs_session$getSource()
+  #   rvest::read_html(html) %>%
+  #     rvest::html_elements(xpath = "//time") %>%
+  #     rvest::html_attr("datetime") %>%
+  #     lubridate::ymd_hms()-> item_pubdate
+  # 
+  # }
   
-  if(length(item_pubdate)==0){
-    print("wait")
-    url <- pjs_session$getUrl()
-    Sys.sleep(600)
-    pjs_session$go(url)
+  # rvest::read_html(html) %>% 
+  #   rvest::html_elements(xpath = "//main//p[contains(@class, 'Gaw')]") %>%
+  #   rvest::html_text(trim = TRUE) -> item_empty
+  # 
+  if(length(item_title) == 0){
+ 
+  df <- data.frame()
 
-    html <- pjs_session$getSource()
-    rvest::read_html(html) %>%
-      rvest::html_elements(xpath = "//time") %>%
-      rvest::html_attr("datetime") %>%
-      lubridate::ymd_hms()-> item_pubdate
-
-  }
-  
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//main//p[contains(@class, 'Gaw')]") %>%
-    rvest::html_text(trim = TRUE) -> item_empty
-  
-  if(length(item_empty) == 0){
-    if(length(item_title) == 0){
-      df <- data.frame()
-    } else {
-      df <- data.frame(item_title, item_link, item_pubdate)
-    }
-    
-    
   } else {
-    df <- data.frame()
+    df <- data.frame(item_title, item_link, item_pubdate)
   }
   
 
   return(df)
 }
 
-tagesspiegel_get_url <- function(url){
+tagesspiegel_get_url <- function(datethru, sub){
   # remDr$navigate(url)
   # print(remDr$getCurrentUrl())
   # remDr$getPageSource()[[1]] %>% tagesspiegel_get_links() -> df
+  
+  datethru %>% 
+    format.Date(format="/%Y/%m/%d/") %>% 
+    paste0("https://www.tagesspiegel.de/", sub, "/archiv", .) -> url
+  
   pjs_session$go(url)
   print(pjs_session$getUrl())
   #Sys.sleep(2)
-  pjs_session$getSource() %>% tagesspiegel_get_links() -> df
+  pjs_session$getSource() %>% tagesspiegel_get_links(., datethru) -> df
 
   return(df)
 }
 
 tagesspiegel_go_thr_archive <- function(sub, startdate){
 
-  seq(as.Date(startdate), Sys.Date(), by="days") %>% 
-    format.Date(format="/%Y/%m/%d/") -> V1
+  seq(as.Date(startdate), Sys.Date(), by="days") -> V1
   
   
   V1 %>%
-    paste0("https://www.tagesspiegel.de/", sub, "/archiv", .) %>%
-    purrr::map_df(~tagesspiegel_get_url(.)) -> valid_links
+    purrr::map_df(~tagesspiegel_get_url(., sub)) -> valid_links
   
   return(valid_links)
 }
 
 
-tagesspiegel_go_thr_archive("politik", "2022-01-01") -> valid_links1
+tagesspiegel_go_thr_archive("politik", "2023-01-01") -> valid_links1
 
-tagesspiegel_go_thr_archive("internationales", "2022-01-01") -> valid_links2
+tagesspiegel_go_thr_archive("internationales", "2023-01-01") -> valid_links2
 
-tagesspiegel_go_thr_archive("berlin", "2022-01-01") -> valid_links3
+tagesspiegel_go_thr_archive("berlin", "2023-01-01") -> valid_links3
 
-tagesspiegel_go_thr_archive("gesellschaft", "2022-01-01") -> valid_links4
+tagesspiegel_go_thr_archive("gesellschaft", "2023-01-01") -> valid_links4
 
-tagesspiegel_go_thr_archive("wirtschaft", "2022-01-01") -> valid_links5
+tagesspiegel_go_thr_archive("wirtschaft", "2023-01-01") -> valid_links5
 
-tagesspiegel_go_thr_archive("kultur", "2022-01-01") -> valid_links6
+tagesspiegel_go_thr_archive("kultur", "2023-01-01") -> valid_links6
 
-tagesspiegel_go_thr_archive("wissen", "2022-01-01") -> valid_links7
+tagesspiegel_go_thr_archive("wissen", "2023-01-01") -> valid_links7
 
-tagesspiegel_go_thr_archive("gesundheit", "2022-01-01") -> valid_links8
+tagesspiegel_go_thr_archive("gesundheit", "2023-01-01") -> valid_links8
 
-tagesspiegel_go_thr_archive("sport", "2022-01-01") -> valid_links9
+tagesspiegel_go_thr_archive("sport", "2023-01-01") -> valid_links9
 
-tagesspiegel_go_thr_archive("meinung", "2022-01-01") -> valid_links10
+tagesspiegel_go_thr_archive("meinung", "2023-01-01") -> valid_links10
 
-tagesspiegel_go_thr_archive("potsdam", "2022-01-01") -> valid_links11
+tagesspiegel_go_thr_archive("potsdam", "2023-01-01") -> valid_links11
 
 
  # remDr$close()

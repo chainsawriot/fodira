@@ -16,21 +16,22 @@ Sys.setlocale("LC_TIME", "de_DE")
 suedd_getlink <- function(html){
  # html <- pjs_session$getUrl()
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'entrylist__content')]//a/em") %>% 
+    rvest::html_elements(xpath = "//section//article//div/h3") %>% 
     rvest::html_text(., trim = TRUE) -> item_title
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'entrylist__content')]//a") %>% 
+    rvest::html_elements(xpath = "//section//article/a") %>% 
     rvest::html_attr("href") -> item_link
   
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//time") %>%
-    rvest::html_text(., trim = TRUE) -> item_pubdate1
+    rvest::html_elements(xpath = "//section//footer//time") %>%
+    rvest::html_attr("datetime") %>%
+    lubridate::ymd() -> item_pubdate
   
-  ifelse(stringr::str_detect(item_pubdate1, "[0-9]+[.][0-9]+[.][0-9]+"), 
-           stringr::str_extract(item_pubdate1, "[0-9]+[.][0-9]+[.][0-9]+"),
-         format.Date(Sys.Date(), format="%d.%m.%Y")) %>% 
-    as.Date(., format="%d.%m.%Y") -> item_pubdate
+  # ifelse(stringr::str_detect(item_pubdate1, "[0-9]+[.][0-9]+[.][0-9]+"), 
+  #          stringr::str_extract(item_pubdate1, "[0-9]+[.][0-9]+[.][0-9]+"),
+  #        format.Date(Sys.Date(), format="%d.%m.%Y")) %>% 
+  #   as.Date(., format="%d.%m.%Y") -> item_pubdate
 
     df <- data.frame(item_title, item_link, item_pubdate)
     
@@ -56,7 +57,7 @@ suedd_getlink_url <- function(url, startdate){
   #   rvest::html_text(., trim = TRUE) -> n
   # 
   pjs_session$getSource() %>% rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//li[contains(@class, 'navigation')]//li[last()]") %>%
+    rvest::html_elements(xpath = "//div[contains(@class, 'css-1cedfft')]//a[contains(@class, 'css-1qmtsfm')][last()]") %>%
     rvest::html_text(., trim = TRUE) -> n
   
   if(length(n) > 0){
@@ -86,9 +87,11 @@ suedd_go_thr_archive <- function(startdate){
   #   rvest::html_elements(xpath = "//div[contains(@class, 'department-overview-title')]//a") %>% 
   #   rvest::html_attr("href") -> categories
   
+  ### this will work until 2030, adjust then! godspeed
+  
   pjs_session$getSource() %>% rvest::read_html(html) %>%
-    rvest::html_elements(xpath = "//div[contains(@class, 'department-overview-title')]//a") %>%
-    rvest::html_attr("href") -> categories
+    rvest::html_elements(xpath = "//a[contains(@class, 'css-127ghhm')]") %>%
+    rvest::html_attr("href") %>% stringr::str_remove("[/]202[56789]$")-> categories
   
   seq(as.Date(startdate), Sys.Date(), by="months") %>% 
     format.Date(format="/%Y/%m") -> V1
@@ -103,7 +106,7 @@ suedd_go_thr_archive <- function(startdate){
   return(valid_links)
 }
 
-suedd_go_thr_archive(startdate = "2022-08-01") -> valid_links
+suedd_go_thr_archive(startdate = "2023-01-01") -> valid_links
 
 valid_links %>% dplyr::distinct() %>% 
   dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

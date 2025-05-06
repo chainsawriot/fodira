@@ -17,7 +17,7 @@ rnd_getlink <- function(html){
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'ArchiveContentstyled__ArchiveContentWrapper')]//a[contains(@class, 'Linkstyled__Link')]") %>% 
-    rvest::html_attr("href") %>% paste0("https://www.lvz.de",.)-> item_link
+    rvest::html_attr("href") %>% paste0("https://www.rnd.de",.)-> item_link
   
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//div[contains(@class, 'ArchiveContentstyled__ArchiveContentWrapper')]//time") %>%

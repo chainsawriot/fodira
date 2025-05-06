@@ -10,45 +10,26 @@ Sys.setlocale("LC_TIME", "de_DE")
 
 #function for geting links from page
 taz_getlink <- function(html){
-
-  remDr$getPageSource()[[1]] -> html
+  
+  html <- remDr$getPageSource()[[1]]
+  
   rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//ul[contains(@role, 'directory')]/li/a") %>% 
-    length() -> j
-  item_title <- c()
-  for (i in 1:j) {
-    
-    rvest::read_html(html) %>% 
-      rvest::html_elements(xpath = paste0("//ul[contains(@role, 'directory')]/li[",
-                                          i,
-                                          "]/a/h3")) %>% 
-      rvest::html_text(., trim = TRUE) -> item_title_1
-    if (length(item_title_1) == 0){
-      rvest::read_html(html) %>% 
-        rvest::html_elements(xpath = paste0("//ul[contains(@role, 'directory')]/li[",
-                                            i,
-                                            "]/a")) %>% 
-        rvest::html_text(., trim = TRUE) -> item_title_1
-    }
-    item_title <- c(item_title, item_title_1)
+    rvest::html_elements(xpath = "//main//section//p[contains(@class, 'headline')]") %>% 
+    rvest::html_text(., trim = TRUE) -> item_title
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//main//section//div[contains(@class, 'article-teaser')]/div[contains(@class, 'column')]/div[contains(@class, 'mobile-order-1')]/a[contains(@class, 'teaser-link')]") %>% 
+    rvest::html_attr("href") -> item_link
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//span[contains(@class, 'typo-link-grey-onpage')]|//p[contains(@class, 'typo-link-grey-onpage')]") %>%
+    rvest::html_text(., trim = TRUE) %>% lubridate::dmy() -> pubdate1
+  
+  pubdate1[!is.na(pubdate1)]  -> item_pubdate
+
+  while(length(item_pubdate) < length(item_title)){
+    item_pubdate <- c(item_pubdate, item_pubdate[1])
   }
-
-  
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//ul[contains(@role, 'directory')]/li/a") %>% 
-    rvest::html_attr("href") %>% paste0("https://www.taz.de", .) -> item_link
-  
-  if(length(item_link) == 1){
-    if(item_link == "https://www.taz.de"){
-      item_link <- NULL
-    }
-  }
-
-  
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//ul[contains(@role, 'directory')]//li[contains(@class, 'date')]") %>%
-    rvest::html_text(., trim = TRUE) %>%stringr::str_extract(., pattern = "[0-9]+\\..[0-9]+\\..[0-9]+") %>%
-    lubridate::dmy() -> item_pubdate
 
     df <- data.frame(item_title, item_link, item_pubdate)
     
@@ -58,29 +39,15 @@ taz_getlink <- function(html){
 taz_getlink_url <- function(url){
   remDr$navigate(url)
   print(url)
-  df <- taz_getlink(remDr$getPageSource()[[1]])
+  df <- data.frame()
   
   remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'sectfoot')]//li[last()]") %>%
+    rvest::html_elements(xpath = "//nav[contains(@class, 'pagination ')]//li[last()]") %>%
     rvest::html_text(., trim = TRUE) -> n
-  remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'sectfoot')]//li[last()]/a") %>%
-    rvest::html_attr("href") %>% paste0(url,.) -> url2
-  print(nrow(df))
-  while(n == "weitere >") {
-    remDr$navigate(url2)
-    print(url2)
-    df <- rbind(df, taz_getlink(remDr$getPageSource()[[1]]))
-    print(nrow(df))
-    remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>% 
-      rvest::html_elements(xpath = "//div[contains(@class, 'sectfoot')]//li[last()]") %>%
-      rvest::html_text(., trim = TRUE) -> n
-    if(length(n) == 0){
-      n <- "no"
-    }
-    remDr$getPageSource()[[1]] %>% rvest::read_html(html) %>% 
-      rvest::html_elements(xpath = "//div[contains(@class, 'sectfoot')]//li[last()]/a") %>%
-      rvest::html_attr("href") %>% paste0(url,.) -> url2
+
+  for (i in 1:as.numeric(n)) {
+    remDr$navigate(paste0(url, "/?search_page=", (i-1)))
+    df <- taz_getlink(remDr$getPageSource()[[1]])
   }
   
   return(df)
@@ -88,10 +55,10 @@ taz_getlink_url <- function(url){
 
 # taz_getlink_url("https://taz.de/!s=&eTagAb=2022-04-23&eTagBis=2022-04-25/")
 
-taz_go_thr_archive <- function(startdate){
-  seq(as.Date(startdate)-1, Sys.Date()-2, by="days") %>% 
+taz_go_thr_archive <- function(startdate, enddate){
+  seq(as.Date(startdate)-1, as.Date(enddate)-2, by="days") %>% 
     format.Date(format="%Y-%m-%d") -> V1
-  seq(as.Date(startdate)+1, Sys.Date(), by="days") %>% 
+  seq(as.Date(startdate)+1, as.Date(enddate), by="days") %>% 
     format.Date(format="%Y-%m-%d") -> V2
   
   paste0("!s=&eTagAb=", V1, "&eTagBis=", V2, "/") -> V3
@@ -104,9 +71,20 @@ taz_go_thr_archive <- function(startdate){
 }
 
 
-taz_go_thr_archive(startdate = "2023-12-31") -> valid_links
+taz_go_thr_archive(startdate = "2023-01-01", enddate = "2023-06-01") -> valid_links1
 
-valid_links <- dplyr::distinct(valid_links)
+taz_go_thr_archive(startdate = "2023-06-01", enddate = "2023-12-01") -> valid_links2
+
+taz_go_thr_archive(startdate = "2023-12-01", enddate = "2024-06-01") -> valid_links3
+
+taz_go_thr_archive(startdate = "2024-06-01", enddate = "2024-12-01") -> valid_links4
+
+taz_go_thr_archive(startdate = "2024-12-01", enddate = Sys.Date()) -> valid_links5
+
+
+
+valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2, valid_links3,
+                               valid_links4, valid_links5))
 
 remDr$close()
 z <- rD$server$stop()

@@ -14,12 +14,12 @@ remDr <- rD[["client"]]
 #Sys.setlocale("LC_TIME", "C")
 Sys.setlocale("LC_TIME", "de_DE")
 
-#pjs_session$go("https://www.badische-zeitung.de/archiv/2022/01/03")
+#pjs_session$go("https://www.badische-zeitung.de/archiv/2023/01/03")
 
 #function for geting links from page
-merkur_getlink <- function(html){
-  
-  # html <- remDr$getPageSource()[[1]]
+merkur_getlink <- function(html, givedate){
+  #Sys.sleep(5)
+  html <- remDr$getPageSource()[[1]]
   # html <- pjs_session$getUrl()
   rvest::read_html(html) %>% 
     rvest::html_elements(xpath = "//a[contains(@class, 'id-LinkOverlay-link')]") %>% 
@@ -29,130 +29,73 @@ merkur_getlink <- function(html){
     rvest::html_elements(xpath = "//a[contains(@class, 'id-LinkOverlay-link')]") %>% 
     rvest::html_attr("href") %>%
     paste0("https:", .)-> item_link
-
-  rvest::read_html(html) %>% 
-    rvest::html_elements(xpath = "//span[contains(@class, 'id-Teaser-el-content-meta-item id-Teaser-el-content-meta-item-date')]") %>%
-    rvest::html_text(., trim = TRUE) %>% 
-    stringr::str_extract("[0-9]+\\.[0-9]+\\.[0-9]+") %>% 
-    as.Date(. , tryFormat = "%d.%m.%y") -> item_pubdate
   
-print(1)
+  #givedate <- Sys.Date()
   
-    df <- data.frame(item_title, item_link, item_pubdate)
-    
-    return(df)
+  givedate -> item_pubdate
+  
+  print(1)
+  
+  df <- data.frame(item_title, item_link, item_pubdate)
+  
+  print("df")
+  
+  return(df)
 }
 
-#pjs_session$go("https://www.sueddeutsche.de/archiv/m%C3%BCnchen/2022/01")
+#pjs_session$go("https://www.sueddeutsche.de/archiv/m%C3%BCnchen/2023/01")
 
 #pjs_session$getUrl()
 
 #remDr$getPageSource()[[1]] %>% merkur_getlink()
 
-merkur_getlink_url <- function(url){
-  remDr$navigate(paste0("https://www.merkur.de/suche/index-vc-376496-", 1, url))
-  remDr$getPageSource()[[1]] %>% 
-  # pjs_session$go(paste0("https://www.merkur.de/suche/index-vc-376496-", 1, url))
-  # pjs_session$getSource() %>% 
-    rvest::read_html() %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'id-Swiper-navcount')]") %>%
-    rvest::html_text(., trim = TRUE) %>% stringr::str_extract("[0-9]+$") %>%
-    as.numeric() -> n
-  Sys.sleep(.2)
-  p <- 0
-  while(length(n) == 0){
-    p <- p+1
-    if(p > 30){
-      print("lzero")
-      remDr$navigate(paste0("https://www.merkur.de/suche/index-vc-376496-", 1, url))
-      p <- 0
+merkur_getlink_url <- function(date){
+  date %>% 
+    format.Date(format="%Y-%m-%d&fd=%Y-%m-%d") -> url
+  
+  remDr$navigate(paste0("https://www.merkur.de/suche?tt=1&tx=&sb=0&td=", url, "&qr="))
+
+  df <- merkur_getlink(remDr$getPageSource()[[1]], date)
+  
+  Sys.sleep(3)
+  
+  html <- remDr$getPageSource()[[1]]
+  
+  rvest::read_html(html) %>% 
+    rvest::html_elements(xpath = "//div[contains(@class, 'id-Swiper-navcount')]") %>% 
+    rvest::html_text(., trim = TRUE) -> navcount
+  
+  check <- as.numeric(stringr::str_extract(navcount, "^[0123456789]*")) < as.numeric(stringr::str_extract(navcount, "[0123456789]*$"))
+  
+  print(check)
+
+  
+  if(length(navcount) == 0){
+    return(df)
+  } else {
+    while(check){
+      
+      webElem <- remDr$findElement(using = "xpath", "//div[contains(@class, 'id-Swiper-navnew-nextWrap')]")
+      webElem$clickElement()
+      
+      Sys.sleep(sample((100:300)/100, 1))
+      
+      df <- dplyr::distinct(rbind(df, merkur_getlink(remDr$getPageSource()[[1]], date)))
+      # df <- rbind(df, merkur_getlink(pjs_session$getSource()))
+      print(nrow(df))
+      
+      html <- remDr$getPageSource()[[1]]
+      
+      
+      rvest::read_html(html) %>% 
+        rvest::html_elements(xpath = "//div[contains(@class, 'id-Swiper-navcount')]") %>% 
+        rvest::html_text(., trim = TRUE) -> navcount
+      
+      check <- as.numeric(stringr::str_extract(navcount, "^[0123456789]*")) < as.numeric(stringr::str_extract(navcount, "[0123456789]*$"))
+      
+      print(check)
     }
-
-    Sys.sleep(.05)
-    remDr$getPageSource()[[1]] %>% 
-    # pjs_session$getSource() %>% 
-      rvest::read_html() %>% 
-      rvest::html_elements(xpath = "//div[contains(@class, 'id-Swiper-navcount')]") %>%
-      rvest::html_text(., trim = TRUE) %>% stringr::str_extract("[0-9]+$") %>%
-      as.numeric() -> n
   }
-  
-  if(is.na(n)){
-    Sys.sleep(5)
-    remDr$getPageSource()[[1]] %>% 
-    # pjs_session$getSource() %>% 
-      rvest::read_html() %>% 
-      rvest::html_elements(xpath = "//div[contains(@class, 'id-Swiper-navcount')]") %>%
-      rvest::html_text(., trim = TRUE) %>% stringr::str_extract("[0-9]+$") %>%
-      as.numeric() -> n
-  }
-  
-
-  print(remDr$getCurrentUrl())
-  # print(pjs_session$getUrl())
-  df <- merkur_getlink(remDr$getPageSource()[[1]])
-  # df <- merkur_getlink(pjs_session$getSource())
-  print(nrow(df))
-  remDr$getPageSource()[[1]] %>% 
-  # pjs_session$getSource() %>%
-    rvest::read_html() %>% 
-    rvest::html_elements(xpath = "//div[contains(@class, 'id-Swiper-navcount')]") %>%
-    rvest::html_text(., trim = TRUE) %>% stringr::str_extract("[0-9]+$") %>%
-    as.numeric() -> n
-  
-  if(is.na(n)){
-    Sys.sleep(3)
-    remDr$getPageSource()[[1]] %>% 
-    # pjs_session$getSource() %>%
-      rvest::read_html() %>% 
-      rvest::html_elements(xpath = "//div[contains(@class, 'id-Swiper-navcount')]") %>%
-      rvest::html_text(., trim = TRUE) %>% stringr::str_extract("[0-9]+$") %>%
-      as.numeric() -> n
-  }
-  
-  print(paste("n is ", n))
-  i <- 2
-  print(paste("i is ", i))
-
-  while (i<=n) {
-    
-    remDr$navigate(paste0("https://www.merkur.de/suche/index-vc-376496-", i, url))
-    # pjs_session$go(paste0("https://www.merkur.de/suche/index-vc-376496-", 1, url))
-    # print(pjs_session$getUrl())
-
-    Sys.sleep(.2)
-    remDr$getPageSource()[[1]] %>% 
-    # pjs_session$getSource() %>% 
-      rvest::read_html() %>% 
-      rvest::html_elements(xpath = "//div[contains(@class, 'id-Swiper-navcount')]") %>%
-      rvest::html_text(., trim = TRUE) %>% stringr::str_extract("[0-9]+$") %>%
-      as.numeric() -> m
-    p <- 0
-    while(length(m) == 0){
-      p <- p+1
-      if(p > 30){
-        print("lzero")
-        remDr$navigate(paste0("https://www.merkur.de/suche/index-vc-376496-", i, url))
-        p <- 0
-      }
-
-      Sys.sleep(.05)
-      remDr$getPageSource()[[1]] %>% 
-      # pjs_session$getSource() %>% 
-        rvest::read_html() %>% 
-        rvest::html_elements(xpath = "//div[contains(@class, 'id-Swiper-navcount')]") %>%
-        rvest::html_text(., trim = TRUE) %>% stringr::str_extract("[0-9]+$") %>%
-        as.numeric() -> m
-    }
-    
-    print(remDr$getCurrentUrl())
-    # print(pjs_session$getUrl())
-    df <- rbind(df, merkur_getlink(remDr$getPageSource()[[1]]))
-    # df <- rbind(df, merkur_getlink(pjs_session$getSource()))
-    print(nrow(df))
-    i <- i + 1
-  }
-  
   return(df)
 }
 
@@ -160,42 +103,69 @@ merkur_getlink_url <- function(url){
 
 ## doesn't work headless - no idea why, individual pages work - sometimes not
 
-merkur_go_thr_archive <- function(startdate, enddate, rubrik){
-
-  seq(as.Date(startdate), as.Date(enddate), by="days") %>% 
-    format.Date(format="%Y-%m-%d&fd=%Y-%m-%d") -> V1
+merkur_go_thr_archive <- function(startdate, enddate){
+  
+  seq(as.Date(startdate), as.Date(enddate), by="days") -> V1
 
   
   V1 %>%
-    paste0(".html?tt=1&tx=&sb=0&td=", .,"&qr=", rubrik) %>%
     purrr::map_df(~merkur_getlink_url(.)) -> valid_links
   print(Sys.time())
   return(valid_links)
 }
 
-#merkur_go_thr_archive(startdate = "2021-12-31", enddate = "2022-01-31", "") -> valid_links
+# merkur_go_thr_archive_2 <- function(startdate, enddate){
+#   remDr$navigate("https://merkur.de")
+#   
+#   html <- remDr$getPageSource()[[1]]
+# 
+#   # rvest::read_html(html) %>% 
+#   #   rvest::html_elements(xpath = "//a[contains(@class, 'id-MainNavV2-el-link')]") %>% 
+#   #   rvest::html_text(., trim = TRUE) -> rubrics
+#   
+#   rubic %>% merkur_go_thr_archive(startdate, enddate, .)
+# }
 
-merkur_go_thr_archive(startdate = "2022-01-01", enddate = "2022-02-01", "") -> valid_links1
+#merkur_go_thr_archive(startdate = "2021-12-31", enddate = "2023-01-31", "") -> valid_links
 
-merkur_go_thr_archive(startdate = "2022-02-01", enddate = "2022-04-01", "") -> valid_links2
+remDr$navigate("https://merkur.de")  ### click away thing
 
-merkur_go_thr_archive(startdate = "2022-04-01", enddate = "2022-06-01", "") -> valid_links3
+merkur_go_thr_archive(startdate = "2023-01-01", enddate = "2023-02-01") -> valid_links1
 
-merkur_go_thr_archive(startdate = "2022-06-01", enddate = "2022-08-01", "") -> valid_links4
+merkur_go_thr_archive(startdate = "2023-02-01", enddate = "2023-04-01") -> valid_links2
 
-merkur_go_thr_archive(startdate = "2022-08-01", enddate = "2022-10-01", "") -> valid_links5
+merkur_go_thr_archive(startdate = "2023-04-01", enddate = "2023-06-01") -> valid_links3
 
-merkur_go_thr_archive(startdate = "2022-10-01", enddate = "2022-12-01", "") -> valid_links6
+merkur_go_thr_archive(startdate = "2023-06-01", enddate = "2023-08-01") -> valid_links4
 
-merkur_go_thr_archive(startdate = "2022-12-01", enddate = "2023-02-01", "") -> valid_links7
+merkur_go_thr_archive(startdate = "2023-08-01", enddate = "2023-10-01") -> valid_links5
 
-merkur_go_thr_archive(startdate = "2023-02-01", enddate = Sys.Date(), "") -> valid_links8
+merkur_go_thr_archive(startdate = "2023-10-01", enddate = "2023-12-01") -> valid_links6
+
+merkur_go_thr_archive(startdate = "2023-12-01", enddate = "2024-02-01") -> valid_links7
+
+merkur_go_thr_archive(startdate = "2024-02-01", enddate = "2024-04-01") -> valid_links8
+
+merkur_go_thr_archive(startdate = "2024-04-01", enddate = "2024-06-01") -> valid_links9
+
+merkur_go_thr_archive(startdate = "2024-06-01", enddate = "2024-08-01") -> valid_links10
+
+merkur_go_thr_archive(startdate = "2024-08-01", enddate = "2024-10-01") -> valid_links11
+
+merkur_go_thr_archive(startdate = "2024-10-01", enddate = "2024-12-01") -> valid_links12
+
+merkur_go_thr_archive(startdate = "2024-12-01", enddate = "2025-01-01") -> valid_links13
+
+merkur_go_thr_archive(startdate = "2025-01-01", enddate = Sys.Date()) -> valid_links14
 
 
 valid_links <- dplyr::distinct(rbind(valid_links1, valid_links2,
                                      valid_links3, valid_links4,
                                      valid_links5, valid_links6,
-                                     valid_links7, valid_links8))
+                                     valid_links7, valid_links8,
+                                     valid_links9, valid_links10,
+                                     valid_links11, valid_links12,
+                                     valid_links13, valid_links14))
 
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 

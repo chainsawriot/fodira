@@ -169,78 +169,78 @@ c("politik") %>%
   purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links1
 
 c("region/polizeiberichte") %>%
- purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links2
+ purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links2
 
 c("region/ansbach") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links3
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links3
 
 c("region/bamberg") %>%
   purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links4
 
 c("region/bayreuth") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links5
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links5
 
 c("region/erlangen") %>%
-  purrr::map_df(~nordb_getlink(. , "2023-08-31")) -> valid_links6
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links6
 
 ###########################################
 c("region/forchheim") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links7
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links7
 
 ###########################################
 c("region/fuerth") %>%
-  purrr::map_df(~nordb_getlink(. , "2023-08-31")) -> valid_links8
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links8
 
 c("region/gunzenhausen") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links9
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links9
 
 c("region/herzogenaurach") %>%
-  purrr::map_df(~nordb_getlink(. , "2023-08-31")) -> valid_links10
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links10
 
 c("region/hoechstadt") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-10-01")) -> valid_links11
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links11
 
 c("region/neumarkt") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links12
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links12
 
 c("region/neustadt-aisch-bad-windsheim") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links13
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links13
 
 ##############################################################
 c("region/nuernberg") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-03-31")) -> valid_links14
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links14
 
 c("region/nuernberger-land") %>%
-  purrr::map_df(~nordb_getlink(. , "2023-08-31")) -> valid_links15
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links15
 
 c("region/regensburg") %>%
-  purrr::map_df(~nordb_getlink(. , "2023-08-31")) -> valid_links16
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links16
 
 c("region/roth") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links17
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links17
 
 c("region/schwabach") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links18
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links18
 
 c("region/weißenburg") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links19
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links19
 
 c("wirtschaft") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links20
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links20
 
 c("panorama") %>%
-  purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links21
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links21
 
 #save.image(file= "nordb_2.RData")
 
  c("kultur") %>%
-   purrr::map_df(~nordb_getlink(. , "2023-08-31")) -> valid_links22
+   purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links22
 
-# c("freizeit-events") %>%
-#   purrr::map_df(~nordb_getlink(. , "2022-08-31")) -> valid_links23
+c("freizeit-events") %>%
+  purrr::map_df(~nordb_getlink(. , "2023-01-01")) -> valid_links23
 
 # c("essen-trinken") %>%
-#   purrr::map_df(~nordb_getlink(. , "2022-10-01")) -> valid_links24
+#   purrr::map_df(~nordb_getlink(. , "2023-10-01")) -> valid_links24
 
 c("boulevard") %>%
   purrr::map_df(~nordb_getlink(. , "2023-01-31")) -> valid_links25
@@ -262,15 +262,16 @@ valid_links <- dplyr::distinct(rbind(valid_links1, valid_links10, #valid_links11
                                      valid_links12,
                 valid_links13, valid_links14, valid_links15, valid_links16,
                 valid_links17, #valid_links18, 
-                valid_links19, #valid_links2,
+                #valid_links19, #valid_links2,
                 valid_links20, valid_links21, valid_links22,
                 #valid_links23, 
                 #valid_links24, 
                 valid_links25, valid_links26,
                 valid_links27, valid_links28, valid_links3, 
                 valid_links4,         
-                valid_links5,  valid_links6,  valid_links7,  valid_links8, 
-                valid_links9))
+                valid_links5,  valid_links6,  valid_links7,  valid_links8#, 
+                #valid_links9
+                ))
 
 valid_links %>% dplyr::rename(title = item_title, link = item_link, pubdate = item_pubdate) %>% 
   dplyr::mutate(pub = "nordbayern.de", description = NA) %>%
@@ -280,3 +281,4 @@ saveRDS(valid_links, "nordbayern.de.RDS")
 
 remDr$close()
 z <- rD$server$stop()
+rm(list=ls())
